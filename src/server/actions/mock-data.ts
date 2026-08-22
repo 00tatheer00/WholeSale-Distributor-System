@@ -31,11 +31,12 @@ export const MOCK_USERS = [
 ];
 
 export const MOCK_CATEGORIES = [
-  { id: "cat-1", name: "Antibiotics & Anti-infectives", description: "Broad-spectrum and narrow-spectrum antibacterial formulations" },
-  { id: "cat-2", name: "Analgesics & Antipyretics", description: "Pain management, NSAIDs, and fever reducing agents" },
-  { id: "cat-3", name: "Cardiovascular & Antihypertensives", description: "Blood pressure regulation, statins, and cardiac medicines" },
-  { id: "cat-4", name: "Gastrointestinal & Antacids", description: "Proton pump inhibitors, H2 blockers, and antacids" },
-  { id: "cat-5", name: "Respiratory & Antiallergics", description: "Bronchodilators, antihistamines, and cough syrups" },
+  { id: "cat-1", name: "Antibiotics & Anti-infectives", code: "ANTIBIO", description: "Broad-spectrum and narrow-spectrum antibacterial formulations", isActive: true, medicineCount: 2, createdAt: "2026-01-10", updatedAt: "2026-01-10" },
+  { id: "cat-2", name: "Analgesics & Antipyretics", code: "ANALGESIC", description: "Pain management, NSAIDs, and fever reducing agents", isActive: true, medicineCount: 1, createdAt: "2026-01-10", updatedAt: "2026-01-10" },
+  { id: "cat-3", name: "Cardiovascular & Antihypertensives", code: "CARDIO", description: "Blood pressure regulation, statins, and cardiac medicines", isActive: true, medicineCount: 0, createdAt: "2026-01-10", updatedAt: "2026-01-10" },
+  { id: "cat-4", name: "Gastrointestinal & Antacids", code: "GASTRO", description: "Proton pump inhibitors, H2 blockers, and antacids", isActive: true, medicineCount: 2, createdAt: "2026-01-10", updatedAt: "2026-01-10" },
+  { id: "cat-5", name: "Respiratory & Antiallergics", code: "RESP", description: "Bronchodilators, antihistamines, and cough syrups", isActive: true, medicineCount: 0, createdAt: "2026-01-10", updatedAt: "2026-01-10" },
+  { id: "cat-6", name: "Endocrine & Diabetes Care", code: "DIAB", description: "Human insulins, oral hypoglycemics, and metabolic agents", isActive: true, medicineCount: 1, createdAt: "2026-01-10", updatedAt: "2026-01-10" },
 ];
 
 export const MOCK_EXPENSE_CATEGORIES = [
@@ -196,7 +197,12 @@ export const MOCK_MEDICINES = [
     isColdChain: false,
     isNarcotic: false,
     primaryUnitName: "Box (20x10)",
+    stripPerBox: 20,
+    unitsPerStrip: 10,
+    batchesCount: 1,
     status: "ACTIVE" as const,
+    createdAt: "2026-01-15",
+    updatedAt: "2026-01-15",
   },
   {
     id: "med-2",
@@ -219,7 +225,12 @@ export const MOCK_MEDICINES = [
     isColdChain: false,
     isNarcotic: false,
     primaryUnitName: "Box (20x10)",
+    stripPerBox: 20,
+    unitsPerStrip: 10,
+    batchesCount: 1,
     status: "ACTIVE" as const,
+    createdAt: "2026-01-15",
+    updatedAt: "2026-01-15",
   },
   {
     id: "med-3",
@@ -242,7 +253,12 @@ export const MOCK_MEDICINES = [
     isColdChain: false,
     isNarcotic: false,
     primaryUnitName: "Box (10x10)",
+    stripPerBox: 10,
+    unitsPerStrip: 10,
+    batchesCount: 1,
     status: "ACTIVE" as const,
+    createdAt: "2026-01-15",
+    updatedAt: "2026-01-15",
   },
   {
     id: "med-4",
@@ -265,7 +281,12 @@ export const MOCK_MEDICINES = [
     isColdChain: false,
     isNarcotic: false,
     primaryUnitName: "Box (5x10)",
+    stripPerBox: 5,
+    unitsPerStrip: 10,
+    batchesCount: 1,
     status: "ACTIVE" as const,
+    createdAt: "2026-01-15",
+    updatedAt: "2026-01-15",
   },
   {
     id: "med-5",
@@ -288,7 +309,12 @@ export const MOCK_MEDICINES = [
     isColdChain: false,
     isNarcotic: false,
     primaryUnitName: "Box (10x10)",
+    stripPerBox: 10,
+    unitsPerStrip: 10,
+    batchesCount: 1,
     status: "ACTIVE" as const,
+    createdAt: "2026-01-15",
+    updatedAt: "2026-01-15",
   },
   {
     id: "med-6",
@@ -311,7 +337,12 @@ export const MOCK_MEDICINES = [
     isColdChain: true,
     isNarcotic: false,
     primaryUnitName: "Vial",
+    stripPerBox: 1,
+    unitsPerStrip: 1,
+    batchesCount: 1,
     status: "ACTIVE" as const,
+    createdAt: "2026-01-15",
+    updatedAt: "2026-01-15",
   },
 ];
 

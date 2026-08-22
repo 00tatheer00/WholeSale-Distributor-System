@@ -29,6 +29,12 @@ export const NAVIGATION_SECTIONS: NavigationSection[] = [
         description: "Drug master catalog, dosage forms, generics & pricing",
       },
       {
+        title: "Categories",
+        href: "/categories",
+        iconName: "Layers",
+        description: "Therapeutic classifications and drug categories",
+      },
+      {
         title: "Inventory & FEFO",
         href: "/inventory",
         iconName: "Boxes",

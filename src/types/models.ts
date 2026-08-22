@@ -1,13 +1,26 @@
+export interface CategoryRecord {
+  id: string;
+  name: string;
+  code?: string | null;
+  description?: string | null;
+  isActive: boolean;
+  medicineCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface MedicineRecord {
   id: string;
   brandName: string;
   genericName: string;
   strength: string;
   dosageForm: string;
+  skuCode?: string | null;
+  darNumber?: string | null;
   categoryId: string;
   categoryName: string;
-  supplierId: string;
-  supplierName: string;
+  supplierId?: string | null;
+  supplierName?: string | null;
   unitTradePrice: number;
   unitMrp: number;
   wholesaleBasePrice: number;
@@ -19,7 +32,13 @@ export interface MedicineRecord {
   isColdChain: boolean;
   isNarcotic: boolean;
   primaryUnitName: string;
+  packSize?: string | null;
+  stripPerBox: number;
+  unitsPerStrip: number;
+  batchesCount?: number;
   status: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface SupplierRecord {

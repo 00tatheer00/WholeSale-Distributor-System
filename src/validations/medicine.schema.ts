@@ -24,6 +24,8 @@ export const recordStatusEnum = z.enum(["ACTIVE", "INACTIVE", "DISCONTINUED"]);
 export const medicineSchema = z.object({
   brandName: z.string().min(2, "Brand name must be at least 2 characters").max(100),
   genericName: z.string().min(2, "Generic name must be at least 2 characters").max(150),
+  skuCode: z.string().optional().nullable(),
+  darNumber: z.string().optional().nullable(),
   strength: z.string().min(1, "Dosage strength is required (e.g. 500mg, 10ml)"),
   dosageForm: dosageFormEnum.default("TABLET"),
   categoryId: z.string().min(1, "Please select a medicine category"),
