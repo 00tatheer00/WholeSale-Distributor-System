@@ -3,7 +3,7 @@
 **Project**: Wholesale Medicine Distribution Management System (WMDMS)  
 **Repository**: [https://github.com/00tatheer00/WholeSale-Distributor-System.git](https://github.com/00tatheer00/WholeSale-Distributor-System.git)  
 **Branch**: `main`  
-**Current State**: **Phase 4 Complete — Ready for Phase 5**  
+**Current State**: **Phase 5 Complete — Ready for Phase 6**  
 **Last Updated**: 2026-08-22  
 
 ---
@@ -17,8 +17,8 @@
 | **Phase 2** | Database & Prisma ORM Engine | ✅ Completed | `prisma/schema.prisma` (24 models, relations, indexes, enums, Money/Decimals, `prisma/seed.ts`). |
 | **Phase 3** | Authentication, RBAC & Admin Core | ✅ Completed | Supabase Auth integration, session management, middleware route guards, RBAC, profile & security settings. |
 | **Phase 4** | Admin Dashboard & Application Overview | ✅ Completed | Real-time cockpit at `/dashboard`, 8 core KPI cards, 4 operational indicators, Recharts sales/purchase trends, top medicines, P&L statement, customer/supplier dues, date range filter (`dashboard.service.ts`). |
-| **Phase 5** | Medicines Master & Formulation Catalog | ⏳ **Upcoming** | Full CRUD for Medicines, Generics, Strengths, Dosage Forms, Packaging Units, Strip/Box conversion ratios, and Narcotics/Cold-Chain flags. |
-| **Phase 6** | Inventory, FEFO Batches & Stock Adjustments | ⏳ Planned | Batch management, Expiry tracking, Rack locations, Stock balance audit, Adjustment vouchers. |
+| **Phase 5** | Medicine, Category & Batch Management | ✅ Completed | Full Category CRUD at `/categories`, Medicine Master CRUD with server-side search, filtering, sorting, pagination at `/medicines`, Medicine Details & FEFO Batch Engine at `/medicines/[id]`, Expiry foundation (`src/lib/expiry-utils.ts`). |
+| **Phase 6** | Inventory & Stock Transactions | ⏳ **Upcoming** | Batch-level inventory ledger, physical count adjustments, damage/expiry write-offs, quarantine holding, stock transfer vouchers. |
 | **Phase 7** | Supplier Management & AP Ledger | ⏳ Planned | Vendor directory, Purchase terms, AP balance ledger, Statement generation. |
 | **Phase 8** | Procurement & Goods Received Notes (GRN) | ⏳ Planned | Purchase Orders, Consignment intake, Batch creation upon receipt, Supplier invoice reconciliation. |
 | **Phase 9** | Customer Pharmacies & Credit Barrier Engine | ⏳ Planned | Pharmacy onboarding, Drug license verification, Route assignment, Real-time credit limits & overdue holds. |
@@ -42,13 +42,4 @@
 - **Verification Status**:
   - `npm run typecheck` $\rightarrow$ **0 Errors**
   - `npm run lint` $\rightarrow$ **0 Errors**
-  - `npm run build` $\rightarrow$ **21/21 Routes compiled successfully**
-
----
-
-## 3. Mandatory Workflow for System Continuations
-
-Whenever resuming work after a restart, session disconnect, or new prompt:
-1. Review this document (`docs/PROJECT_STATUS.md`) and `MASTER_BLUEPRINT.md`.
-2. Check `git status` to verify working branch state.
-3. Automatically commit all new code changes and push to `https://github.com/00tatheer00/WholeSale-Distributor-System.git`.
+  - `npm run build` $\rightarrow$ **22/22 Routes compiled and optimized successfully**
