@@ -43,3 +43,8 @@
   - `npm run typecheck` $\rightarrow$ **0 Errors**
   - `npm run lint` $\rightarrow$ **0 Errors**
   - `npm run build` $\rightarrow$ **25/25 Routes compiled and optimized successfully**
+- **UI/UX Refinements**:
+  - Pure Apple-inspired White Theme (`#FBFBFD` canvas, Apple `#0071E3` Blue, `rounded-2xl` squircles).
+  - Streamlined 5-module core navigation and Apple mobile bottom bar with thumb navigation.
+  - Interactive **System Guide (Roman Urdu)** modal directly accessible via Header info button `(i)`.
+  - Realistic wholesale transactions seeded (Square, Beximco, Green Life Pharmacy, Popular Hospital Dispensary, Invoices, Collections & Fuel/Cold-chain Expenses).
