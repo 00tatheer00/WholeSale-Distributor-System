@@ -69,7 +69,7 @@ export function SalesTrendChart({ data }: SalesTrendChartProps) {
                   axisLine={false}
                   fontSize={11}
                   tick={{ fill: "hsl(var(--muted-foreground))" }}
-                  tickFormatter={(val) => `৳${(val / 1000).toFixed(0)}k`}
+                  tickFormatter={(val) => `AFN ${(val / 1000).toFixed(0)}k`}
                 />
                 <Tooltip
                   content={({ active, payload, label }) => {

@@ -544,7 +544,7 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-foreground">Monthly Sales Target (৳ BDT)</Label>
+                <Label className="text-xs font-semibold text-foreground">Monthly Sales Target (AFN / ؋)</Label>
                 <Input
                   type="number"
                   min="0"

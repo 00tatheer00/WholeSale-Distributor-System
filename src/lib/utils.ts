@@ -9,19 +9,20 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Formats a numeric currency amount with standardized locale representation.
+ * Formats a numeric currency amount with standardized Afghanistan Afghani (AFN / ؋) representation.
  */
 export function formatCurrency(
-  amount: number,
-  currency: string = "USD",
+  amount: number | string,
+  currency: string = "AFN",
   locale: string = "en-US"
 ): string {
+  const num = typeof amount === "number" ? amount : Number(amount) || 0;
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount);
+  }).format(num);
 }
 
 /**

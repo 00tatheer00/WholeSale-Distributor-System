@@ -77,10 +77,10 @@ export function InventoryReportClient({
       "Batch Number",
       "Expiry Date",
       "Units on Hand",
-      "Unit Cost (BDT)",
-      "Trade Price (BDT)",
-      "Cost Valuation (BDT)",
-      "Potential Selling Revenue (BDT)",
+      "Unit Cost (AFN)",
+      "Trade Price (AFN)",
+      "Cost Valuation (AFN)",
+      "Potential Selling Revenue (AFN)",
     ];
 
     const rows = data.items.map((it: any) => [

@@ -84,11 +84,11 @@ export function SalesReportClient({
       "Customer Pharmacy",
       "Sales Representative",
       "Date",
-      "Grand Total (BDT)",
-      "Paid Amount (BDT)",
-      "Due Amount (BDT)",
-      "COGS (BDT)",
-      "Gross Profit (BDT)",
+      "Grand Total (AFN)",
+      "Paid Amount (AFN)",
+      "Due Amount (AFN)",
+      "COGS (AFN)",
+      "Gross Profit (AFN)",
       "Status",
     ];
 

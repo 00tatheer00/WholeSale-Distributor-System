@@ -200,7 +200,7 @@ export function SaleDetailsClient({ sale }: SaleDetailsClientProps) {
       {/* 3. Top Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-4.5 shadow-sm">
-          <div className="text-xs font-medium text-sky-800">Grand Total (BDT)</div>
+          <div className="text-xs font-medium text-sky-800">Grand Total (AFN)</div>
           <div className="mt-2 text-2xl font-bold text-sky-950 font-mono">
             {formatCurrency(sale.grandTotal)}
           </div>

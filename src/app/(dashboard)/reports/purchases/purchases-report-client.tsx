@@ -72,9 +72,9 @@ export function PurchasesReportClient({
       "Supplier Invoice #",
       "Manufacturer Supplier",
       "Date",
-      "Total Amount (BDT)",
-      "Paid Amount (BDT)",
-      "Due Balance (BDT)",
+      "Total Amount (AFN)",
+      "Paid Amount (AFN)",
+      "Due Balance (AFN)",
       "Status",
     ];
 

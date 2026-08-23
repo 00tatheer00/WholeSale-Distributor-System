@@ -748,7 +748,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                 <div className="space-y-3 pt-2">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <Label className="text-xs font-semibold text-foreground">Amount Paid (৳ BDT)</Label>
+                      <Label className="text-xs font-semibold text-foreground">Amount Paid (AFN / ؋)</Label>
                       <Input
                         type="number"
                         min="0"
@@ -772,7 +772,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                           <SelectItem value="CASH">Cash Deposit</SelectItem>
                           <SelectItem value="BANK_TRANSFER">Bank Online Transfer</SelectItem>
                           <SelectItem value="CHEQUE">Cheque / Demand Draft</SelectItem>
-                          <SelectItem value="MFS_BKASH_NAGAD">bKash / Nagad / MFS</SelectItem>
+                          <SelectItem value="MFS_BKASH_NAGAD">Hawala / Digital Wallet</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -784,7 +784,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                       <div className="space-y-1">
                         <Label className="text-xs font-semibold text-foreground">Bank Name / Wallet</Label>
                         <Input
-                          placeholder="e.g. Dutch-Bangla Bank"
+                          placeholder="e.g. Kabul Bank / Da Afghanistan Bank"
                           value={paymentBank}
                           onChange={(e) => setPaymentBank(e.target.value)}
                           className="h-9 rounded-xl bg-muted/20 text-xs"
@@ -822,7 +822,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs font-semibold text-foreground">Delivery Charge (৳ BDT)</Label>
+                  <Label className="text-xs font-semibold text-foreground">Delivery Charge (AFN / ؋)</Label>
                   <Input
                     type="number"
                     min="0"

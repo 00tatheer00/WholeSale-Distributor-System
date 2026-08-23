@@ -492,7 +492,7 @@ export function CustomerDetailsClient({ customer }: CustomerDetailsClientProps) 
                     <th className="px-4 py-3">Date</th>
                     <th className="px-4 py-3">Method</th>
                     <th className="px-4 py-3">Bank / Cheque Details</th>
-                    <th className="px-4 py-3 text-right">Amount (BDT)</th>
+                    <th className="px-4 py-3 text-right">Amount (AFN)</th>
                     <th className="px-4 py-3">Recorded By</th>
                     <th className="px-4 py-3 text-center">Status</th>
                   </tr>

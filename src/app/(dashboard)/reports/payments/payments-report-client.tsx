@@ -48,7 +48,7 @@ export function PaymentsReportClient({ reportData }: PaymentsReportClientProps) 
 
   const handleExportCSV = () => {
     if (activeTab === "CUSTOMERS") {
-      const headers = ["Receipt #", "Customer Pharmacy", "Sales Representative", "Date", "Method", "Amount (BDT)"];
+      const headers = ["Receipt #", "Customer Pharmacy", "Sales Representative", "Date", "Method", "Amount (AFN)"];
       const rows = data.customerPayments.map((p: any) => [
         p.receiptNumber,
         p.customerName,
@@ -59,7 +59,7 @@ export function PaymentsReportClient({ reportData }: PaymentsReportClientProps) 
       ]);
       exportToCSV(`Customer_Collections_Report_${data.startDate}_to_${data.endDate}`, headers, rows);
     } else {
-      const headers = ["Voucher #", "Manufacturer Supplier", "Date", "Method", "Amount (BDT)"];
+      const headers = ["Voucher #", "Manufacturer Supplier", "Date", "Method", "Amount (AFN)"];
       const rows = data.supplierPayments.map((p: any) => [
         p.voucherNumber,
         p.supplierName,

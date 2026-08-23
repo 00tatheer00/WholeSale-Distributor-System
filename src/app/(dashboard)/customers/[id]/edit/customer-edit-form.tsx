@@ -360,7 +360,7 @@ export function CustomerEditForm({ customer }: CustomerEditFormProps) {
             {/* Credit Limit */}
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground">
-                Credit Limit (৳ BDT) <span className="text-rose-500">*</span>
+                Credit Limit (AFN / ؋) <span className="text-rose-500">*</span>
               </Label>
               <Input
                 type="number"

@@ -399,7 +399,7 @@ export function DistributorDetailsClient({
                   <th className="px-5 py-3.5">Date</th>
                   <th className="px-4 py-3.5">Category</th>
                   <th className="px-4 py-3.5">Description</th>
-                  <th className="px-4 py-3.5 text-right">Amount (BDT)</th>
+                  <th className="px-4 py-3.5 text-right">Amount (AFN)</th>
                   <th className="px-5 py-3.5 text-center">Status</th>
                 </tr>
               </thead>
@@ -467,7 +467,7 @@ export function DistributorDetailsClient({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-foreground">Amount (৳ BDT)</Label>
+                <Label className="text-xs font-semibold text-foreground">Amount (AFN / ؋)</Label>
                 <Input
                   type="number"
                   min="1"

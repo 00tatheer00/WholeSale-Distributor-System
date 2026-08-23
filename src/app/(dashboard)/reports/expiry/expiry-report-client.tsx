@@ -66,8 +66,8 @@ export function ExpiryReportClient({ reportData }: ExpiryReportClientProps) {
       "Quantity on Hand",
       "Expiry Date",
       "Days Remaining",
-      "Unit Cost Price (BDT)",
-      "Inventory Value at Risk (BDT)",
+      "Unit Cost Price (AFN)",
+      "Inventory Value at Risk (AFN)",
       "Status",
     ];
 

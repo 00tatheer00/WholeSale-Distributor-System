@@ -560,7 +560,7 @@ export function PaymentsClient({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-foreground">
-                  Payment Amount (৳ BDT) <span className="text-rose-500">*</span>
+                  Payment Amount (AFN / ؋) <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   type="number"

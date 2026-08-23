@@ -703,7 +703,7 @@ export function PurchaseFormClient({
             <CardHeader className="p-4 border-b border-border/50 bg-muted/20">
               <CardTitle className="text-sm font-semibold flex items-center justify-between">
                 <span>Invoice Breakdown</span>
-                <Badge variant="outline" className="font-mono text-[10px]">BDT (৳)</Badge>
+                <Badge variant="outline" className="font-mono text-[10px]">AFN (؋)</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 space-y-2.5 text-xs">

@@ -358,7 +358,7 @@ export default function NewCustomerPage() {
             {/* Credit Limit */}
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground">
-                Credit Limit (৳ BDT) <span className="text-rose-500">*</span>
+                Credit Limit (AFN / ؋) <span className="text-rose-500">*</span>
               </Label>
               <Input
                 type="number"
@@ -394,7 +394,7 @@ export default function NewCustomerPage() {
             {/* Opening Balance */}
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground">
-                Opening Balance Due (৳ BDT)
+                Opening Balance Due (AFN / ؋)
               </Label>
               <Input
                 type="number"

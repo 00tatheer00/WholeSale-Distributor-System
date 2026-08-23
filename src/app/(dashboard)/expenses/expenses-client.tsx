@@ -417,7 +417,7 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
                 <th className="px-4 py-3.5">Paid To / Payee</th>
                 <th className="px-4 py-3.5">Description</th>
                 <th className="px-4 py-3.5">Method</th>
-                <th className="px-4 py-3.5 text-right">Amount (BDT)</th>
+                <th className="px-4 py-3.5 text-right">Amount (AFN)</th>
                 <th className="px-4 py-3.5 text-center">Status</th>
                 <th className="px-5 py-3.5 text-right">Action</th>
               </tr>
@@ -589,7 +589,7 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
 
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-foreground">
-                  Amount (৳ BDT) <span className="text-rose-500">*</span>
+                  Amount (AFN / ؋) <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   type="number"

@@ -49,7 +49,7 @@ export function SupplierDuesClient({ reportData }: SupplierDuesClientProps) {
       "Drug License #",
       "Phone",
       "Credit Period (Days)",
-      "Outstanding Payable Due (BDT)",
+      "Outstanding Payable Due (AFN)",
       "Status",
     ];
 

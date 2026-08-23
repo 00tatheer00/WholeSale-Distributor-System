@@ -62,9 +62,9 @@ export function MedicinesReportClient({ reportData }: MedicinesReportClientProps
       "Generic Name",
       "Therapeutic Category",
       "Quantity Sold (Units)",
-      "Sales Revenue (BDT)",
-      "Historical COGS (BDT)",
-      "Gross Profit (BDT)",
+      "Sales Revenue (AFN)",
+      "Historical COGS (AFN)",
+      "Gross Profit (AFN)",
       "Gross Margin %",
     ];
 

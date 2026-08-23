@@ -56,9 +56,9 @@ export function CustomerDuesClient({ reportData }: CustomerDuesClientProps) {
       "Pharmacy Name",
       "Proprietor",
       "Phone",
-      "Credit Limit (BDT)",
-      "Current Due (BDT)",
-      "Available Credit (BDT)",
+      "Credit Limit (AFN)",
+      "Current Due (AFN)",
+      "Available Credit (AFN)",
       "Credit Utilization %",
       "Over Limit Status",
     ];
