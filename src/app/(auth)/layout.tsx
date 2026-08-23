@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Cross } from "lucide-react";
+import Link from "next/link";
+import { Cross, ShieldCheck, Sparkles } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -9,61 +10,56 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen grid lg:grid-cols-2 bg-background">
-      {/* Left Branding Hero Panel (Desktop) */}
-      <div className="relative hidden lg:flex flex-col justify-between p-12 bg-slate-900 text-white overflow-hidden">
-        {/* Background Gradient & Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 opacity-90" />
-        <div className="absolute inset-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:24px_24px] opacity-10" />
+    <div className="min-h-screen relative flex flex-col justify-between bg-[#FBFBFD] dark:bg-[#000000] text-foreground antialiased overflow-hidden">
+      {/* Apple-style Soft Ambient Lighting Effects */}
+      <div className="absolute top-[-10%] left-[20%] w-[550px] h-[550px] rounded-full bg-blue-400/10 dark:bg-blue-600/10 blur-[130px] pointer-events-none -z-10" />
+      <div className="absolute bottom-[-10%] right-[20%] w-[500px] h-[500px] rounded-full bg-emerald-400/10 dark:bg-emerald-600/10 blur-[140px] pointer-events-none -z-10" />
 
-        {/* Brand Header */}
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg">
-            <Cross className="h-6 w-6" />
+      {/* Top Navbar */}
+      <header className="w-full max-w-6xl mx-auto px-6 py-6 flex items-center justify-between z-10">
+        <Link
+          href="/login"
+          className="flex items-center gap-3 group transition-transform hover:scale-[1.02]"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0071E3] text-white shadow-sm shadow-blue-500/25">
+            <Cross className="h-5 w-5" />
           </div>
-          <div>
-            <h2 className="text-lg font-bold tracking-tight text-white">
+          <div className="flex flex-col">
+            <span className="text-base font-semibold tracking-tight text-[#1D1D1F] dark:text-[#F5F5F7]">
               {APP_NAME}
-            </h2>
-            <p className="text-xs text-slate-400 font-medium">
-              Enterprise Wholesale ERP
-            </p>
+            </span>
+            <span className="text-[10px] font-medium tracking-wider uppercase text-[#86868B]">
+              Cloud ERP Platform
+            </span>
           </div>
-        </div>
+        </Link>
 
-        {/* Center Pharmaceutical Value Proposition */}
-        <div className="relative z-10 max-w-md space-y-4">
-          <blockquote className="space-y-2">
-            <p className="text-xl font-medium leading-relaxed text-slate-200">
-              “Automating batch-level FEFO traceability, customer credit control, and real-time COGS profit intelligence for modern pharmaceutical distribution.”
-            </p>
-            <footer className="text-xs text-slate-400 font-mono">
-              Designed for Wholesalers & Licensed Stockists
-            </footer>
-          </blockquote>
-        </div>
-
-        {/* Footer Meta */}
-        <div className="relative z-10 flex items-center justify-between text-xs text-slate-400">
-          <span>Production Release v1.0.0</span>
-          <span>Regulatory Compliance (FEFO / DAR)</span>
-        </div>
-      </div>
-
-      {/* Right Form Container */}
-      <div className="flex flex-col justify-between p-6 sm:p-12 relative">
-        <div className="flex justify-end">
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/[0.04] dark:bg-white/[0.08] text-[11px] font-medium text-[#424245] dark:text-[#A1A1A6] border border-black/[0.04] dark:border-white/[0.06]">
+            <span className="h-2 w-2 rounded-full bg-[#34C759] animate-pulse" />
+            <span>v1.0 Production ERP</span>
+          </div>
           <ThemeToggle />
         </div>
+      </header>
 
-        <div className="mx-auto w-full max-w-md my-auto">
+      {/* Main Content Area */}
+      <main className="flex-1 flex items-center justify-center px-4 py-8 z-10">
+        <div className="w-full max-w-[460px]">
           {children}
         </div>
+      </main>
 
-        <div className="text-center text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} {APP_NAME}. Secure B2B Pharmaceutical System.
+      {/* Minimal Apple Footer */}
+      <footer className="w-full max-w-6xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#86868B] z-10 border-t border-black/[0.04] dark:border-white/[0.06]">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="h-4 w-4 text-[#0071E3]" />
+          <span>Licensed Wholesale Pharmaceutical Distribution Management System</span>
         </div>
-      </div>
+        <div>
+          &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
+        </div>
+      </footer>
     </div>
   );
 }

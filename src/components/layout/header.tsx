@@ -16,14 +16,14 @@ interface HeaderProps {
 
 export function Header({ onMobileMenuToggle }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-border/80 bg-background/80 px-6 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70 transition-all">
       {/* Left: Mobile Toggle & Breadcrumbs */}
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"
           size="icon"
           onClick={onMobileMenuToggle}
-          className="md:hidden h-9 w-9 text-muted-foreground"
+          className="md:hidden h-9 w-9 text-muted-foreground rounded-xl"
         >
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle menu</span>
@@ -37,28 +37,28 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
       {/* Center: Global Search Bar Placeholder */}
       <div className="hidden lg:flex items-center w-full max-w-md mx-4">
         <div className="relative w-full">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Search medicines, batches, customers, invoices (Press ⌘K)..."
-            className="w-full pl-9 pr-4 h-9 text-xs bg-muted/40 border-muted focus-visible:bg-background"
+            className="w-full pl-10 pr-4 h-9 text-xs rounded-full bg-muted/60 border-transparent focus-visible:bg-background focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/10 transition-all"
           />
         </div>
       </div>
 
       {/* Right: Company Badge, Theme, Notifications & User */}
-      <div className="flex items-center gap-2">
-        <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/80 text-secondary-foreground text-xs font-medium">
+      <div className="flex items-center gap-2.5">
+        <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-xs font-medium border border-border/50">
           <Building2 className="h-3.5 w-3.5 text-primary" />
-          <span className="truncate max-w-[160px]">Apex Pharma Dist Ltd.</span>
-          <Badge variant="outline" className="text-[10px] h-4 px-1 py-0 border-primary/40 text-primary">
+          <span className="truncate max-w-[160px] font-semibold">Apex Pharma Dist Ltd.</span>
+          <Badge variant="outline" className="text-[10px] h-4 px-1.5 py-0 border-primary/30 text-primary rounded-full bg-primary/5">
             Main Hub
           </Badge>
         </div>
 
         <ThemeToggle />
         <NotificationsPopover />
-        <div className="h-5 w-px bg-border mx-1" />
+        <div className="h-5 w-px bg-border/80 mx-1" />
         <UserNav />
       </div>
     </header>

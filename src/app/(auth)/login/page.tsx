@@ -5,20 +5,69 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Lock, Mail, Eye, EyeOff, ShieldAlert, Loader2, ArrowRight } from "lucide-react";
+import {
+  Lock,
+  Mail,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  Loader2,
+  ArrowRight,
+  UserCheck,
+  Building2,
+  Package,
+  Wallet,
+  Sparkles,
+} from "lucide-react";
 import { loginSchema, LoginInput } from "@/validations/auth.schema";
 import { loginAction } from "@/server/actions/auth.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
+
+const DEMO_ROLES = [
+  {
+    id: "admin",
+    label: "Super Admin",
+    icon: UserCheck,
+    email: "admin@pharmadist.com",
+    roleName: "Executive & System Control",
+    badge: "Full Access",
+  },
+  {
+    id: "sales",
+    label: "Sales Manager",
+    icon: Building2,
+    email: "sales.manager@pharmadist.com",
+    roleName: "Orders, Customers & Invoicing",
+    badge: "Commercial",
+  },
+  {
+    id: "warehouse",
+    label: "Warehouse",
+    icon: Package,
+    email: "warehouse@pharmadist.com",
+    roleName: "Purchases, Batches & GRN",
+    badge: "Inventory",
+  },
+  {
+    id: "accounts",
+    label: "Accounts",
+    icon: Wallet,
+    email: "accounts@pharmadist.com",
+    roleName: "Payments & AP/AR Ledgers",
+    badge: "Finance",
+  },
+];
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect") || "/dashboard";
 
+  const [selectedRole, setSelectedRole] = React.useState<string>("admin");
   const [showPassword, setShowPassword] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -31,11 +80,18 @@ export default function LoginPage() {
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
-      password: "",
-      rememberMe: false,
+      email: "admin@pharmadist.com",
+      password: "admin123",
+      rememberMe: true,
     },
   });
+
+  const handleRoleSelect = (role: typeof DEMO_ROLES[0]) => {
+    setSelectedRole(role.id);
+    setValue("email", role.email, { shouldValidate: true });
+    setValue("password", "admin123", { shouldValidate: true });
+    setErrorMessage(null);
+  };
 
   const onSubmit = async (data: LoginInput) => {
     try {
@@ -49,7 +105,7 @@ export default function LoginPage() {
         return;
       }
 
-      // Success: Navigate to requested redirect route or dashboard
+      // Success: Navigate to requested route
       router.push(redirectUrl);
       router.refresh();
     } catch {
@@ -59,81 +115,130 @@ export default function LoginPage() {
     }
   };
 
+  const activeRoleData = DEMO_ROLES.find((r) => r.id === selectedRole) || DEMO_ROLES[0];
+
   return (
-    <Card className="border border-border/80 shadow-lg bg-card">
-      <CardHeader className="space-y-1">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl font-bold tracking-tight">
-            Distributor Sign In
-          </CardTitle>
-          <span className="flex h-2 w-2 rounded-full bg-emerald-500" title="System Operational" />
+    <div className="w-full">
+      {/* Apple Frosted Glass Card Container */}
+      <div className="bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-2xl border border-black/[0.06] dark:border-white/[0.08] rounded-[28px] p-7 sm:p-9 shadow-[0_16px_50px_rgba(0,0,0,0.06)] transition-all">
+        {/* Header Branding */}
+        <div className="text-center space-y-1.5 mb-6">
+          <div className="inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#0071E3] text-white shadow-sm shadow-blue-500/30 mb-1">
+            <ShieldCheck className="h-6 w-6" />
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-[#1D1D1F] dark:text-[#F5F5F7]">
+            Sign in to PharmaDist
+          </h1>
+          <p className="text-xs text-[#86868B]">
+            Enterprise Wholesale Medicine Distribution Platform
+          </p>
         </div>
-        <CardDescription className="text-xs text-muted-foreground">
-          Enter your authorized credentials to access the wholesale ERP platform.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+
+        {/* Apple Segmented 1-Click Role Selector */}
+        <div className="space-y-2 mb-6">
+          <div className="flex items-center justify-between text-[11px] font-medium text-[#86868B] px-1">
+            <span className="flex items-center gap-1">
+              <Sparkles className="h-3 w-3 text-[#0071E3]" />
+              Quick Demo Access
+            </span>
+            <span className="text-[#0071E3] font-semibold">{activeRoleData.badge}</span>
+          </div>
+
+          <div className="grid grid-cols-4 gap-1.5 p-1 rounded-2xl bg-[#F5F5F7] dark:bg-[#2C2C2E] border border-black/[0.04] dark:border-white/[0.04]">
+            {DEMO_ROLES.map((role) => {
+              const isSelected = selectedRole === role.id;
+              const Icon = role.icon;
+              return (
+                <button
+                  key={role.id}
+                  type="button"
+                  onClick={() => handleRoleSelect(role)}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl text-center transition-all duration-200",
+                    isSelected
+                      ? "bg-white dark:bg-[#3A3A3C] text-[#0071E3] dark:text-[#2997FF] shadow-sm font-semibold scale-[1.02]"
+                      : "text-[#86868B] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
+                  )}
+                >
+                  <Icon className={cn("h-4 w-4", isSelected ? "text-[#0071E3] dark:text-[#2997FF]" : "text-[#86868B]")} />
+                  <span className="text-[10px] leading-tight truncate w-full font-medium">
+                    {role.label.split(" ")[0]}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active Role Indicator Pill */}
+          <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/40 text-[11px] text-[#0071E3] dark:text-[#2997FF] border border-blue-100 dark:border-blue-900/50">
+            <span className="font-semibold">{activeRoleData.label}:</span>
+            <span className="text-[#424245] dark:text-[#A1A1A6] text-[10px] truncate max-w-[220px]">
+              {activeRoleData.roleName}
+            </span>
+          </div>
+        </div>
+
+        {/* Login Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Error Alert Banner */}
+          {/* Error Banner */}
           {errorMessage && (
-            <Alert variant="destructive" className="py-2.5">
-              <ShieldAlert className="h-4 w-4" />
-              <AlertDescription>{errorMessage}</AlertDescription>
+            <Alert variant="destructive" className="py-2.5 rounded-2xl border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300">
+              <AlertDescription className="text-xs">{errorMessage}</AlertDescription>
             </Alert>
           )}
 
-          {/* Email Address Field */}
+          {/* Email Input */}
           <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-xs font-medium">
+            <Label htmlFor="email" className="text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7] px-1">
               Email Address
             </Label>
             <div className="relative">
-              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Mail className="absolute left-3.5 top-3 h-4 w-4 text-[#86868B]" />
               <Input
                 id="email"
                 type="email"
                 autoComplete="email"
                 placeholder="name@pharmadist.com"
-                className="pl-9 text-xs"
+                className="pl-10 h-11 text-xs rounded-2xl bg-[#F5F5F7] dark:bg-[#2C2C2E] border-transparent focus:border-[#0071E3] focus:bg-white dark:focus:bg-[#1C1C1E] focus:ring-4 focus:ring-[#0071E3]/15 transition-all text-[#1D1D1F] dark:text-[#F5F5F7]"
                 disabled={isSubmitting}
                 {...register("email")}
               />
             </div>
             {errors.email && (
-              <p className="text-[11px] text-destructive font-medium">
+              <p className="text-[11px] text-destructive font-medium px-1">
                 {errors.email.message}
               </p>
             )}
           </div>
 
-          {/* Password Field with Show/Hide Toggle */}
+          {/* Password Input */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-xs font-medium">
+            <div className="flex items-center justify-between px-1">
+              <Label htmlFor="password" className="text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7]">
                 Password
               </Label>
               <Link
                 href="/forgot-password"
-                className="text-[11px] text-muted-foreground hover:text-primary transition-colors font-medium"
+                className="text-[11px] text-[#0071E3] hover:underline font-medium"
               >
                 Forgot password?
               </Link>
             </div>
             <div className="relative">
-              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Lock className="absolute left-3.5 top-3 h-4 w-4 text-[#86868B]" />
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 placeholder="••••••••••••"
-                className="pl-9 pr-9 text-xs"
+                className="pl-10 pr-10 h-11 text-xs rounded-2xl bg-[#F5F5F7] dark:bg-[#2C2C2E] border-transparent focus:border-[#0071E3] focus:bg-white dark:focus:bg-[#1C1C1E] focus:ring-4 focus:ring-[#0071E3]/15 transition-all text-[#1D1D1F] dark:text-[#F5F5F7]"
                 disabled={isSubmitting}
                 {...register("password")}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground focus:outline-none"
+                className="absolute right-3.5 top-3 text-[#86868B] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] focus:outline-none"
                 tabIndex={-1}
               >
                 {showPassword ? (
@@ -141,121 +246,59 @@ export default function LoginPage() {
                 ) : (
                   <Eye className="h-4 w-4" />
                 )}
-                <span className="sr-only">
-                  {showPassword ? "Hide password" : "Show password"}
-                </span>
               </button>
             </div>
             {errors.password && (
-              <p className="text-[11px] text-destructive font-medium">
+              <p className="text-[11px] text-destructive font-medium px-1">
                 {errors.password.message}
               </p>
             )}
           </div>
 
-          {/* Remember Session Checkbox */}
-          <div className="flex items-center space-x-2 pt-1">
+          {/* Remember Session */}
+          <div className="flex items-center space-x-2 pt-0.5 px-1">
             <input
               id="rememberMe"
               type="checkbox"
-              className="h-3.5 w-3.5 rounded border-muted text-primary focus:ring-primary"
+              className="h-3.5 w-3.5 rounded-md border-[#D1D1D6] dark:border-[#48484A] text-[#0071E3] focus:ring-[#0071E3]"
               {...register("rememberMe")}
             />
-            <Label htmlFor="rememberMe" className="text-xs text-muted-foreground font-normal cursor-pointer">
-              Remember my session on this device
+            <Label htmlFor="rememberMe" className="text-xs text-[#86868B] font-normal cursor-pointer">
+              Keep me signed in on this device
             </Label>
           </div>
 
-          {/* Submit Button */}
+          {/* Primary Submit Button */}
           <Button
             type="submit"
-            className="w-full gap-2 text-xs font-semibold"
+            className="w-full h-11 rounded-2xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-semibold text-xs shadow-sm shadow-blue-500/25 transition-all active:scale-[0.99] gap-2 mt-2"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                Authenticating...
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Signing in...
               </>
             ) : (
               <>
                 Sign In to ERP
-                <ArrowRight className="h-3.5 w-3.5" />
+                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </Button>
 
-          {/* Quick Demo Fill Section */}
-          <div className="pt-2 border-t border-border/60">
-            <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-              ⚡ Quick Demo Credentials (Click to fill)
-            </div>
-            <div className="grid grid-cols-2 gap-1.5">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-auto py-1.5 px-2 flex flex-col items-start text-left text-[11px]"
-                onClick={() => {
-                  setValue("email", "admin@pharmadist.com");
-                  setValue("password", "admin123");
-                }}
-              >
-                <span className="font-semibold text-foreground">Super Admin</span>
-                <span className="text-[10px] text-muted-foreground truncate w-full">admin@pharmadist.com</span>
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-auto py-1.5 px-2 flex flex-col items-start text-left text-[11px]"
-                onClick={() => {
-                  setValue("email", "sales.manager@pharmadist.com");
-                  setValue("password", "admin123");
-                }}
-              >
-                <span className="font-semibold text-foreground">Sales Manager</span>
-                <span className="text-[10px] text-muted-foreground truncate w-full">sales.manager@pharmadist.com</span>
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-auto py-1.5 px-2 flex flex-col items-start text-left text-[11px]"
-                onClick={() => {
-                  setValue("email", "warehouse@pharmadist.com");
-                  setValue("password", "admin123");
-                }}
-              >
-                <span className="font-semibold text-foreground">Warehouse Mgr</span>
-                <span className="text-[10px] text-muted-foreground truncate w-full">warehouse@pharmadist.com</span>
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-auto py-1.5 px-2 flex flex-col items-start text-left text-[11px]"
-                onClick={() => {
-                  setValue("email", "accounts@pharmadist.com");
-                  setValue("password", "admin123");
-                }}
-              >
-                <span className="font-semibold text-foreground">Accounts Officer</span>
-                <span className="text-[10px] text-muted-foreground truncate w-full">accounts@pharmadist.com</span>
-              </Button>
-            </div>
-          </div>
-
-          {/* Security Notice */}
-          <div className="rounded-md bg-muted/40 p-2.5 border border-border/60 text-[11px] text-muted-foreground flex items-center gap-2">
-            <ShieldAlert className="h-4 w-4 text-primary shrink-0" />
-            <span>Authorized distributor personnel only. All access attempts are logged.</span>
+          {/* Security & Compliance Footer */}
+          <div className="text-center pt-2">
+            <p className="text-[11px] text-[#86868B] flex items-center justify-center gap-1.5">
+              <span>🔒 256-bit SSL</span>
+              <span>•</span>
+              <span>FEFO Inventory Engine</span>
+              <span>•</span>
+              <span>Strictly Wholesale</span>
+            </p>
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
