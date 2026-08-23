@@ -6,6 +6,8 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "PharmaDist ERP",
     description: "Enterprise Web-Based Wholesale Medicine Distribution Management System",
     start_url: "/",
+    scope: "/",
+    id: "/",
     display: "standalone",
     background_color: "#FFFFFF",
     theme_color: "#0071E3",
@@ -15,6 +17,12 @@ export default function manifest(): MetadataRoute.Manifest {
         src: "/icons/icon-192.png",
         sizes: "192x192",
         type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icons/icon-192-maskable.png",
+        sizes: "192x192",
+        type: "image/png",
         purpose: "maskable",
       },
       {
@@ -22,6 +30,12 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
+      },
+      {
+        src: "/icons/icon-512-maskable.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
       },
     ],
   };
