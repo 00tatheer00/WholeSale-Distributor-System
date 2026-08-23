@@ -182,6 +182,7 @@ export interface BatchRecord {
 
 export interface CustomerRecord {
   id: string;
+  customerCode?: string | null;
   tradeName: string;
   proprietorName: string;
   customerType: string;
@@ -190,17 +191,110 @@ export interface CustomerRecord {
   tradeLicenseNo: string;
   taxIdTin: string;
   phone: string;
+  alternatePhone?: string | null;
   email: string;
   deliveryAddress: string;
   city: string;
   assignedRoute: string;
   creditLimit: number;
   maxDueDays: number;
+  openingBalance: number;
   currentDue: number;
+  totalPurchased: number;
+  totalPaid: number;
+  availableCredit: number;
+  creditUtilizationPercent: number;
+  creditStatus: "NORMAL" | "WARNING" | "EXCEEDED";
   oldestOverdueDays: number;
   defaultDiscountPercent: number;
   status: string;
   totalSales: number;
+  salesCount?: number;
+  invoicesCount?: number;
+  paymentsCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CustomerLedgerEntry {
+  id: string;
+  date: string;
+  type: "OPENING_BALANCE" | "WHOLESALE_SALE" | "PAYMENT" | "CREDIT_NOTE" | "DEBIT_ADJUSTMENT";
+  referenceNumber: string;
+  description: string;
+  debit: number;   // Sales / Initial Due increases receivable from customer
+  credit: number;  // Payment reduces receivable from customer
+  runningBalance: number;
+}
+
+export interface CustomerFinancialSummary {
+  openingBalance: number;
+  totalSales: number;
+  totalPaid: number;
+  currentDue: number;
+  creditLimit: number;
+  availableCredit: number;
+  creditUtilizationPercent: number;
+  creditStatus: "NORMAL" | "WARNING" | "EXCEEDED";
+  salesCount: number;
+  invoicesCount: number;
+  paymentsCount: number;
+}
+
+export interface CustomerSaleHistoryItem {
+  id: string;
+  orderNumber: string;
+  invoiceNumber?: string | null;
+  orderDate: string;
+  deliveryDate?: string | null;
+  itemsCount: number;
+  subtotalAmount: number;
+  discountAmount: number;
+  taxAmount: number;
+  deliveryCharge: number;
+  grandTotal: number;
+  paidAmount: number;
+  dueAmount: number;
+  paymentStatus: string;
+  deliveryStatus: string;
+  status: string;
+  salesmanName?: string | null;
+}
+
+export interface CustomerPaymentHistoryItem {
+  id: string;
+  receiptNumber: string;
+  amount: number;
+  paymentDate: string;
+  paymentMethod: string;
+  referenceNumber?: string | null;
+  bankName?: string | null;
+  chequeNumber?: string | null;
+  chequeDate?: string | null;
+  chequeStatus?: string;
+  notes?: string | null;
+  recordedByName?: string | null;
+  allocatedInvoices?: string[];
+  status: string;
+}
+
+export interface CustomerQueryResult {
+  customers: CustomerRecord[];
+  totalCount: number;
+  totalReceivableDue: number;
+  totalCreditLimit: number;
+  activeCount: number;
+  overdueBlockedCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export interface CustomerDetailRecord extends CustomerRecord {
+  financialSummary: CustomerFinancialSummary;
+  recentSales: CustomerSaleHistoryItem[];
+  recentPayments: CustomerPaymentHistoryItem[];
+  ledger: CustomerLedgerEntry[];
 }
 
 export interface DistributorRecord {

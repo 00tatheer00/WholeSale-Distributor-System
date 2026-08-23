@@ -1,6 +1,6 @@
 import * as React from "react";
 import { getInvoicesAction } from "@/server/actions/sales.actions";
-import { getCustomersAction } from "@/server/actions/customer.actions";
+import { getCustomersListAction } from "@/server/actions/customer.actions";
 import { getDistributorsAction } from "@/server/actions/distributor.actions";
 import { getMedicinesAction } from "@/server/actions/medicine.actions";
 import { getBatchesAction } from "@/server/actions/inventory.actions";
@@ -10,7 +10,7 @@ export default async function SalesPage() {
   const [invoicesRes, customersRes, distributorsRes, medicinesRes, batchesRes] =
     await Promise.all([
       getInvoicesAction(),
-      getCustomersAction(),
+      getCustomersListAction(),
       getDistributorsAction(),
       getMedicinesAction(),
       getBatchesAction(),
