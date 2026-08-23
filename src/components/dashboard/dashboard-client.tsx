@@ -149,40 +149,22 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
         </Link>
       </div>
 
-      {/* 1. Core KPIs & Operational Meters */}
+      {/* 1. Core KPIs & Operational Status Badges */}
       <DashboardKpiGrid kpis={data.kpis} />
 
-      {/* 2. Summaries Row: Sales Summary & Purchase Summary */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <SalesSummaryCard data={data.salesSummary} />
-        <PurchaseSummaryCard data={data.purchaseSummary} />
-      </div>
-
-      {/* 3. Financial Statements & Inventory Valuation Row */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <ProfitSummaryCard data={data.profitSummary} />
-        <InventorySummaryCard data={data.inventorySummary} />
-      </div>
-
-      {/* 4. Trends Visualizer Row: Sales Trend & Purchase Trend */}
+      {/* 2. Key Performance Trends & Top Fast-Moving Medicines */}
       <div className="grid gap-4 lg:grid-cols-2">
         <SalesTrendChart data={data.salesTrend} />
-        <PurchaseTrendChart data={data.purchaseTrend} />
-      </div>
-
-      {/* 5. Due Balances & Top Selling Medicines */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <DueSummaryCard data={data.dueSummary} />
         <TopSellingMedicines data={data.topSellingMedicines} />
       </div>
 
-      {/* 6. Recent Transaction Ledgers: Sales & Purchases */}
+      {/* 3. Recent Real-Time Wholesale Ledgers (Sales & Purchases) */}
       <div className="grid gap-4 lg:grid-cols-2">
         <RecentSalesTable data={data.recentSales} />
         <RecentPurchasesTable data={data.recentPurchases} />
       </div>
 
-      {/* 7. Actionable Priority Operational Alerts */}
+      {/* 4. Priority Operational Action Alerts */}
       <AlertsCard alerts={data.alerts} />
     </div>
   );

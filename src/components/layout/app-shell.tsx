@@ -9,9 +9,11 @@ import {
   ReceiptText,
   Truck,
   ShoppingCart,
+  X,
 } from "lucide-react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface AppShellProps {
@@ -31,6 +33,11 @@ export function AppShell({ children }: AppShellProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
 
+  // Automatically close mobile menu on route change
+  React.useEffect(() => {
+    setIsMobileOpen(false);
+  }, [pathname]);
+
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       {/* Desktop Sidebar */}
@@ -44,15 +51,34 @@ export function AppShell({ children }: AppShellProps) {
       {/* Mobile Drawer Sidebar */}
       {isMobileOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
+          {/* Touch Backdrop - Closes drawer on tap/click */}
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
             onClick={() => setIsMobileOpen(false)}
+            onTouchEnd={() => setIsMobileOpen(false)}
+            aria-hidden="true"
           />
-          <div className="relative flex w-72 flex-1 flex-col bg-white dark:bg-[#1C1C1E] z-50 shadow-2xl border-r border-border">
-            <Sidebar
-              isCollapsed={false}
-              setIsCollapsed={() => setIsMobileOpen(false)}
-            />
+
+          {/* Drawer Container */}
+          <div className="relative flex w-[280px] max-w-[85vw] flex-col bg-white dark:bg-[#1C1C1E] z-50 shadow-2xl border-r border-border h-full">
+            <div className="flex items-center justify-between p-3 border-b border-border/80">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Menu</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsMobileOpen(false)}
+                className="h-8 w-8 rounded-full hover:bg-muted"
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close menu</span>
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              <Sidebar
+                isCollapsed={false}
+                setIsCollapsed={() => setIsMobileOpen(false)}
+              />
+            </div>
           </div>
         </div>
       )}
