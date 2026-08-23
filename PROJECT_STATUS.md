@@ -21,14 +21,13 @@
 | **Phase 6** | Inventory & Stock Management Engine | ✅ Completed | Authoritative batch-level stock in `MedicineBatch`, immutable `StockMovement` ledger, `/inventory` cockpit with live valuation, `/inventory/adjustments` voucher reconciliation with negative stock protection, `/inventory/movements` audit ledger, atomic `increaseStock` / `decreaseStock` / `adjustStock` services. |
 | **Phase 7** | Supplier & Purchase Management Engine | ✅ Completed | Full Supplier Directory at `/suppliers`, Supplier Profile & Chronological AP Ledger at `/suppliers/[id]`, Payment Vouchers (`PV-YYYY-XXXXX`) & FIFO settlement, High-Speed Purchase Intake at `/purchases/new` with multi-item batch creation & `PURCHASE_IN` ledger commit, Purchase Consignments at `/purchases`, Purchase Details & Safe Reversal at `/purchases/[id]`. |
 | **Phase 8** | Customer / Pharmacy Client Management | ✅ Completed | Full Customer Directory at `/customers` with search/filters/pagination/pastel KPIs, Onboarding at `/customers/new`, 360° Profile & Credit Gauge at `/customers/[id]`, Financial Guardrail Edit at `/customers/[id]/edit`, Chronological Statement Ledger at `/customers/[id]/ledger`, and `customer.service.ts`. |
-| **Phase 9** | Wholesale Sales Booking & Tax Invoicing | ⏳ **Upcoming** | High-speed B2B sales booking, FEFO automated batch allocation, Wholesale Tax Invoices & Delivery Challans (`InvoicePrintModal`), Credit barrier holds. |
-| **Phase 10**| Accounts Receivable, Cheques & FIFO Reconciliation | ⏳ Planned | Money receipts, Cash/Cheque/Bank/MFS logging, FIFO invoice settlement. |
-| **Phase 11**| Field Sales Representatives & Route Beats | ⏳ Planned | Salesman directory, Route schedules, Recovery commission tracking. |
-| **Phase 12**| Procurement & Goods Received Notes (GRN) | ⏳ Planned | Advanced PO approvals, Multi-warehouse intake inspection, barcode scanning. |
-| **Phase 13**| Operating Expenses & Petty Cash | ⏳ Planned | Expense vouchers, Logistics/Fuel/Cold-chain cost tracking. |
-| **Phase 14**| Financial Intelligence & Audit Reports | ⏳ Planned | P&L Statements, AR Aging Analysis, Sales tax ledgers. |
-| **Phase 15**| Security, Audit Logs & System Settings | ⏳ Planned | Enterprise profile, Multi-user RBAC, Audit trail explorer. |
-| **Phase 16**| Production Deployment & Handover | ⏳ Planned | Vercel deployment, Supabase production pooler, Final signoff. |
+| **Phase 9** | Wholesale Sales, Invoices & Customer Payments | ✅ Completed | Complete Wholesale Sales Engine at `/sales` & `/sales/new` & `/sales/[id]`, FEFO automated batch allocation, Historical Batch COGS preservation, DGDA-compliant Wholesale Tax Invoices & Delivery Challans at `/invoices` & `/invoices/[id]`, Customer Collections & Money Receipts with FIFO settlement at `/payments`, and Safe Cancellation (`SALE_CANCEL_RETURN`). |
+| **Phase 10**| Field Sales Representatives & Route Beats | ⏳ **Upcoming** | Salesman directory, Route schedules, Recovery commission tracking. |
+| **Phase 11**| Procurement & Goods Received Notes (GRN) | ⏳ Planned | Advanced PO approvals, Multi-warehouse intake inspection, barcode scanning. |
+| **Phase 12**| Operating Expenses & Petty Cash | ⏳ Planned | Expense vouchers, Logistics/Fuel/Cold-chain cost tracking. |
+| **Phase 13**| Financial Intelligence & Audit Reports | ⏳ Planned | P&L Statements, AR Aging Analysis, Sales tax ledgers. |
+| **Phase 14**| Security, Audit Logs & System Settings | ⏳ Planned | Enterprise profile, Multi-user RBAC, Audit trail explorer. |
+| **Phase 15**| Production Deployment & Handover | ⏳ Planned | Vercel deployment, Supabase production pooler, Final signoff. |
 
 ---
 
