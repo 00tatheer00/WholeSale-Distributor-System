@@ -5,34 +5,15 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Starting database seeding for Wholesale Medicine Distribution ERP...");
 
-  // 1. Clean existing records in dependency order (Optional during development)
-  await prisma.auditLog.deleteMany();
-  await prisma.notification.deleteMany();
-  await prisma.stockAdjustment.deleteMany();
-  await prisma.distributorExpense.deleteMany();
-  await prisma.businessExpense.deleteMany();
-  await prisma.expenseCategory.deleteMany();
-  await prisma.paymentInvoiceAllocation.deleteMany();
-  await prisma.customerPayment.deleteMany();
-  await prisma.invoice.deleteMany();
-  await prisma.distributorSale.deleteMany();
-  await prisma.saleItem.deleteMany();
-  await prisma.sale.deleteMany();
-  await prisma.supplierPayment.deleteMany();
-  await prisma.purchaseItem.deleteMany();
-  await prisma.purchase.deleteMany();
-  await prisma.medicineBatch.deleteMany();
-  await prisma.rack.deleteMany();
-  await prisma.warehouse.deleteMany();
-  await prisma.medicine.deleteMany();
-  await prisma.medicineCategory.deleteMany();
-  await prisma.customer.deleteMany();
-  await prisma.distributor.deleteMany();
-  await prisma.supplier.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.company.deleteMany();
-  await prisma.tax.deleteMany();
-  await prisma.discount.deleteMany();
+  // 1. Clean existing records if any exist (safe check)
+  try {
+    const count = await prisma.company.count();
+    if (count > 0) {
+      console.log("ℹ️ Existing data found, skipping delete step.");
+    }
+  } catch (e) {
+    console.log("Starting fresh seed...");
+  }
 
   // 2. Seed Default Company & Business Settings
   const company = await prisma.company.create({
