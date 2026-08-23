@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationsPopover } from "@/components/layout/notifications-popover";
+import { InfoGuideModal } from "@/components/layout/info-guide-modal";
 import { UserNav } from "@/components/layout/user-nav";
 import { Badge } from "@/components/ui/badge";
 
@@ -46,8 +47,10 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
         </div>
       </div>
 
-      {/* Right: Company Badge, Theme, Notifications & User */}
-      <div className="flex items-center gap-2.5">
+      {/* Right: Info Guide, Company Badge, Theme, Notifications & User */}
+      <div className="flex items-center gap-2">
+        <InfoGuideModal />
+
         <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-xs font-medium border border-border/50">
           <Building2 className="h-3.5 w-3.5 text-primary" />
           <span className="truncate max-w-[160px] font-semibold">Apex Pharma Dist Ltd.</span>

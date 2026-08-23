@@ -1,4 +1,16 @@
-import { PrismaClient, UserRole, UserStatus, RecordStatus, CustomerStatus, CustomerType, DistributorStatus, DosageForm, StorageCondition, StorageZone, BatchStatus } from "@prisma/client";
+import {
+  PrismaClient,
+  UserRole,
+  UserStatus,
+  RecordStatus,
+  CustomerStatus,
+  CustomerType,
+  DistributorStatus,
+  DosageForm,
+  StorageCondition,
+  StorageZone,
+  BatchStatus,
+} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -520,8 +532,6 @@ async function main() {
     },
   });
 
-  console.log(`✅ Seeded 4 Operating Expense Categories`);
-
   // 12. Seed Taxes & Discounts
   await prisma.tax.create({
     data: {
@@ -542,7 +552,7 @@ async function main() {
     },
   });
 
-  console.log("🚀 Database seeding completed successfully!");
+  console.log("🚀 Base database seeding completed successfully!");
 }
 
 main()
