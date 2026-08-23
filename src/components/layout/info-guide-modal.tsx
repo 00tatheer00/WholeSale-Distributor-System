@@ -221,7 +221,7 @@ export function InfoGuideModal() {
                 placeholder="Search topic ya feature..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8.5 h-8 text-xs rounded-xl bg-background border-border/80"
+                className="pl-9 h-8 text-xs rounded-xl bg-background border-border/80"
               />
             </div>
 

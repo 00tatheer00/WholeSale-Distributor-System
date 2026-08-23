@@ -92,7 +92,7 @@ export function DataTable<TData, TValue>({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 items-center gap-2">
           <div className="relative w-full max-w-sm">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={searchPlaceholder}
               value={
@@ -107,7 +107,7 @@ export function DataTable<TData, TValue>({
                   setGlobalFilter(event.target.value);
                 }
               }}
-              className="pl-8 text-xs h-9 rounded-xl bg-muted/50 border-transparent focus-visible:bg-background focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/10 transition-all"
+              className="pl-9 text-xs h-9 rounded-xl bg-muted/50 border-transparent focus-visible:bg-background focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/10 transition-all"
             />
           </div>
           {filterComponent}

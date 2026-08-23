@@ -238,7 +238,7 @@ export function SalesClient({ initialSalesData, customers }: SalesClientProps) {
               placeholder="Search by order number (SO-...), invoice number, pharmacy name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9.5 pr-20 h-10 rounded-xl bg-muted/30 border-muted-foreground/20 text-sm focus-visible:ring-1"
+              className="pl-10 pr-20 h-10 rounded-xl bg-muted/30 border-muted-foreground/20 text-sm focus-visible:ring-1"
             />
             {search && (
               <button

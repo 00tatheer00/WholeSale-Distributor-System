@@ -143,7 +143,7 @@ export function SupplierDuesClient({ reportData }: SupplierDuesClientProps) {
             placeholder="Search manufacturer name, drug license #, phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9.5 pr-4 h-10 rounded-xl bg-muted/30 border-muted-foreground/20 text-sm"
+            className="pl-10 pr-4 h-10 rounded-xl bg-muted/30 border-muted-foreground/20 text-sm"
           />
         </div>
       </div>

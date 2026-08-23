@@ -245,7 +245,7 @@ export function SalesReportClient({
             placeholder="Search sale # (SO-...), pharmacy name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9.5 pr-16 h-10 rounded-xl bg-muted/30 border-muted-foreground/20 text-sm"
+            className="pl-10 pr-16 h-10 rounded-xl bg-muted/30 border-muted-foreground/20 text-sm"
           />
         </form>
 

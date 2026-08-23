@@ -208,7 +208,7 @@ export function InventoryReportClient({
             placeholder="Search medicine brand, generic name, batch #..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9.5 pr-16 h-10 rounded-xl bg-muted/30 border-muted-foreground/20 text-sm"
+            className="pl-10 pr-16 h-10 rounded-xl bg-muted/30 border-muted-foreground/20 text-sm"
           />
         </form>
 

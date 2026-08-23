@@ -339,7 +339,7 @@ export function MedicineClient({
         const low = row.original.reorderAlertLevel;
         return (
           <div className="space-y-0.5">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2 whitespace-nowrap">
               <span
                 className={`font-bold ${
                   stock === 0
@@ -351,8 +351,13 @@ export function MedicineClient({
               >
                 {stock.toLocaleString()} units
               </span>
-              <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">
-                {row.original.batchesCount || 0} batches
+              <Badge
+                variant="secondary"
+                className="text-[10px] font-medium px-2 py-0.5 h-5 whitespace-nowrap shrink-0 border border-border/50 bg-muted/80 text-muted-foreground"
+              >
+                {(row.original.batchesCount || 0) === 1
+                  ? "1 batch"
+                  : `${row.original.batchesCount || 0} batches`}
               </Badge>
             </div>
             {stock <= low && stock > 0 && (
