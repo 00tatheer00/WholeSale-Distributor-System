@@ -1,14 +1,33 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard,
+  Pill,
+  ReceiptText,
+  Truck,
+  ShoppingCart,
+} from "lucide-react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+import { cn } from "@/lib/utils";
 
 interface AppShellProps {
   children: React.ReactNode;
 }
 
+const MOBILE_NAV_ITEMS = [
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Medicines", href: "/medicines", icon: Pill },
+  { label: "Purchases", href: "/purchases", icon: ReceiptText },
+  { label: "Suppliers", href: "/suppliers", icon: Truck },
+  { label: "Sales", href: "/sales", icon: ShoppingCart },
+];
+
 export function AppShell({ children }: AppShellProps) {
+  const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
 
@@ -26,10 +45,10 @@ export function AppShell({ children }: AppShellProps) {
       {isMobileOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
             onClick={() => setIsMobileOpen(false)}
           />
-          <div className="relative flex w-64 flex-1 flex-col bg-sidebar z-50">
+          <div className="relative flex w-72 flex-1 flex-col bg-white dark:bg-[#1C1C1E] z-50 shadow-2xl border-r border-border">
             <Sidebar
               isCollapsed={false}
               setIsCollapsed={() => setIsMobileOpen(false)}
@@ -39,12 +58,42 @@ export function AppShell({ children }: AppShellProps) {
       )}
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col min-w-0 overflow-x-hidden">
+      <div className="flex flex-1 flex-col min-w-0 overflow-x-hidden pb-16 md:pb-0">
         <Header onMobileMenuToggle={() => setIsMobileOpen(true)} />
-        <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-3 sm:p-5 md:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           {children}
         </main>
       </div>
+
+      {/* Apple-Style Floating Mobile Bottom Bar (Thumb-Friendly) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white/90 dark:bg-[#1C1C1E]/90 backdrop-blur-xl border-t border-border/80 px-2 py-1.5 shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
+        <div className="grid grid-cols-5 items-center justify-around">
+          {MOBILE_NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/dashboard" && pathname.startsWith(item.href));
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-0.5 py-1 px-1 rounded-xl transition-all",
+                  isActive
+                    ? "text-[#0071E3] font-semibold"
+                    : "text-[#86868B] hover:text-[#1D1D1F] dark:hover:text-white"
+                )}
+              >
+                <Icon className={cn("h-5 w-5", isActive ? "stroke-[2.5]" : "stroke-[1.75]")} />
+                <span className="text-[10px] leading-tight truncate w-full text-center">
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }

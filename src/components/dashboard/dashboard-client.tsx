@@ -65,7 +65,7 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
       <PageHeader
         title="Wholesale Distribution Cockpit"
         description="Real-time pharmaceutical wholesale distribution command center, inventory FEFO queues, and financial health."
-        badge={<Badge variant="outline">Enterprise Edition</Badge>}
+        badge={<Badge variant="outline" className="rounded-full px-2.5 py-0.5 border-primary/30 text-primary bg-primary/5">Enterprise Live</Badge>}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <DashboardDateFilter
@@ -81,28 +81,73 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
               size="icon"
               onClick={handleManualRefresh}
               disabled={isLoading}
-              className="h-9 w-9"
+              className="h-9 w-9 rounded-xl border-border"
               title="Refresh Dashboard"
             >
               <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
             </Button>
-
-            <Button size="sm" variant="outline" asChild className="h-9 text-xs gap-1.5 hidden sm:flex">
-              <Link href="/purchases">
-                <ReceiptText className="h-3.5 w-3.5" />
-                New GRN Intake
-              </Link>
-            </Button>
-
-            <Button size="sm" asChild className="h-9 text-xs gap-1.5">
-              <Link href="/sales">
-                <FileSpreadsheet className="h-3.5 w-3.5" />
-                Book Wholesale Order
-              </Link>
-            </Button>
           </div>
         }
       />
+
+      {/* Apple Direct Quick Action Deck (Mobile Responsive) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Link
+          href="/sales"
+          className="group flex flex-col p-4 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-[#0071E3]/50 hover:scale-[1.01]"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-[#0071E3] flex items-center justify-center group-hover:bg-[#0071E3] group-hover:text-white transition-all shadow-sm">
+              <FileSpreadsheet className="h-5 w-5" />
+            </div>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Sales</span>
+          </div>
+          <span className="text-sm font-bold text-foreground group-hover:text-[#0071E3] transition-colors">Book Wholesale Order</span>
+          <span className="text-xs text-muted-foreground mt-0.5">Create invoice & dispatch</span>
+        </Link>
+
+        <Link
+          href="/purchases/new"
+          className="group flex flex-col p-4 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-emerald-500/50 hover:scale-[1.01]"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="h-10 w-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm">
+              <ReceiptText className="h-5 w-5" />
+            </div>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Intake</span>
+          </div>
+          <span className="text-sm font-bold text-foreground group-hover:text-emerald-600 transition-colors">Direct Purchase Intake</span>
+          <span className="text-xs text-muted-foreground mt-0.5">Batch creation & stock-in</span>
+        </Link>
+
+        <Link
+          href="/medicines"
+          className="group flex flex-col p-4 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-purple-500/50 hover:scale-[1.01]"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm">
+              <RefreshCw className="h-5 w-5" />
+            </div>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Catalog</span>
+          </div>
+          <span className="text-sm font-bold text-foreground group-hover:text-purple-600 transition-colors">Medicine & Batch Stock</span>
+          <span className="text-xs text-muted-foreground mt-0.5">FEFO queue & trade pricing</span>
+        </Link>
+
+        <Link
+          href="/suppliers"
+          className="group flex flex-col p-4 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-amber-500/50 hover:scale-[1.01]"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition-all shadow-sm">
+              <RefreshCw className="h-5 w-5" />
+            </div>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Vendors</span>
+          </div>
+          <span className="text-sm font-bold text-foreground group-hover:text-amber-600 transition-colors">Supplier AP Ledger</span>
+          <span className="text-xs text-muted-foreground mt-0.5">Payables & settlement</span>
+        </Link>
+      </div>
 
       {/* 1. Core KPIs & Operational Meters */}
       <DashboardKpiGrid kpis={data.kpis} />

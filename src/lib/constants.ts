@@ -9,128 +9,66 @@ export const APP_VERSION = "1.0.0";
  */
 export const NAVIGATION_SECTIONS: NavigationSection[] = [
   {
-    title: "Overview",
+    title: "Core Operations",
     items: [
       {
         title: "Dashboard",
         href: "/dashboard",
         iconName: "LayoutDashboard",
-        description: "Key distribution metrics, sales trends, and alerts",
+        description: "Overview & key distribution metrics",
       },
-    ],
-  },
-  {
-    title: "Catalog & Stock",
-    items: [
       {
-        title: "Medicines",
+        title: "Medicines & Stock",
         href: "/medicines",
         iconName: "Pill",
-        description: "Drug master catalog, dosage forms, generics & pricing",
+        description: "Drug catalog, dosage forms, and batch stock",
       },
       {
-        title: "Categories",
-        href: "/categories",
-        iconName: "Layers",
-        description: "Therapeutic classifications and drug categories",
-      },
-      {
-        title: "Inventory & FEFO",
-        href: "/inventory",
-        iconName: "Boxes",
-        description: "Batch tracking, rack locations, expiry alerts & quarantine",
-      },
-      {
-        title: "Stock Adjustments",
-        href: "/inventory/adjustments",
-        iconName: "SlidersHorizontal",
-        description: "Physical count reconciliation, damage & expiry write-offs",
-      },
-      {
-        title: "Movement Ledger",
-        href: "/inventory/movements",
-        iconName: "History",
-        description: "Immutable stock audit trail and transaction log",
-      },
-    ],
-  },
-  {
-    title: "Procurement & Vendors",
-    items: [
-      {
-        title: "Suppliers",
-        href: "/suppliers",
-        iconName: "Truck",
-        description: "Medicine manufacturers, vendors & purchase accounts",
-      },
-      {
-        title: "Purchases & GRN",
+        title: "Purchases & Intake",
         href: "/purchases",
         iconName: "ReceiptText",
-        description: "Purchase orders, goods received notes & batch intake",
+        description: "Direct purchase intake & batch creation",
+      },
+      {
+        title: "Suppliers & Accounts",
+        href: "/suppliers",
+        iconName: "Truck",
+        description: "Manufacturers, vendors & AP balance ledger",
+      },
+      {
+        title: "Sales & Invoicing",
+        href: "/sales",
+        iconName: "ShoppingCart",
+        description: "Wholesale orders, billing & deliveries",
       },
     ],
   },
   {
-    title: "Sales & Distribution",
+    title: "Management & Reports",
     items: [
       {
         title: "Customer Pharmacies",
         href: "/customers",
         iconName: "Store",
-        description: "Licensed pharmacies, clinics, credit limits & aging",
+        description: "Licensed pharmacies, clinics & credit limits",
       },
       {
-        title: "Sales Orders",
-        href: "/sales",
-        iconName: "ShoppingCart",
-        description: "Field order booking, FEFO allocation & picking slips",
+        title: "Warehouse Inventory",
+        href: "/inventory",
+        iconName: "Boxes",
+        description: "Batch FEFO tracking & stock adjustments",
       },
       {
-        title: "Wholesale Invoices",
-        href: "/invoices",
-        iconName: "FileSpreadsheet",
-        description: "Tax billing, delivery challans, discounts & VAT",
-      },
-      {
-        title: "Distributors & Salesmen",
-        href: "/distributors",
-        iconName: "Users2",
-        description: "Territories, routes/beats, delivery & commissions",
-      },
-    ],
-  },
-  {
-    title: "Finance & Accounts",
-    items: [
-      {
-        title: "Payments & Dues",
-        href: "/payments",
-        iconName: "CreditCard",
-        description: "AR/AP vouchers, cheque clearance & FIFO due settlement",
-      },
-      {
-        title: "Operating Expenses",
-        href: "/expenses",
-        iconName: "Wallet",
-        description: "Direct/indirect expenses, petty cash & cost centers",
-      },
-    ],
-  },
-  {
-    title: "Analytics & System",
-    items: [
-      {
-        title: "Reports & P&L",
+        title: "Financial Reports",
         href: "/reports",
         iconName: "BarChart3",
-        description: "COGS analysis, profit & loss, stock valuation & tax",
+        description: "Profit & loss, sales analysis & tax summaries",
       },
       {
-        title: "Settings & Audit",
+        title: "System Settings",
         href: "/settings",
         iconName: "Settings",
-        description: "Company config, users, roles & immutable audit logs",
+        description: "Enterprise profile, users & security settings",
       },
     ],
   },

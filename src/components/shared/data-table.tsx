@@ -107,7 +107,7 @@ export function DataTable<TData, TValue>({
                   setGlobalFilter(event.target.value);
                 }
               }}
-              className="pl-8 text-xs h-9"
+              className="pl-8 text-xs h-9 rounded-xl bg-muted/50 border-transparent focus-visible:bg-background focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/10 transition-all"
             />
           </div>
           {filterComponent}
@@ -118,12 +118,12 @@ export function DataTable<TData, TValue>({
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9 gap-1.5 text-xs">
+              <Button variant="outline" size="sm" className="h-9 gap-1.5 text-xs rounded-xl border-border">
                 <SlidersHorizontal className="h-3.5 w-3.5" />
                 Columns
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-44 text-xs">
+            <DropdownMenuContent align="end" className="w-44 text-xs rounded-xl">
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
@@ -145,7 +145,7 @@ export function DataTable<TData, TValue>({
       </div>
 
       {/* Table Container */}
-      <div className="rounded-md border bg-card shadow-sm overflow-hidden">
+      <div className="rounded-2xl border border-border/80 bg-card shadow-sm overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
