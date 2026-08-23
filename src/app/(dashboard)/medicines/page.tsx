@@ -13,7 +13,7 @@ export default async function MedicinesPage() {
 
   const medicines = medicinesRes.data || [];
   const categories = categoriesRes.data || [];
-  const suppliers = suppliersRes.data || [];
+  const suppliers = suppliersRes.data?.suppliers || [];
 
   return (
     <MedicineClient

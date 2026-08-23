@@ -15,7 +15,9 @@ export const supplierSchema = z.object({
   bankAccountNo: z.string().optional().nullable(),
   creditDays: z.coerce.number().int().min(0).default(30),
   creditLimit: z.coerce.number().min(0).default(500000),
+  openingBalance: z.coerce.number().min(0).default(0),
   status: z.enum(["ACTIVE", "INACTIVE"]).default("ACTIVE"),
+  notes: z.string().optional().nullable(),
 });
 
 export type SupplierInput = z.infer<typeof supplierSchema>;

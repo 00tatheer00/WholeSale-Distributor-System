@@ -44,6 +44,7 @@ export interface MedicineRecord {
 export interface SupplierRecord {
   id: string;
   name: string;
+  code?: string | null;
   contactPerson: string;
   email: string;
   phone: string;
@@ -55,9 +56,108 @@ export interface SupplierRecord {
   taxIdTin: string;
   creditDays: number;
   creditLimit: number;
+  openingBalance: number;
   currentPayable: number;
+  totalPaid: number;
   status: string;
   totalPurchases: number;
+  purchasesCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SupplierLedgerEntry {
+  id: string;
+  date: string;
+  type: "PURCHASE" | "PAYMENT" | "OPENING_BALANCE" | "CANCELLATION_REVERSAL";
+  referenceNumber: string;
+  description: string;
+  debit: number;   // In B2B AP accounting: Purchase / Initial Due increases payable (Debit to Expense / Credit to AP)
+  credit: number;  // Payment reduces payable
+  runningBalance: number;
+}
+
+export interface SupplierPaymentRecord {
+  id: string;
+  voucherNumber: string;
+  supplierId: string;
+  supplierName: string;
+  purchaseId?: string | null;
+  purchaseNumber?: string | null;
+  amount: number;
+  paymentDate: string;
+  paymentMethod: string;
+  referenceNumber?: string | null;
+  bankName?: string | null;
+  chequeNumber?: string | null;
+  chequeDate?: string | null;
+  notes?: string | null;
+  status: "CONFIRMED" | "VOIDED";
+  createdByName?: string;
+  createdAt: string;
+}
+
+export interface SupplierDetailRecord extends SupplierRecord {
+  recentPurchases: PurchaseRecord[];
+  recentPayments: SupplierPaymentRecord[];
+  ledger: SupplierLedgerEntry[];
+  suppliedMedicinesCount: number;
+}
+
+export interface PurchaseItemDetailRecord {
+  id: string;
+  medicineId: string;
+  medicineName: string;
+  genericName?: string;
+  dosageForm?: string;
+  strength?: string;
+  batchNumber: string;
+  mfgDate?: string | null;
+  expiryDate: string;
+  quantity: number;
+  bonusQuantity: number;
+  unitPurchaseCost: number;
+  unitTradePrice: number;
+  unitMrp: number;
+  discountPercent: number;
+  taxPercent: number;
+  subtotal: number;
+  totalAmount: number;
+  createdBatchId?: string | null;
+}
+
+export interface PurchaseRecord {
+  id: string;
+  poNumber: string;
+  supplierId: string;
+  supplierName: string;
+  warehouseId?: string | null;
+  warehouseName?: string;
+  purchaseDate: string;
+  expectedDeliveryDate?: string | null;
+  supplierInvoiceNo?: string;
+  subtotalAmount: number;
+  discountAmount: number;
+  taxAmount: number;
+  grandTotal: number;
+  paidAmount: number;
+  dueAmount: number;
+  paymentStatus: "UNPAID" | "PARTIALLY_PAID" | "PAID";
+  status: "DRAFT" | "ORDERED" | "RECEIVED" | "CANCELLED";
+  itemsCount: number;
+  notes?: string | null;
+  cancellationReason?: string | null;
+  cancelledAt?: string | null;
+  createdByName?: string;
+  createdAt?: string;
+}
+
+export interface PurchaseDetailRecord extends PurchaseRecord {
+  items: PurchaseItemDetailRecord[];
+  payments: SupplierPaymentRecord[];
+  supplierPhone?: string;
+  supplierEmail?: string;
+  supplierAddress?: string;
 }
 
 export interface BatchRecord {
@@ -171,20 +271,6 @@ export interface InvoiceRecord {
   items: InvoiceItemRecord[];
 }
 
-export interface PurchaseRecord {
-  id: string;
-  poNumber: string;
-  supplierId: string;
-  supplierName: string;
-  purchaseDate: string;
-  supplierInvoiceNo?: string;
-  totalAmount: number;
-  paidAmount: number;
-  dueAmount: number;
-  status: "DRAFT" | "ORDERED" | "RECEIVED" | "CANCELLED";
-  itemsCount: number;
-}
-
 export interface FinancialSummary {
   grossRevenue: number;
   tradeDiscounts: number;
@@ -219,3 +305,4 @@ export interface AgingBucket {
   totalDue: number;
   status: string;
 }
+

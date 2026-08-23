@@ -23,7 +23,7 @@ export default async function InventoryPage() {
     expiredCount: 0,
   };
   const categories = categoriesRes.data || [];
-  const suppliers = suppliersRes.data || [];
+  const suppliers = suppliersRes.data?.suppliers || [];
 
   return (
     <InventoryClient

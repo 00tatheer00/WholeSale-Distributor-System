@@ -24,7 +24,7 @@ export default async function MedicineDetailPage({ params }: MedicineDetailPageP
 
   const medicine = medicineRes.data;
   const batches = batchesRes.data || [];
-  const suppliers = suppliersRes.data || [];
+  const suppliers = suppliersRes.data?.suppliers || [];
   const warehouses = [
     { id: "wh-001", name: "Tejgaon Central Warehouse (Air-Conditioned)" },
     { id: "wh-002", name: "Mirpur Transit Distribution Hub" },

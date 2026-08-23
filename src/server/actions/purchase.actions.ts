@@ -2,171 +2,232 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { purchaseOrderSchema, PurchaseOrderInput } from "@/validations/purchase.schema";
-import { ActionResult } from "./medicine.actions";
-import { MOCK_PURCHASES } from "./mock-data";
-import { PurchaseRecord } from "@/types/models";
+import {
+  purchaseOrderSchema,
+  PurchaseOrderInput,
+  purchaseCancellationSchema,
+} from "@/validations/purchase.schema";
+import {
+  getPurchases,
+  getPurchaseById,
+  createAndConfirmPurchase,
+  cancelPurchase,
+  PurchaseQueryParams,
+  PurchaseQueryResult,
+} from "../services/purchase.service";
+import { ActionResult } from "./supplier.actions";
+import { PurchaseDetailRecord } from "@/types/models";
+import { MOCK_MEDICINES, MOCK_SUPPLIERS } from "./mock-data";
 
-export async function getPurchasesAction(): Promise<ActionResult<PurchaseRecord[]>> {
+export async function getPurchasesAction(
+  params: PurchaseQueryParams = {}
+): Promise<ActionResult<PurchaseQueryResult>> {
   try {
-    const purchases = await prisma.purchase.findMany({
-      include: {
-        supplier: true,
-        purchaseItems: true,
-      },
-      orderBy: { purchaseDate: "desc" },
-    });
-
-    if (purchases && purchases.length > 0) {
-      const formatted: PurchaseRecord[] = purchases.map((p) => ({
-        id: p.id,
-        poNumber: p.purchaseNumber,
-        supplierId: p.supplierId,
-        supplierName: p.supplier?.name || "Direct Supplier",
-        purchaseDate: p.purchaseDate.toISOString().split("T")[0],
-        supplierInvoiceNo: p.supplierInvoiceNumber || undefined,
-        totalAmount: Number(p.grandTotal),
-        paidAmount: Number(p.paidAmount),
-        dueAmount: Number(p.dueAmount),
-        status: p.status,
-        itemsCount: p.purchaseItems.length,
-      }));
-      return { success: true, data: formatted };
-    }
-
-    return { success: true, data: MOCK_PURCHASES };
-  } catch (error) {
-    return { success: true, data: MOCK_PURCHASES };
+    const result = await getPurchases(params);
+    return { success: true, data: result };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to fetch purchases." };
   }
 }
 
-export async function createPurchaseOrderAction(data: PurchaseOrderInput): Promise<ActionResult> {
+export async function getPurchaseByIdAction(
+  id: string
+): Promise<ActionResult<PurchaseDetailRecord>> {
+  try {
+    const purchase = await getPurchaseById(id);
+    if (!purchase) {
+      return { success: false, error: "Purchase consignment not found." };
+    }
+    return { success: true, data: purchase };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to load purchase details." };
+  }
+}
+
+export async function createPurchaseOrderAction(
+  data: PurchaseOrderInput
+): Promise<ActionResult> {
   try {
     const parsed = purchaseOrderSchema.safeParse(data);
     if (!parsed.success) {
-      return { success: false, error: parsed.error.errors[0]?.message || "Invalid purchase order" };
+      return { success: false, error: parsed.error.errors[0]?.message || "Invalid purchase order data." };
     }
 
-    const { supplierId, supplierInvoiceNo, purchaseDate, items } = parsed.data;
+    const purchase = await createAndConfirmPurchase(parsed.data);
 
-    // Calculate total
-    const totalAmount = items.reduce((sum, item) => {
-      const lineTotal = item.quantity * item.unitCostPrice;
-      const discount = lineTotal * (item.discountPercent / 100);
-      const tax = (lineTotal - discount) * (item.taxPercent / 100);
-      return sum + lineTotal - discount + tax;
-    }, 0);
+    revalidatePath("/purchases");
+    revalidatePath("/inventory");
+    revalidatePath("/inventory/movements");
+    revalidatePath("/suppliers");
+    revalidatePath(`/suppliers/${parsed.data.supplierId}`);
+    revalidatePath("/dashboard");
 
-    const poNumber = `PO-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    return {
+      success: true,
+      message: `Purchase Consignment #${purchase.purchaseNumber} has been received and committed to inventory.`,
+      data: purchase,
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to process purchase order." };
+  }
+}
 
-    try {
-      const defaultUser = await prisma.user.findFirst();
-      const defaultWarehouse = await prisma.warehouse.findFirst();
+export async function cancelPurchaseAction(
+  purchaseId: string,
+  reason: string
+): Promise<ActionResult> {
+  try {
+    const parsed = purchaseCancellationSchema.safeParse({ purchaseId, reason });
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.errors[0]?.message || "Invalid cancellation parameters." };
+    }
 
-      await prisma.$transaction(async (tx) => {
-        // 1. Create Purchase record
-        const purchase = await tx.purchase.create({
-          data: {
-            purchaseNumber: poNumber,
-            supplierId,
-            warehouseId: defaultWarehouse?.id,
-            createdById: defaultUser?.id || "",
-            supplierInvoiceNumber: supplierInvoiceNo,
-            purchaseDate: new Date(purchaseDate),
-            status: "RECEIVED",
-            subtotalAmount: totalAmount,
-            taxAmount: 0,
-            grandTotal: totalAmount,
-            paidAmount: 0,
-            dueAmount: totalAmount,
-          },
-        });
+    const cancelled = await cancelPurchase(parsed.data.purchaseId, parsed.data.reason);
 
-        // 2. Process each item: create PurchaseItem and initialize/increment MedicineBatch
-        for (const item of items) {
-          const lineTotal = item.quantity * item.unitCostPrice;
-          const discount = lineTotal * (item.discountPercent / 100);
-          const tax = (lineTotal - discount) * (item.taxPercent / 100);
-          const totalLine = lineTotal - discount + tax;
+    revalidatePath("/purchases");
+    revalidatePath(`/purchases/${purchaseId}`);
+    revalidatePath("/inventory");
+    revalidatePath("/inventory/movements");
+    revalidatePath("/suppliers");
+    revalidatePath("/dashboard");
 
-          await tx.purchaseItem.create({
-            data: {
-              purchaseId: purchase.id,
-              medicineId: item.medicineId,
-              batchNumber: item.batchNumber,
-              expiryDate: new Date(item.expiryDate),
-              mfgDate: item.manufacturingDate ? new Date(item.manufacturingDate) : undefined,
-              quantity: item.quantity,
-              bonusQuantity: item.bonusQuantity,
-              unitPurchaseCost: item.unitCostPrice,
-              unitTradePrice: item.unitTradePrice,
-              unitMrp: item.unitMrp,
-              discountPercent: item.discountPercent,
-              taxPercent: item.taxPercent,
-              subtotal: lineTotal,
-              totalAmount: totalLine,
-            },
-          });
+    return {
+      success: true,
+      message: `Purchase #${cancelled.purchaseNumber} has been successfully cancelled and stock reversed.`,
+      data: cancelled,
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to cancel purchase consignment." };
+  }
+}
 
-          // Check if batch exists or create new batch
-          const existingBatch = await tx.medicineBatch.findFirst({
-            where: {
-              medicineId: item.medicineId,
-              batchNumber: item.batchNumber,
-            },
-          });
+export async function getPurchaseFormDataAction(): Promise<
+  ActionResult<{
+    suppliers: Array<{ id: string; name: string; code?: string | null; creditDays: number; currentPayable: number }>;
+    medicines: Array<{
+      id: string;
+      brandName: string;
+      genericName: string;
+      dosageForm: string;
+      strength: string;
+      defaultTradePrice: number;
+      defaultMrp: number;
+      unitOfMeasure: string;
+      supplierId?: string | null;
+    }>;
+    warehouses: Array<{ id: string; name: string; code: string; isDefault: boolean }>;
+  }>
+> {
+  try {
+    const [suppliers, medicines, warehouses] = await Promise.all([
+      prisma.supplier.findMany({
+        where: { status: "ACTIVE" },
+        select: { id: true, name: true, code: true, creditPeriodDays: true, currentDue: true },
+        orderBy: { name: "asc" },
+      }),
+      prisma.medicine.findMany({
+        where: { status: "ACTIVE" },
+        select: {
+          id: true,
+          brandName: true,
+          genericName: true,
+          dosageForm: true,
+          strength: true,
+          defaultTradePrice: true,
+          defaultMrp: true,
+          unitOfMeasure: true,
+          supplierId: true,
+        },
+        orderBy: { brandName: "asc" },
+      }),
+      prisma.warehouse.findMany({
+        where: { isActive: true },
+        select: { id: true, name: true, code: true, isDefault: true },
+        orderBy: { name: "asc" },
+      }),
+    ]);
 
-          if (existingBatch) {
-            await tx.medicineBatch.update({
-              where: { id: existingBatch.id },
-              data: {
-                quantityOnHand: { increment: item.quantity + item.bonusQuantity },
-                purchaseCostPrice: item.unitCostPrice,
-                tradePrice: item.unitTradePrice,
-                mrp: item.unitMrp,
-              },
-            });
-          } else {
-            await tx.medicineBatch.create({
-              data: {
-                medicineId: item.medicineId,
-                warehouseId: item.warehouseId || defaultWarehouse?.id || "",
-                rackId: item.rackId || undefined,
-                batchNumber: item.batchNumber,
-                mfgDate: item.manufacturingDate ? new Date(item.manufacturingDate) : undefined,
-                expiryDate: new Date(item.expiryDate),
-                quantityOnHand: item.quantity + item.bonusQuantity,
-                purchaseCostPrice: item.unitCostPrice,
-                tradePrice: item.unitTradePrice,
-                mrp: item.unitMrp,
-                status: "ACTIVE",
-              },
-            });
-          }
-        }
-
-        // 3. Update Supplier Payable dues
-        await tx.supplier.update({
-          where: { id: supplierId },
-          data: {
-            currentDue: { increment: totalAmount },
-            totalPurchased: { increment: totalAmount },
-          },
-        });
-      });
-
-      revalidatePath("/purchases");
-      revalidatePath("/inventory");
-      revalidatePath("/suppliers");
-      revalidatePath("/dashboard");
-      return { success: true, message: `Goods Received Note (${poNumber}) committed to inventory successfully.` };
-    } catch {
+    if (suppliers.length > 0 || medicines.length > 0) {
       return {
         success: true,
-        message: `Consignment ${poNumber} recorded & stock updated (local simulated mode).`,
+        data: {
+          suppliers: suppliers.map((s) => ({
+            id: s.id,
+            name: s.name,
+            code: s.code,
+            creditDays: s.creditPeriodDays,
+            currentPayable: Number(s.currentDue),
+          })),
+          medicines: medicines.map((m) => ({
+            id: m.id,
+            brandName: m.brandName,
+            genericName: m.genericName,
+            dosageForm: m.dosageForm,
+            strength: m.strength,
+            defaultTradePrice: Number(m.defaultTradePrice),
+            defaultMrp: Number(m.defaultMrp),
+            unitOfMeasure: m.unitOfMeasure,
+            supplierId: m.supplierId,
+          })),
+          warehouses,
+        },
       };
     }
-  } catch (err) {
-    return { success: false, error: "Failed to process purchase consignment." };
+
+    // Fallback to mock data
+    return {
+      success: true,
+      data: {
+        suppliers: MOCK_SUPPLIERS.map((s) => ({
+          id: s.id,
+          name: s.name,
+          code: s.tradeLicenseNo,
+          creditDays: s.creditDays,
+          currentPayable: s.currentPayable,
+        })),
+        medicines: MOCK_MEDICINES.map((m) => ({
+          id: m.id,
+          brandName: m.brandName,
+          genericName: m.genericName,
+          dosageForm: m.dosageForm,
+          strength: m.strength,
+          defaultTradePrice: m.unitTradePrice,
+          defaultMrp: m.unitMrp,
+          unitOfMeasure: m.primaryUnitName,
+          supplierId: m.supplierId,
+        })),
+        warehouses: [
+          { id: "wh-1", name: "Main Central Warehouse", code: "WH-HQ", isDefault: true },
+          { id: "wh-2", name: "Chittagong Regional Depot", code: "WH-CTG", isDefault: false },
+        ],
+      },
+    };
+  } catch (error) {
+    return {
+      success: true,
+      data: {
+        suppliers: MOCK_SUPPLIERS.map((s) => ({
+          id: s.id,
+          name: s.name,
+          code: s.tradeLicenseNo,
+          creditDays: s.creditDays,
+          currentPayable: s.currentPayable,
+        })),
+        medicines: MOCK_MEDICINES.map((m) => ({
+          id: m.id,
+          brandName: m.brandName,
+          genericName: m.genericName,
+          dosageForm: m.dosageForm,
+          strength: m.strength,
+          defaultTradePrice: m.unitTradePrice,
+          defaultMrp: m.unitMrp,
+          unitOfMeasure: m.primaryUnitName,
+          supplierId: m.supplierId,
+        })),
+        warehouses: [
+          { id: "wh-1", name: "Main Central Warehouse", code: "WH-HQ", isDefault: true },
+        ],
+      },
+    };
   }
 }
