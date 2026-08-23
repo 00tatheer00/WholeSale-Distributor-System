@@ -36,16 +36,46 @@ export const NAVIGATION_SECTIONS: NavigationSection[] = [
         description: "Manufacturers, vendors & AP balance ledger",
       },
       {
-        title: "Sales & Invoicing",
+        title: "Wholesale Sales",
         href: "/sales",
         iconName: "ShoppingCart",
-        description: "Wholesale orders, billing & deliveries",
+        description: "Wholesale orders, billing & FEFO stock allocation",
+      },
+      {
+        title: "Tax Invoices",
+        href: "/invoices",
+        iconName: "FileSpreadsheet",
+        description: "DGDA-compliant invoices & delivery challans",
+      },
+      {
+        title: "Collections & Receipts",
+        href: "/payments",
+        iconName: "CreditCard",
+        description: "Customer collections & FIFO invoice settlement",
       },
     ],
   },
   {
-    title: "Management & Reports",
+    title: "Field Force & Financials",
     items: [
+      {
+        title: "Field Sales Representatives",
+        href: "/distributors",
+        iconName: "Users2",
+        description: "Medical representatives, route beats & targets",
+      },
+      {
+        title: "Operating Expenses",
+        href: "/expenses",
+        iconName: "Wallet",
+        description: "Warehouse, fuel, utilities & expense vouchers",
+      },
+      {
+        title: "Profit & Financials",
+        href: "/profit",
+        iconName: "TrendingUp",
+        description: "Historical batch COGS, gross margins & net profit",
+      },
       {
         title: "Customer Pharmacies",
         href: "/customers",

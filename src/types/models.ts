@@ -300,16 +300,147 @@ export interface CustomerDetailRecord extends CustomerRecord {
 export interface DistributorRecord {
   id: string;
   name: string;
+  employeeCode?: string | null;
   phone: string;
-  email: string;
+  email?: string | null;
+  address?: string | null;
   assignedTerritory: string;
-  dailyRouteBeat: string;
+  assignedRoute?: string | null;
   monthlySalesTarget: number;
-  currentMonthSales: number;
-  recoveryAmount: number;
   commissionRatePercent: number;
-  earnedCommission: number;
+  joiningDate?: string | null;
   status: string;
+  notes?: string | null;
+  totalSales: number;
+  totalCollected: number;
+  totalDue: number;
+  totalExpenses: number;
+  grossProfitContribution: number;
+  netContribution: number;
+  salesCount?: number;
+  collectionsCount?: number;
+  expensesCount?: number;
+}
+
+export interface DistributorExpenseRecord {
+  id: string;
+  distributorId: string;
+  distributorName?: string;
+  categoryId: string;
+  categoryName: string;
+  amount: number;
+  expenseDate: string;
+  description: string;
+  receiptUrl?: string | null;
+  status: string;
+  approvedByName?: string | null;
+  createdAt: string;
+}
+
+export interface DistributorDetailRecord extends DistributorRecord {
+  sales: Array<{
+    id: string;
+    saleNumber: string;
+    invoiceNumber?: string | null;
+    customerName: string;
+    saleDate: string;
+    grandTotal: number;
+    paidAmount: number;
+    dueAmount: number;
+    cogsTotal: number;
+    grossProfit: number;
+    paymentStatus: string;
+  }>;
+  collections: Array<{
+    id: string;
+    receiptNumber: string;
+    customerName: string;
+    amount: number;
+    paymentDate: string;
+    paymentMethod: string;
+    referenceNumber?: string | null;
+  }>;
+  expenses: DistributorExpenseRecord[];
+}
+
+export interface ExpenseCategoryRecord {
+  id: string;
+  name: string;
+  code?: string | null;
+  description?: string | null;
+  isDirectCost: boolean;
+  isActive: boolean;
+  expensesCount?: number;
+  totalAmount?: number;
+}
+
+export interface ExpenseRecord {
+  id: string;
+  voucherNumber: string;
+  categoryId: string;
+  categoryName: string;
+  amount: number;
+  expenseDate: string;
+  paymentMethod: string;
+  paidTo?: string | null;
+  description: string;
+  referenceNumber?: string | null;
+  status: string;
+  approvedByName?: string | null;
+  notes?: string | null;
+  createdByName?: string | null;
+  createdAt: string;
+}
+
+export interface MedicineProfitItem {
+  medicineId: string;
+  brandName: string;
+  genericName: string;
+  categoryName: string;
+  quantitySold: number;
+  salesRevenue: number;
+  historicalCogs: number;
+  grossProfit: number;
+  marginPercent: number;
+}
+
+export interface DistributorProfitItem {
+  distributorId: string;
+  name: string;
+  territory: string;
+  salesRevenue: number;
+  collectionsAmount: number;
+  historicalCogs: number;
+  grossProfitContribution: number;
+  distributorExpenses: number;
+  netContribution: number;
+  marginPercent: number;
+}
+
+export interface ProfitOverviewData {
+  startDate: string;
+  endDate: string;
+  preset: string;
+  salesRevenue: number;
+  historicalCogs: number;
+  grossProfit: number;
+  grossMarginPercent: number;
+  operatingExpenses: number;
+  distributorExpenses: number;
+  totalExpenses: number;
+  netProfit: number;
+  netMarginPercent: number;
+  totalSalesCount: number;
+  dailyTrends: Array<{
+    date: string;
+    revenue: number;
+    cogs: number;
+    grossProfit: number;
+    expenses: number;
+    netProfit: number;
+  }>;
+  medicineBreakdown: MedicineProfitItem[];
+  distributorBreakdown: DistributorProfitItem[];
 }
 
 export interface PaymentRecord {

@@ -37,7 +37,7 @@ export default async function PaymentsPage({
     <PaymentsClient
       initialPaymentsData={paymentsRes.data}
       customers={customersRes.data || []}
-      distributors={distributorsRes.data || []}
+      distributors={distributorsRes.data?.distributors || []}
     />
   );
 }

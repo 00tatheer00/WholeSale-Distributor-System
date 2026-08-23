@@ -1,93 +1,143 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma } from "@/lib/prisma";
-import { expenseSchema, ExpenseInput } from "@/validations/expense.schema";
-import { MOCK_EXPENSES, MOCK_EXPENSE_CATEGORIES } from "./mock-data";
-import { ActionResult } from "./medicine.actions";
+import {
+  expenseCategorySchema,
+  expenseSchema,
+  cancelExpenseSchema,
+  ExpenseCategoryInput,
+  ExpenseInput,
+  CancelExpenseInput,
+} from "@/validations/expense.schema";
+import {
+  getExpenseCategories,
+  createExpenseCategory,
+  toggleExpenseCategoryStatus,
+  getExpenses,
+  createExpense,
+  cancelExpense,
+  ExpenseQueryParams,
+  ExpenseQueryResult,
+} from "@/server/services/expense.service";
+import { ExpenseCategoryRecord, ExpenseRecord } from "@/types/models";
 
-export async function getExpensesAction(): Promise<ActionResult<typeof MOCK_EXPENSES>> {
+export interface ActionResult<T = any> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}
+
+export async function getExpenseCategoriesAction(): Promise<ActionResult<ExpenseCategoryRecord[]>> {
   try {
-    const expenses = await prisma.businessExpense.findMany({
-      include: {
-        category: true,
-      },
-      orderBy: { expenseDate: "desc" },
-    });
-
-    if (expenses && expenses.length > 0) {
-      const formatted = expenses.map((e) => ({
-        id: e.id,
-        voucherNo: e.voucherNumber,
-        categoryName: e.category?.name || "General Operating Expense",
-        amount: Number(e.amount),
-        expenseDate: e.expenseDate.toISOString().split("T")[0],
-        payeeName: e.paidTo || "Operational Payee",
-        paymentMethod: e.paymentMethod as string,
-        description: e.description,
-        status: e.status as string,
-      }));
-      return { success: true, data: formatted };
-    }
-
-    return { success: true, data: MOCK_EXPENSES };
-  } catch (error) {
-    return { success: true, data: MOCK_EXPENSES };
+    const categories = await getExpenseCategories();
+    return { success: true, data: categories };
+  } catch (error: any) {
+    console.error("getExpenseCategoriesAction error:", error);
+    return { success: false, error: "Failed to fetch expense categories." };
   }
 }
 
-export async function getExpenseCategoriesAction(): Promise<ActionResult<typeof MOCK_EXPENSE_CATEGORIES>> {
+export async function createExpenseCategoryAction(
+  data: ExpenseCategoryInput
+): Promise<ActionResult> {
   try {
-    const cats = await prisma.expenseCategory.findMany();
-    if (cats && cats.length > 0) {
-      return { success: true, data: cats.map((c) => ({ id: c.id, name: c.name })) };
+    const parsed = expenseCategorySchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.errors[0]?.message || "Invalid category data" };
     }
-    return { success: true, data: MOCK_EXPENSE_CATEGORIES };
-  } catch {
-    return { success: true, data: MOCK_EXPENSE_CATEGORIES };
+
+    const result = await createExpenseCategory(parsed.data);
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
+
+    revalidatePath("/expenses");
+    return { success: true, message: `Expense category "${parsed.data.name}" created.` };
+  } catch (error: any) {
+    console.error("createExpenseCategoryAction error:", error);
+    return { success: false, error: "Failed to create category." };
   }
 }
 
-export async function createExpenseAction(data: ExpenseInput): Promise<ActionResult> {
+export async function toggleExpenseCategoryStatusAction(
+  id: string,
+  isActive: boolean
+): Promise<ActionResult> {
+  try {
+    const result = await toggleExpenseCategoryStatus(id, isActive);
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
+
+    revalidatePath("/expenses");
+    return { success: true, message: `Category status updated.` };
+  } catch (error: any) {
+    console.error("toggleExpenseCategoryStatusAction error:", error);
+    return { success: false, error: "Failed to update category status." };
+  }
+}
+
+export async function getExpensesAction(
+  params?: ExpenseQueryParams
+): Promise<ActionResult<ExpenseQueryResult>> {
+  try {
+    const result = await getExpenses(params);
+    return { success: true, data: result };
+  } catch (error: any) {
+    console.error("getExpensesAction error:", error);
+    return { success: false, error: "Failed to fetch expense vouchers." };
+  }
+}
+
+export async function createExpenseAction(
+  data: ExpenseInput
+): Promise<ActionResult<{ voucherNumber: string }>> {
   try {
     const parsed = expenseSchema.safeParse(data);
     if (!parsed.success) {
       return { success: false, error: parsed.error.errors[0]?.message || "Invalid expense data" };
     }
 
-    const voucherNo = `EXP-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-
-    try {
-      const company = await prisma.company.findFirst();
-      if (!company) throw new Error("Company missing");
-      const defaultUser = await prisma.user.findFirst();
-
-      await prisma.businessExpense.create({
-        data: {
-          companyId: company.id,
-          categoryId: parsed.data.categoryId,
-          createdById: defaultUser?.id || "",
-          voucherNumber: voucherNo,
-          amount: parsed.data.amount,
-          expenseDate: new Date(parsed.data.expenseDate),
-          paidTo: parsed.data.payeeName,
-          paymentMethod: parsed.data.paymentMethod,
-          description: parsed.data.description,
-          status: "APPROVED",
-        },
-      });
-
-      revalidatePath("/expenses");
-      revalidatePath("/reports");
-      revalidatePath("/dashboard");
-      return { success: true, message: `Expense voucher ${voucherNo} for ৳${parsed.data.amount} recorded.` };
-    } catch {
-      return {
-        success: true,
-        message: `Expense voucher ${voucherNo} recorded in expense book.`,
-      };
+    const result = await createExpense(parsed.data);
+    if (!result.success) {
+      return { success: false, error: result.error };
     }
-  } catch (err) {
+
+    revalidatePath("/expenses");
+    revalidatePath("/profit");
+    revalidatePath("/dashboard");
+    return {
+      success: true,
+      data: { voucherNumber: result.data?.voucherNumber },
+      message: `Expense voucher ${result.data?.voucherNumber} for ৳${parsed.data.amount} recorded.`,
+    };
+  } catch (error: any) {
+    console.error("createExpenseAction error:", error);
     return { success: false, error: "Failed to record expense voucher." };
+  }
+}
+
+export async function cancelExpenseAction(
+  data: CancelExpenseInput
+): Promise<ActionResult> {
+  try {
+    const parsed = cancelExpenseSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.errors[0]?.message || "Invalid cancellation data" };
+    }
+
+    const result = await cancelExpense(parsed.data.expenseId, parsed.data.reason);
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
+
+    revalidatePath("/expenses");
+    revalidatePath("/profit");
+    revalidatePath("/dashboard");
+    return { success: true, message: "Expense voucher cancelled." };
+  } catch (error: any) {
+    console.error("cancelExpenseAction error:", error);
+    return { success: false, error: "Failed to cancel expense." };
   }
 }

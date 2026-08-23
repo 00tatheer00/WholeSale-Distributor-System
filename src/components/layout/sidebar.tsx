@@ -23,6 +23,7 @@ import {
   Layers,
   SlidersHorizontal,
   History,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAVIGATION_SECTIONS, APP_NAME } from "@/lib/constants";
@@ -43,6 +44,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Users2,
   CreditCard,
   Wallet,
+  TrendingUp,
   BarChart3,
   Settings,
 };
