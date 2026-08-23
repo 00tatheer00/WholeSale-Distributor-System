@@ -23,6 +23,10 @@ export const metadata: Metadata = {
   },
   description:
     "Enterprise Web-Based Wholesale Medicine Distribution Management System",
+  robots: {
+    index: false,
+    follow: false,
+  },
   icons: {
     icon: "/favicon.ico",
   },

@@ -11,6 +11,11 @@ import {
 const prisma = new PrismaClient();
 
 async function main() {
+  if (process.env.NODE_ENV === "production" && process.env.ALLOW_PRODUCTION_SEED !== "true") {
+    console.error("🛑 DANGER: Transaction seeding is strictly blocked in production environment.");
+    process.exit(1);
+  }
+
   console.log("🌱 Injecting live wholesale transactions and records...");
 
   const company = await prisma.company.findFirst();

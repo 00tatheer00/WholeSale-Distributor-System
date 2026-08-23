@@ -15,6 +15,12 @@ import {
 const prisma = new PrismaClient();
 
 async function main() {
+  if (process.env.NODE_ENV === "production" && process.env.ALLOW_PRODUCTION_SEED !== "true") {
+    console.error("🛑 DANGER: Direct seeding is strictly blocked in production environment.");
+    console.error("Set ALLOW_PRODUCTION_SEED=true explicitly if initializing an empty production database.");
+    process.exit(1);
+  }
+
   console.log("🌱 Starting database seeding for Wholesale Medicine Distribution ERP...");
 
   // 1. Clean existing records if any exist (safe check)
