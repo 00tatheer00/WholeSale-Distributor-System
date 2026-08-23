@@ -6,6 +6,8 @@ import {
 } from "@/server/actions/settings.actions";
 import { SettingsClient } from "./settings-client";
 
+export const dynamic = "force-dynamic";
+
 export default async function SettingsPage() {
   const [companyRes, usersRes, auditLogsRes] = await Promise.all([
     getCompanySettingsAction(),

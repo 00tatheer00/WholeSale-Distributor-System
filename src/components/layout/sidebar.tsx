@@ -25,6 +25,7 @@ import {
   History,
   TrendingUp,
   Bell,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAVIGATION_SECTIONS, APP_NAME } from "@/lib/constants";
@@ -49,6 +50,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   BarChart3,
   Bell,
   Settings,
+  Shield,
 };
 
 interface SidebarProps {
