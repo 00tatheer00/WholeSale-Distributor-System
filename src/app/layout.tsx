@@ -32,6 +32,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { Suspense } from "react";
+import { TopProgressBar } from "@/components/shared/top-progress-bar";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -46,6 +49,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <Suspense fallback={null}>
+            <TopProgressBar />
+          </Suspense>
           {children}
         </ThemeProvider>
       </body>
