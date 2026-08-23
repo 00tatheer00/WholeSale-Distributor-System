@@ -17,6 +17,8 @@ import {
   BookOpen,
   HelpCircle,
   FileSpreadsheet,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   Dialog,
@@ -37,86 +39,111 @@ export function InfoGuideModal() {
   const chapters = [
     {
       id: "quickstart",
-      title: "1. Quick Start (5 Asaan Steps)",
+      title: "1. Quick Start",
+      fullTitle: "1. Quick Start (5 Asaan Steps)",
       shortDesc: "Pehli dafa system shuru karne ka mukammal tariqa",
       icon: Sparkles,
       badge: "Zaroori",
     },
     {
       id: "medicines",
-      title: "2. Medicines & FEFO Stock",
+      title: "2. Medicines & FEFO",
+      fullTitle: "2. Medicines & FEFO Stock",
       shortDesc: "Dawaiyon ka catalog, batches, TP, MRP aur Expiry",
       icon: Pill,
       badge: "Stock Control",
     },
     {
       id: "purchases",
-      title: "3. Purchases & Factory Stock-In",
+      title: "3. Purchases",
+      fullTitle: "3. Purchases & Factory Stock-In",
       shortDesc: "Manufacturer se stock kharidna aur GRN banana",
       icon: ReceiptText,
       badge: "Inward Stock",
     },
     {
       id: "suppliers",
-      title: "4. Suppliers & Khata (AP)",
+      title: "4. Suppliers (AP)",
+      fullTitle: "4. Suppliers & Khata (AP)",
       shortDesc: "Medicine manufacturers ke baqaya paise aur vouchers",
       icon: Truck,
       badge: "Payables",
     },
     {
       id: "sales",
-      title: "5. Sales Orders & Invoicing",
+      title: "5. Sales & Invoices",
+      fullTitle: "5. Sales Orders & Invoicing",
       shortDesc: "Wholesale bill, FEFO batch allocation aur challan",
       icon: ShoppingCart,
       badge: "Billing",
     },
     {
       id: "customers",
-      title: "6. Customer Pharmacies & Dues (AR)",
+      title: "6. Customers (AR)",
+      fullTitle: "6. Customer Pharmacies & Dues (AR)",
       shortDesc: "Pharmacy credit limit, dues recovery aur ledgers",
       icon: Building2,
       badge: "Receivables",
     },
     {
       id: "payments",
-      title: "7. Collections & Money Receipts",
+      title: "7. Collections",
+      fullTitle: "7. Collections & Money Receipts",
       shortDesc: "Cash, bank aur hawala receipts ki entry",
       icon: FileSpreadsheet,
       badge: "Cash Flow",
     },
     {
       id: "distributors",
-      title: "8. Salesmen / Medical Reps",
+      title: "8. Salesmen / Reps",
+      fullTitle: "8. Salesmen / Medical Reps",
       shortDesc: "Order bookers ke targets aur field expenses",
       icon: Users2,
       badge: "Field Reps",
     },
     {
       id: "profit",
-      title: "9. Profit & Expenses (P&L)",
+      title: "9. Profit & P&L",
+      fullTitle: "9. Profit & Expenses (P&L)",
       shortDesc: "Asli Gross aur Net Munafa (COGS Formula)",
       icon: TrendingUp,
       badge: "Finance",
     },
     {
       id: "reports",
-      title: "10. Reports & Excel Export",
+      title: "10. Reports",
+      fullTitle: "10. Reports & Excel Export",
       shortDesc: "Rozana, hafta-war aur mahana business reports",
       icon: BarChart3,
       badge: "Analytics",
     },
     {
       id: "settings",
-      title: "11. Settings & Audit Logs",
+      title: "11. Settings & Audit",
+      fullTitle: "11. Settings & Audit Logs",
       shortDesc: "Company license, tax rules aur security logs",
       icon: Settings,
       badge: "Admin",
     },
   ];
 
+  const currentIndex = chapters.findIndex((c) => c.id === activeTab);
+
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      setActiveTab(chapters[currentIndex - 1].id);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentIndex < chapters.length - 1) {
+      setActiveTab(chapters[currentIndex + 1].id);
+    }
+  };
+
   const filteredChapters = chapters.filter(
     (c) =>
-      c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.fullTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.shortDesc.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -126,45 +153,68 @@ export function InfoGuideModal() {
         <Button
           variant="outline"
           size="sm"
-          className="h-9 px-3.5 gap-2 rounded-full border-blue-200 dark:border-blue-800/60 bg-blue-50/70 dark:bg-blue-950/50 text-[#0071E3] hover:bg-[#0071E3] hover:text-white transition-all text-xs font-semibold shadow-sm"
+          className="h-9 px-2.5 sm:px-3.5 gap-1.5 sm:gap-2 rounded-full border-blue-200 dark:border-blue-800/60 bg-blue-50/70 dark:bg-blue-950/50 text-[#0071E3] hover:bg-[#0071E3] hover:text-white transition-all text-xs font-semibold shadow-sm"
           title="Complete System User Manual & Guide (Roman Urdu)"
         >
           <BookOpen className="h-4 w-4 stroke-[2.2]" />
-          <span className="font-semibold">System Guide (Urdu)</span>
+          <span className="hidden sm:inline font-semibold">System Guide (Urdu)</span>
+          <span className="sm:hidden font-semibold">Guide</span>
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-5xl max-h-[90vh] p-0 rounded-[28px] overflow-hidden border border-border bg-background shadow-2xl flex flex-col">
+      <DialogContent className="max-w-5xl w-[95vw] sm:w-full max-h-[92vh] p-0 rounded-[24px] sm:rounded-[28px] overflow-hidden border border-border bg-background shadow-2xl flex flex-col">
         {/* Top Header Bar */}
-        <div className="px-6 py-4 border-b border-border/70 bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-[#0071E3]/10 text-[#0071E3] flex items-center justify-center font-bold">
-              <Sparkles className="h-5 w-5" />
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-border/70 bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl sm:rounded-2xl bg-[#0071E3]/10 text-[#0071E3] flex items-center justify-center font-bold shrink-0">
+              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
             <div>
-              <DialogTitle className="text-base font-bold text-foreground">
-                Wholesale Medicine ERP — Mukammal Rehnumai Guide
+              <DialogTitle className="text-sm sm:text-base font-bold text-foreground">
+                Wholesale Medicine ERP — User Manual
               </DialogTitle>
-              <DialogDescription className="text-xs text-muted-foreground">
-                Software ko shuru se aakhir tak chalane ka asaan Roman Urdu manual (Client Reference Guide)
+              <DialogDescription className="text-[11px] sm:text-xs text-muted-foreground line-clamp-1">
+                Software chalane ka asaan Roman Urdu manual (Client Reference Guide)
               </DialogDescription>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200 font-medium">
-              Currency: AFN (؋)
+          <div className="flex items-center gap-1.5 self-start sm:self-auto">
+            <Badge variant="outline" className="text-[10px] sm:text-xs bg-emerald-50 text-emerald-700 border-emerald-200 font-medium">
+              AFN (؋)
             </Badge>
-            <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200 font-medium">
-              Strict FEFO ERP
+            <Badge variant="outline" className="text-[10px] sm:text-xs bg-blue-50 text-blue-700 border-blue-200 font-medium">
+              FEFO ERP
             </Badge>
           </div>
         </div>
 
+        {/* Mobile Horizontal Chapter Scroll Bar (Thumb-Friendly on Phone) */}
+        <div className="flex md:hidden overflow-x-auto gap-1.5 p-2 bg-muted/30 border-b border-border/60 no-scrollbar">
+          {chapters.map((ch) => {
+            const Icon = ch.icon;
+            const isActive = activeTab === ch.id;
+            return (
+              <button
+                key={ch.id}
+                onClick={() => setActiveTab(ch.id)}
+                className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 ${
+                  isActive
+                    ? "bg-[#0071E3] text-white shadow-sm font-bold"
+                    : "bg-background text-muted-foreground hover:bg-muted hover:text-foreground border border-border/60"
+                }`}
+              >
+                <Icon className={`h-3.5 w-3.5 ${isActive ? "text-white" : "text-[#0071E3]"}`} />
+                <span>{ch.title}</span>
+              </button>
+            );
+          })}
+        </div>
+
         {/* Search & Main Two-Column Layout */}
         <div className="grid grid-cols-1 md:grid-cols-12 flex-1 overflow-hidden">
-          {/* Left Column: Navigation Sidebar */}
-          <div className="md:col-span-4 border-r border-border/70 p-3 bg-muted/10 flex flex-col gap-2 overflow-y-auto max-h-[calc(90vh-140px)]">
+          {/* Left Column: Navigation Sidebar (Desktop) */}
+          <div className="hidden md:flex md:col-span-4 border-r border-border/70 p-3 bg-muted/10 flex-col gap-2 overflow-y-auto max-h-[calc(92vh-140px)]">
             <div className="relative mb-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <Input
@@ -191,7 +241,7 @@ export function InfoGuideModal() {
                   >
                     <div className="flex items-center gap-2.5 min-w-0 pr-2">
                       <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-white" : "text-[#0071E3]"}`} />
-                      <span className="truncate">{ch.title}</span>
+                      <span className="truncate">{ch.fullTitle}</span>
                     </div>
                     <Badge
                       className={`text-[9px] px-1.5 py-0 shrink-0 ${
@@ -216,24 +266,24 @@ export function InfoGuideModal() {
           </div>
 
           {/* Right Column: Detailed Chapter View */}
-          <div className="md:col-span-8 p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-6">
+          <div className="md:col-span-8 p-4 sm:p-6 overflow-y-auto max-h-[calc(92vh-140px)] space-y-5">
             {/* Chapter 1: Quick Start */}
             {activeTab === "quickstart" && (
-              <div className="space-y-5">
-                <div className="border-b pb-3">
-                  <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-[#0071E3]" />
+              <div className="space-y-4 sm:space-y-5">
+                <div className="border-b pb-2.5">
+                  <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-[#0071E3]" />
                     Pehli Dafa Shuru Karne Ke 5 Zaroori Steps
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                     Naya distributor account setup karne ke baad in 5 steps ko follow karein:
                   </p>
                 </div>
 
-                <div className="space-y-3.5">
-                  <div className="p-4 rounded-2xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-200/70 space-y-1.5">
+                <div className="space-y-3">
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-200/70 space-y-1.5">
                     <div className="flex items-center gap-2 font-bold text-xs text-sky-900 dark:text-sky-100">
-                      <span className="h-5 w-5 rounded-full bg-[#0071E3] text-white flex items-center justify-center text-[10px]">1</span>
+                      <span className="h-5 w-5 rounded-full bg-[#0071E3] text-white flex items-center justify-center text-[10px] shrink-0">1</span>
                       Supplier / Medicine Manufacturer Add Karein
                     </div>
                     <p className="text-xs text-sky-900/80 dark:text-sky-200/80 leading-relaxed">
@@ -241,9 +291,9 @@ export function InfoGuideModal() {
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-200/70 space-y-1.5">
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-200/70 space-y-1.5">
                     <div className="flex items-center gap-2 font-bold text-xs text-purple-900 dark:text-purple-100">
-                      <span className="h-5 w-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px]">2</span>
+                      <span className="h-5 w-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] shrink-0">2</span>
                       Medicine Catalog & Therapeutic Categories Banayein
                     </div>
                     <p className="text-xs text-purple-900/80 dark:text-purple-200/80 leading-relaxed">
@@ -251,9 +301,9 @@ export function InfoGuideModal() {
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/70 space-y-1.5">
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/70 space-y-1.5">
                     <div className="flex items-center gap-2 font-bold text-xs text-emerald-900 dark:text-emerald-100">
-                      <span className="h-5 w-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px]">3</span>
+                      <span className="h-5 w-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] shrink-0">3</span>
                       Purchase Intake (GRN) Se Stock Warehouse Mein Layein
                     </div>
                     <p className="text-xs text-emerald-900/80 dark:text-emerald-200/80 leading-relaxed">
@@ -261,9 +311,9 @@ export function InfoGuideModal() {
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/70 space-y-1.5">
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/70 space-y-1.5">
                     <div className="flex items-center gap-2 font-bold text-xs text-amber-900 dark:text-amber-100">
-                      <span className="h-5 w-5 rounded-full bg-amber-600 text-white flex items-center justify-center text-[10px]">4</span>
+                      <span className="h-5 w-5 rounded-full bg-amber-600 text-white flex items-center justify-center text-[10px] shrink-0">4</span>
                       Customer Pharmacy / Clinic Register Karein
                     </div>
                     <p className="text-xs text-amber-900/80 dark:text-amber-200/80 leading-relaxed">
@@ -271,9 +321,9 @@ export function InfoGuideModal() {
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200/70 space-y-1.5">
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200/70 space-y-1.5">
                     <div className="flex items-center gap-2 font-bold text-xs text-blue-900 dark:text-blue-100">
-                      <span className="h-5 w-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">5</span>
+                      <span className="h-5 w-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] shrink-0">5</span>
                       Wholesale Sales Order Book Karein & Invoice Print Karein
                     </div>
                     <p className="text-xs text-blue-900/80 dark:text-blue-200/80 leading-relaxed">
@@ -287,12 +337,12 @@ export function InfoGuideModal() {
             {/* Chapter 2: Medicines & FEFO */}
             {activeTab === "medicines" && (
               <div className="space-y-4">
-                <div className="border-b pb-3">
-                  <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                    <Pill className="h-5 w-5 text-purple-600" />
+                <div className="border-b pb-2.5">
+                  <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                    <Pill className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
                     Medicines, Batches & FEFO Stock Rule
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                     Dawaiyon ka master catalog aur automated First-Expire, First-Out (FEFO) nizam.
                   </p>
                 </div>
@@ -325,12 +375,12 @@ export function InfoGuideModal() {
             {/* Chapter 3: Purchases */}
             {activeTab === "purchases" && (
               <div className="space-y-4">
-                <div className="border-b pb-3">
-                  <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                    <ReceiptText className="h-5 w-5 text-emerald-600" />
+                <div className="border-b pb-2.5">
+                  <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                    <ReceiptText className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
                     Purchases & Goods Received Note (GRN)
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                     Manufacturer company se stock kharidne aur warehouse me dakhil karne ka tariqa.
                   </p>
                 </div>
@@ -359,12 +409,12 @@ export function InfoGuideModal() {
             {/* Chapter 4: Suppliers */}
             {activeTab === "suppliers" && (
               <div className="space-y-4">
-                <div className="border-b pb-3">
-                  <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                    <Truck className="h-5 w-5 text-amber-600" />
+                <div className="border-b pb-2.5">
+                  <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                    <Truck className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
                     Suppliers & Accounts Payable (AP)
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                     Dawai banane wali companies ka hisab kitab aur payment vouchers.
                   </p>
                 </div>
@@ -383,12 +433,12 @@ export function InfoGuideModal() {
             {/* Chapter 5: Sales & Invoices */}
             {activeTab === "sales" && (
               <div className="space-y-4">
-                <div className="border-b pb-3">
-                  <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                    <ShoppingCart className="h-5 w-5 text-[#0071E3]" />
+                <div className="border-b pb-2.5">
+                  <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                    <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 text-[#0071E3]" />
                     Wholesale Sales Orders & Invoicing
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                     Pharmacies aur hospitals ko wholesale bill banane ka step-by-step tariqa.
                   </p>
                 </div>
@@ -418,12 +468,12 @@ export function InfoGuideModal() {
             {/* Chapter 6: Customer Pharmacies & Credit Dues */}
             {activeTab === "customers" && (
               <div className="space-y-4">
-                <div className="border-b pb-3">
-                  <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-indigo-600" />
+                <div className="border-b pb-2.5">
+                  <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                    <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600" />
                     Customer Pharmacies & Credit Limit (AR)
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                     Pharmacies ka udhaar (Credit Limit) control aur recovery ledger.
                   </p>
                 </div>
@@ -449,12 +499,12 @@ export function InfoGuideModal() {
             {/* Chapter 7: Payments & Collections */}
             {activeTab === "payments" && (
               <div className="space-y-4">
-                <div className="border-b pb-3">
-                  <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                    <FileSpreadsheet className="h-5 w-5 text-emerald-600" />
+                <div className="border-b pb-2.5">
+                  <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                    <FileSpreadsheet className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
                     Customer Collections & Money Receipts
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                     Order booker ya cashier ke zariye paise jama karne ka tareeqa.
                   </p>
                 </div>
@@ -473,12 +523,12 @@ export function InfoGuideModal() {
             {/* Chapter 8: Distributors / Sales Reps */}
             {activeTab === "distributors" && (
               <div className="space-y-4">
-                <div className="border-b pb-3">
-                  <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                    <Users2 className="h-5 w-5 text-[#0071E3]" />
+                <div className="border-b pb-2.5">
+                  <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                    <Users2 className="h-4 w-4 sm:h-5 sm:w-5 text-[#0071E3]" />
                     Distributors / Field Sales Representatives
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                     Salesmen ki performance, targets aur travel allowance ka hisab.
                   </p>
                 </div>
@@ -497,12 +547,12 @@ export function InfoGuideModal() {
             {/* Chapter 9: Profit & Expenses */}
             {activeTab === "profit" && (
               <div className="space-y-4">
-                <div className="border-b pb-3">
-                  <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-emerald-600" />
+                <div className="border-b pb-2.5">
+                  <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
                     Profit & Financial Intelligence (P&L)
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                     Asli munafa aur karobari kharchon ka hisab.
                   </p>
                 </div>
@@ -525,12 +575,12 @@ export function InfoGuideModal() {
             {/* Chapter 10: Reports */}
             {activeTab === "reports" && (
               <div className="space-y-4">
-                <div className="border-b pb-3">
-                  <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-sky-600" />
+                <div className="border-b pb-2.5">
+                  <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-sky-600" />
                     Reports Center & Excel / CSV Export
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                     Accounting aur tax audit ke liye mukammal export reports.
                   </p>
                 </div>
@@ -554,12 +604,12 @@ export function InfoGuideModal() {
             {/* Chapter 11: Settings & Security */}
             {activeTab === "settings" && (
               <div className="space-y-4">
-                <div className="border-b pb-3">
-                  <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                    <Settings className="h-5 w-5 text-purple-600" />
+                <div className="border-b pb-2.5">
+                  <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                    <Settings className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
                     System Settings, Licensing & Audit Trail
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                     Company profile, invoice customization aur security ledger.
                   </p>
                 </div>
@@ -583,18 +633,44 @@ export function InfoGuideModal() {
                 </div>
               </div>
             )}
+
+            {/* Previous & Next Chapter Navigation Buttons (Easy on Mobile) */}
+            <div className="pt-4 border-t border-border/60 flex items-center justify-between gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrev}
+                disabled={currentIndex === 0}
+                className="rounded-xl text-xs h-8 px-3"
+              >
+                <ChevronLeft className="h-3.5 w-3.5 mr-1" />
+                Previous Chapter
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNext}
+                disabled={currentIndex === chapters.length - 1}
+                className="rounded-xl text-xs h-8 px-3 text-[#0071E3]"
+              >
+                Next Chapter
+                <ChevronRight className="h-3.5 w-3.5 ml-1" />
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Bottom Action Footer */}
-        <div className="px-6 py-3.5 border-t border-border/70 bg-muted/20 flex items-center justify-between">
-          <div className="text-xs text-muted-foreground flex items-center gap-2">
+        <div className="px-4 sm:px-6 py-3 border-t border-border/70 bg-muted/20 flex items-center justify-between">
+          <div className="text-[11px] sm:text-xs text-muted-foreground flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-emerald-500 inline-block" />
-            Wholesale Medicine ERP v1.0 • Afghanistan Region Edition (AFN)
+            <span className="hidden sm:inline">Wholesale Medicine ERP v1.0 • Afghanistan (AFN)</span>
+            <span className="sm:hidden">ERP v1.0 • AFN</span>
           </div>
           <Button
             onClick={() => setIsOpen(false)}
-            className="rounded-xl px-6 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-semibold h-9 shadow-sm"
+            className="rounded-xl px-5 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-semibold h-8.5 shadow-sm"
           >
             Guide Band Karein
           </Button>
