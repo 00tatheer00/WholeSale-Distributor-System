@@ -40,6 +40,18 @@ export const NAVIGATION_SECTIONS: NavigationSection[] = [
         iconName: "Boxes",
         description: "Batch tracking, rack locations, expiry alerts & quarantine",
       },
+      {
+        title: "Stock Adjustments",
+        href: "/inventory/adjustments",
+        iconName: "SlidersHorizontal",
+        description: "Physical count reconciliation, damage & expiry write-offs",
+      },
+      {
+        title: "Movement Ledger",
+        href: "/inventory/movements",
+        iconName: "History",
+        description: "Immutable stock audit trail and transaction log",
+      },
     ],
   },
   {

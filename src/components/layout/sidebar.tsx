@@ -21,6 +21,8 @@ import {
   ChevronRight,
   Cross,
   Layers,
+  SlidersHorizontal,
+  History,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAVIGATION_SECTIONS, APP_NAME } from "@/lib/constants";
@@ -30,6 +32,9 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   LayoutDashboard,
   Pill,
   Boxes,
+  Layers,
+  SlidersHorizontal,
+  History,
   Truck,
   ReceiptText,
   Store,
