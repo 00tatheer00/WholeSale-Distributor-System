@@ -24,6 +24,7 @@ import {
   SlidersHorizontal,
   History,
   TrendingUp,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAVIGATION_SECTIONS, APP_NAME } from "@/lib/constants";
@@ -46,6 +47,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Wallet,
   TrendingUp,
   BarChart3,
+  Bell,
   Settings,
 };
 

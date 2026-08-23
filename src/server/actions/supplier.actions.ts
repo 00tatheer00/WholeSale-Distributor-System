@@ -33,6 +33,15 @@ export async function getSuppliersAction(
   }
 }
 
+export async function getSuppliersListAction(): Promise<ActionResult<any[]>> {
+  try {
+    const result = await getSuppliers({ pageSize: 100 });
+    return { success: true, data: result.suppliers };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to fetch suppliers list." };
+  }
+}
+
 export async function getSupplierByIdAction(
   id: string
 ): Promise<ActionResult<SupplierDetailRecord>> {

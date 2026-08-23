@@ -1,16 +1,11 @@
 import * as React from "react";
-import { getReportsSummaryAction } from "@/server/actions/reports.actions";
+import { getReportsHubSummaryAction } from "@/server/actions/reports.actions";
 import { ReportsClient } from "./reports-client";
 
-export default async function ReportsPage() {
-  const reportsRes = await getReportsSummaryAction();
-  const data = reportsRes.data!;
+export const dynamic = "force-dynamic";
 
-  return (
-    <ReportsClient
-      financials={data.financials}
-      monthlyTrends={data.monthlyTrends}
-      dueAging={data.dueAging}
-    />
-  );
+export default async function ReportsPage() {
+  const res = await getReportsHubSummaryAction();
+
+  return <ReportsClient summary={res.data} />;
 }

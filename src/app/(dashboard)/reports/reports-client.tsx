@@ -1,249 +1,246 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import {
   BarChart3,
-  TrendingUp,
+  ShoppingCart,
+  ReceiptText,
+  Boxes,
+  Clock,
+  AlertTriangle,
+  Store,
   CreditCard,
-  DollarSign,
-  PieChart,
-  Calendar,
-  Layers,
+  Truck,
+  Users2,
+  Wallet,
+  TrendingUp,
+  Pill,
   ArrowUpRight,
-  ShieldCheck,
+  FileSpreadsheet,
+  Download,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
-import { StatCard } from "@/components/shared/stat-card";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatCurrency } from "@/lib/utils";
-import { FinancialSummary, MonthlyTrendData, AgingBucket } from "@/types/models";
 
 interface ReportsClientProps {
-  financials: FinancialSummary;
-  monthlyTrends: MonthlyTrendData[];
-  dueAging: AgingBucket[];
+  summary?: any;
 }
 
-export function ReportsClient({
-  financials,
-  monthlyTrends,
-  dueAging,
-}: ReportsClientProps) {
-  const [activeTab, setActiveTab] = React.useState("pnl");
+export function ReportsClient({ summary }: ReportsClientProps) {
+  const s = summary || {
+    totalRevenue: 0,
+    totalSalesCount: 0,
+    grossProfit: 0,
+    netProfit: 0,
+    totalPurchases: 0,
+    totalPurchaseCount: 0,
+    totalUnitsInStock: 0,
+    totalExpenses: 0,
+    expiredCount: 0,
+    nearExpiryCount: 0,
+    lowStockCount: 0,
+    totalCustomers: 0,
+    totalCustomerDues: 0,
+    totalSuppliers: 0,
+    totalSupplierDues: 0,
+    activeDistributors: 0,
+  };
+
+  const reportCards = [
+    {
+      title: "Wholesale Sales Intelligence",
+      description: "Itemized sales orders, discounts, DGDA tax, customer billing, and gross profits.",
+      icon: ShoppingCart,
+      href: "/reports/sales",
+      kpi: formatCurrency(s.totalRevenue),
+      kpiLabel: `${s.totalSalesCount} Orders Booked`,
+      accent: "text-[#0071E3] bg-sky-50 border-sky-100",
+    },
+    {
+      title: "Procurement & Consignments",
+      description: "Direct purchase intake, supplier invoice reconciliation, and batch receiving logs.",
+      icon: ReceiptText,
+      href: "/reports/purchases",
+      kpi: formatCurrency(s.totalPurchases),
+      kpiLabel: `${s.totalPurchaseCount} Consignments Received`,
+      accent: "text-emerald-700 bg-emerald-50 border-emerald-100",
+    },
+    {
+      title: "Warehouse Inventory Valuation",
+      description: "Active batch quantities on hand, historical unit cost valuation, and potential selling revenue.",
+      icon: Boxes,
+      href: "/reports/inventory",
+      kpi: `${s.totalUnitsInStock.toLocaleString()} Units`,
+      kpiLabel: "Total Stock on Hand",
+      accent: "text-indigo-700 bg-indigo-50 border-indigo-100",
+    },
+    {
+      title: "DGDA Expiry Watchdog",
+      description: "Expired batches and near-expiry medicines expiring in 30, 60, and 90 days.",
+      icon: Clock,
+      href: "/reports/expiry",
+      kpi: `${s.expiredCount} Expired • ${s.nearExpiryCount} Near Expiry`,
+      kpiLabel: "FEFO Compliance Watch",
+      accent: "text-rose-700 bg-rose-50 border-rose-100",
+    },
+    {
+      title: "Low Stock & Reorder Deficit",
+      description: "Medicines below minimum threshold or out of stock with reorder calculations.",
+      icon: AlertTriangle,
+      href: "/reports/low-stock",
+      kpi: `${s.lowStockCount} Products Deficit`,
+      kpiLabel: "Reorder Required",
+      accent: "text-amber-700 bg-amber-50 border-amber-100",
+    },
+    {
+      title: "Customer Accounts & AR Dues",
+      description: "Pharmacy customer outstanding balances, credit utilization, and overdue limits.",
+      icon: Store,
+      href: "/reports/customer-dues",
+      kpi: formatCurrency(s.totalCustomerDues),
+      kpiLabel: `${s.totalCustomers} Active Pharmacies`,
+      accent: "text-purple-700 bg-purple-50 border-purple-100",
+    },
+    {
+      title: "Supplier Accounts & AP Payables",
+      description: "Manufacturer balances due, payment terms, and pending invoice payables.",
+      icon: Truck,
+      href: "/reports/supplier-dues",
+      kpi: formatCurrency(s.totalSupplierDues),
+      kpiLabel: `${s.totalSuppliers} Active Manufacturers`,
+      accent: "text-cyan-700 bg-cyan-50 border-cyan-100",
+    },
+    {
+      title: "Medical Representatives Performance",
+      description: "Sales representatives field booking volume, recovery collections, and net profit contribution.",
+      icon: Users2,
+      href: "/distributors",
+      kpi: `${s.activeDistributors} Field Reps`,
+      kpiLabel: "Sales Team Performance",
+      accent: "text-blue-700 bg-blue-50 border-blue-100",
+    },
+    {
+      title: "Operating Expenses Breakdown",
+      description: "Logistics fuel, warehouse rent, electricity, and administrative overheads.",
+      icon: Wallet,
+      href: "/expenses",
+      kpi: formatCurrency(s.totalExpenses),
+      kpiLabel: "Total Approved Expenses",
+      accent: "text-orange-700 bg-orange-50 border-orange-100",
+    },
+    {
+      title: "Profit & Loss Financials",
+      description: "Strict historical COGS derived gross margins, operating expenses, and net profit trajectory.",
+      icon: TrendingUp,
+      href: "/profit",
+      kpi: formatCurrency(s.netProfit),
+      kpiLabel: `Gross: ${formatCurrency(s.grossProfit)}`,
+      accent: "text-emerald-700 bg-emerald-50 border-emerald-100",
+    },
+    {
+      title: "Fast-Moving Medicine Performance",
+      description: "Top 10 selling products, quantity sold ranking, revenue, and gross margins.",
+      icon: Pill,
+      href: "/reports/medicines",
+      kpi: "Top Product Rankings",
+      kpiLabel: "Sales Volume & Profit Margins",
+      accent: "text-teal-700 bg-teal-50 border-teal-100",
+    },
+    {
+      title: "Collections & Cash Reconciliation",
+      description: "Customer money receipts collected vs Supplier purchase payments disbursed.",
+      icon: CreditCard,
+      href: "/reports/payments",
+      kpi: "Cash Flow Ledgers",
+      kpiLabel: "Customer & Supplier Reconciliation",
+      accent: "text-violet-700 bg-violet-50 border-violet-100",
+    },
+  ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-[1400px] mx-auto pb-20">
+      {/* 1. Header Section */}
       <PageHeader
-        title="Financial & BI Analytics Hub"
-        description="Real-time Cost of Goods Sold (COGS), Gross vs Net Profit statements, customer accounts receivable aging matrices, and executive intelligence."
-        badge={<Badge variant="outline">Module M14 & M15</Badge>}
+        title="Enterprise Reports & Business Analytics"
+        description="Authoritative, real-time database intelligence covering sales, procurement, FEFO stock valuation, and double-entry ledgers."
       />
 
-      {/* Top Level Financial KPIs */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Net Billed Revenue"
-          value={formatCurrency(financials.netRevenue)}
-          description={`Gross: ${formatCurrency(financials.grossRevenue)}`}
-          icon={DollarSign}
-        />
-        <StatCard
-          title="Gross Profit"
-          value={formatCurrency(financials.grossProfit)}
-          description={`Margin: ${financials.grossProfitMargin.toFixed(1)}%`}
-          icon={TrendingUp}
-          trend={{ value: financials.grossProfitMargin, isPositive: true, label: "Gross Margin" }}
-        />
-        <StatCard
-          title="Operating Expenses"
-          value={formatCurrency(financials.operatingExpenses)}
-          description="Logistics, fuel & overhead"
-          icon={Layers}
-        />
-        <StatCard
-          title="Net Operating Profit"
-          value={formatCurrency(financials.netProfit)}
-          description={`Net Margin: ${financials.netProfitMargin.toFixed(1)}%`}
-          icon={BarChart3}
-          trend={{ value: financials.netProfitMargin, isPositive: true, label: "Net Margin" }}
-        />
+      {/* 2. Top 4 Macro KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-4.5 shadow-sm">
+          <div className="text-xs font-medium text-sky-800">Total Billed Revenue</div>
+          <div className="mt-2 text-2xl font-bold text-sky-950 font-mono">
+            {formatCurrency(s.totalRevenue)}
+          </div>
+          <div className="text-[11px] text-sky-600 mt-1">{s.totalSalesCount} confirmed sales orders</div>
+        </div>
+
+        <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-4.5 shadow-sm">
+          <div className="text-xs font-medium text-emerald-800">Realized Gross Profit</div>
+          <div className="mt-2 text-2xl font-bold text-emerald-950 font-mono">
+            {formatCurrency(s.grossProfit)}
+          </div>
+          <div className="text-[11px] text-emerald-600 mt-1">Derived from batch COGS</div>
+        </div>
+
+        <div className="bg-purple-50/70 border border-purple-100/80 rounded-2xl p-4.5 shadow-sm">
+          <div className="text-xs font-medium text-purple-800">Customer Receivables (AR)</div>
+          <div className="mt-2 text-2xl font-bold text-purple-950 font-mono">
+            {formatCurrency(s.totalCustomerDues)}
+          </div>
+          <div className="text-[11px] text-purple-600 mt-1">Total pharmacy outstanding</div>
+        </div>
+
+        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-4.5 shadow-sm">
+          <div className="text-xs font-medium text-amber-800">Supplier Payables (AP)</div>
+          <div className="mt-2 text-2xl font-bold text-amber-950 font-mono">
+            {formatCurrency(s.totalSupplierDues)}
+          </div>
+          <div className="text-[11px] text-amber-600 mt-1">Outstanding manufacturer bills</div>
+        </div>
       </div>
 
-      {/* Report Section Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3 max-w-md">
-          <TabsTrigger value="pnl">Profit & Loss (P&L)</TabsTrigger>
-          <TabsTrigger value="aging">Customer Due Aging</TabsTrigger>
-          <TabsTrigger value="trends">Monthly Trends</TabsTrigger>
-        </TabsList>
-
-        {/* Tab 1: P&L Statement */}
-        <TabsContent value="pnl" className="space-y-4 pt-2">
-          <Card className="border shadow-sm">
-            <CardHeader className="pb-3 border-b bg-muted/20">
-              <CardTitle className="text-sm font-bold flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-primary" />
-                Wholesale Profit & Loss (P&L) Statement
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Real-time calculation based on exact batch acquisition costs and net billed invoices
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-6 space-y-4 text-xs font-mono">
-              <div className="space-y-2">
-                <div className="flex justify-between py-1.5 border-b font-sans">
-                  <span className="font-semibold text-foreground">1. Gross Revenue (Trade Price Value)</span>
-                  <span className="font-bold text-foreground">{formatCurrency(financials.grossRevenue)}</span>
-                </div>
-                <div className="flex justify-between py-1 text-emerald-600 pl-4">
-                  <span>Less: Trade Discounts & Scheme Reductions</span>
-                  <span>-{formatCurrency(financials.tradeDiscounts)}</span>
-                </div>
-                <div className="flex justify-between py-2 border-y bg-muted/30 px-2 font-bold font-sans">
-                  <span>Net Billed Wholesale Revenue</span>
-                  <span>{formatCurrency(financials.netRevenue)}</span>
+      {/* 3. 12 Interactive Domain Report Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {reportCards.map((r, i) => {
+          const Icon = r.icon;
+          return (
+            <Link
+              key={i}
+              href={r.href}
+              className="group bg-card border border-border/80 rounded-2xl p-5 shadow-sm hover:border-[#0071E3]/40 hover:shadow-md transition-all flex flex-col justify-between"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className={`p-2.5 rounded-xl border ${r.accent}`}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="h-7 w-7 rounded-full bg-muted/40 group-hover:bg-[#0071E3] group-hover:text-white text-muted-foreground flex items-center justify-center transition-colors">
+                    <ArrowUpRight className="h-4 w-4" />
+                  </div>
                 </div>
 
-                <div className="flex justify-between py-1.5 text-rose-600 pl-4">
-                  <span>Less: Cost of Goods Sold (COGS - Batch Acquisition Cost)</span>
-                  <span>-{formatCurrency(financials.cogsTotal)}</span>
-                </div>
-                <div className="flex justify-between py-2 border-y bg-primary/10 px-2 font-bold text-sm text-primary font-sans">
-                  <span>Gross Profit</span>
-                  <span>{formatCurrency(financials.grossProfit)} ({financials.grossProfitMargin.toFixed(2)}%)</span>
-                </div>
-
-                <div className="flex justify-between py-1.5 text-amber-600 pl-4">
-                  <span>Less: Logistics, Fuel, Cold-Chain Power & Operating Expenses</span>
-                  <span>-{formatCurrency(financials.operatingExpenses)}</span>
-                </div>
-                <div className="flex justify-between py-3 border-y-2 border-primary bg-primary/20 px-2 font-extrabold text-sm text-foreground font-sans">
-                  <span>Net Operating Profit</span>
-                  <span className="text-emerald-700 dark:text-emerald-400">
-                    {formatCurrency(financials.netProfit)} ({financials.netProfitMargin.toFixed(2)}%)
-                  </span>
+                <div>
+                  <h3 className="text-sm font-bold text-foreground group-hover:text-[#0071E3] transition-colors">
+                    {r.title}
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                    {r.description}
+                  </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
-        {/* Tab 2: Customer Due Aging Matrix */}
-        <TabsContent value="aging" className="space-y-4 pt-2">
-          <Card className="border shadow-sm">
-            <CardHeader className="pb-3 border-b bg-muted/20">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <CardTitle className="text-sm font-bold flex items-center gap-2">
-                    <CreditCard className="h-4 w-4 text-amber-600" />
-                    Customer Accounts Receivable (AR) Aging Matrix
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Analysis of customer dues by payment maturity intervals
-                  </CardDescription>
-                </div>
-                <div className="text-xs">
-                  Total Outstanding: <strong className="text-foreground">{formatCurrency(financials.totalCustomerReceivables)}</strong>
-                </div>
+              <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-foreground">{r.kpi}</span>
+                <span className="text-[11px] text-muted-foreground">{r.kpiLabel}</span>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-muted/40 border-b text-muted-foreground font-semibold">
-                    <tr>
-                      <th className="p-3">Customer Pharmacy</th>
-                      <th className="p-3 text-right">Current (0-30d)</th>
-                      <th className="p-3 text-right">31-60 Days</th>
-                      <th className="p-3 text-right">61-90 Days</th>
-                      <th className="p-3 text-right">90+ Days</th>
-                      <th className="p-3 text-right">Total Due</th>
-                      <th className="p-3 text-center">Credit Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {dueAging.map((row, idx) => (
-                      <tr key={idx} className="hover:bg-muted/30 transition-colors">
-                        <td className="p-3 font-semibold text-foreground">{row.customerName}</td>
-                        <td className="p-3 text-right">{formatCurrency(row.current)}</td>
-                        <td className="p-3 text-right font-medium text-amber-600">
-                          {row.days31To60 > 0 ? formatCurrency(row.days31To60) : "-"}
-                        </td>
-                        <td className="p-3 text-right text-rose-600">
-                          {row.days61To90 > 0 ? formatCurrency(row.days61To90) : "-"}
-                        </td>
-                        <td className="p-3 text-right text-rose-700 font-bold">
-                          {row.daysOver90 > 0 ? formatCurrency(row.daysOver90) : "-"}
-                        </td>
-                        <td className="p-3 text-right font-bold text-foreground">
-                          {formatCurrency(row.totalDue)}
-                        </td>
-                        <td className="p-3 text-center">
-                          <Badge
-                            variant={row.status === "ACTIVE" ? "success" : "destructive"}
-                            className="text-[10px]"
-                          >
-                            {row.status}
-                          </Badge>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Tab 3: Monthly Trends */}
-        <TabsContent value="trends" className="space-y-4 pt-2">
-          <Card className="border shadow-sm">
-            <CardHeader className="pb-3 border-b bg-muted/20">
-              <CardTitle className="text-sm font-bold flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-indigo-600" />
-                Monthly Revenue & Profit Progression
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Historical monthly turnover, batch cost, and net margins
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                {monthlyTrends.map((m, idx) => {
-                  const marginPercent = Math.round((m.netProfit / m.revenue) * 100);
-                  return (
-                    <div key={idx} className="space-y-1 text-xs">
-                      <div className="flex justify-between items-center">
-                        <span className="font-semibold text-foreground">{m.month}</span>
-                        <div className="space-x-4">
-                          <span className="text-muted-foreground">Revenue: <strong>{formatCurrency(m.revenue)}</strong></span>
-                          <span className="text-muted-foreground">COGS: <strong>{formatCurrency(m.cogs)}</strong></span>
-                          <span className="text-emerald-600 font-bold">Net: +{formatCurrency(m.netProfit)} ({marginPercent}%)</span>
-                        </div>
-                      </div>
-                      <div className="h-2 w-full rounded-full bg-muted overflow-hidden flex">
-                        <div
-                          className="h-full bg-primary"
-                          style={{ width: `${(m.cogs / m.revenue) * 100}%` }}
-                          title="COGS Portion"
-                        />
-                        <div
-                          className="h-full bg-emerald-500"
-                          style={{ width: `${(m.netProfit / m.revenue) * 100}%` }}
-                          title="Net Profit"
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }

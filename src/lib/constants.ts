@@ -89,10 +89,16 @@ export const NAVIGATION_SECTIONS: NavigationSection[] = [
         description: "Batch FEFO tracking & stock adjustments",
       },
       {
-        title: "Financial Reports",
+        title: "Reports & Analytics",
         href: "/reports",
         iconName: "BarChart3",
-        description: "Profit & loss, sales analysis & tax summaries",
+        description: "Comprehensive business analytics & export center",
+      },
+      {
+        title: "System Alerts",
+        href: "/notifications",
+        iconName: "Bell",
+        description: "FEFO expiry watchdog & inventory depletion alerts",
       },
       {
         title: "System Settings",

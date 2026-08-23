@@ -1,54 +1,122 @@
 "use server";
 
-import { ActionResult } from "./medicine.actions";
-import { FinancialSummary, MonthlyTrendData, AgingBucket } from "@/types/models";
+import {
+  getReportsHubSummary,
+  getSalesReport,
+  getPurchaseReport,
+  getInventoryReport,
+  getExpiryReport,
+  getLowStockReport,
+  getCustomerDueReport,
+  getSupplierDueReport,
+  getMedicinePerformanceReport,
+  getPaymentReport,
+  ReportFilterParams,
+} from "@/server/services/report.service";
 
-export async function getReportsSummaryAction(): Promise<ActionResult<{
-  financials: FinancialSummary;
-  monthlyTrends: MonthlyTrendData[];
-  dueAging: AgingBucket[];
-}>> {
+export interface ActionResult<T = any> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}
+
+export async function getReportsHubSummaryAction() {
   try {
-    const defaultFinancials: FinancialSummary = {
-      grossRevenue: 1285000,
-      tradeDiscounts: 45000,
-      netRevenue: 1240000,
-      cogsTotal: 1042000,
-      grossProfit: 198000,
-      grossProfitMargin: 15.96,
-      operatingExpenses: 48700,
-      netProfit: 149300,
-      netProfitMargin: 12.04,
-      totalCustomerReceivables: 549000,
-      overdueReceivables: 142000,
-      totalSupplierPayables: 262000,
-      stockInventoryValuation: 2850000,
-    };
+    const data = await getReportsHubSummary();
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("getReportsHubSummaryAction error:", error);
+    return { success: false, error: "Failed to generate reports overview." };
+  }
+}
 
-    const defaultTrends: MonthlyTrendData[] = [
-      { month: "Apr 2026", revenue: 980000, cogs: 820000, grossProfit: 160000, expenses: 42000, netProfit: 118000 },
-      { month: "May 2026", revenue: 1050000, cogs: 880000, grossProfit: 170000, expenses: 44000, netProfit: 126000 },
-      { month: "Jun 2026", revenue: 1120000, cogs: 940000, grossProfit: 180000, expenses: 46000, netProfit: 134000 },
-      { month: "Jul 2026", revenue: 1190000, cogs: 1000000, grossProfit: 190000, expenses: 47500, netProfit: 142500 },
-      { month: "Aug 2026 (MTD)", revenue: 1240000, cogs: 1042000, grossProfit: 198000, expenses: 48700, netProfit: 149300 },
-    ];
+export async function getSalesReportAction(params?: ReportFilterParams) {
+  try {
+    const data = await getSalesReport(params);
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("getSalesReportAction error:", error);
+    return { success: false, error: "Failed to load sales report." };
+  }
+}
 
-    const defaultAging: AgingBucket[] = [
-      { customerName: "Popular Model Pharmacy", current: 68500, days31To60: 0, days61To90: 0, daysOver90: 0, totalDue: 68500, status: "ACTIVE" },
-      { customerName: "Labaid Hospital Dispensary", current: 240000, days31To60: 80000, days61To90: 0, daysOver90: 0, totalDue: 320000, status: "ACTIVE" },
-      { customerName: "Evergreen Drug Corner", current: 0, days31To60: 42000, days61To90: 65000, daysOver90: 35000, totalDue: 142000, status: "BLOCKED_OVERDUE" },
-      { customerName: "MediCare Clinic & Diagnostics", current: 18500, days31To60: 0, days61To90: 0, daysOver90: 0, totalDue: 18500, status: "ACTIVE" },
-    ];
+export async function getPurchaseReportAction(params?: ReportFilterParams) {
+  try {
+    const data = await getPurchaseReport(params);
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("getPurchaseReportAction error:", error);
+    return { success: false, error: "Failed to load purchase report." };
+  }
+}
 
-    return {
-      success: true,
-      data: {
-        financials: defaultFinancials,
-        monthlyTrends: defaultTrends,
-        dueAging: defaultAging,
-      },
-    };
-  } catch (error) {
-    return { success: false, error: "Failed to generate financial reports" };
+export async function getInventoryReportAction(params?: ReportFilterParams) {
+  try {
+    const data = await getInventoryReport(params);
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("getInventoryReportAction error:", error);
+    return { success: false, error: "Failed to load inventory valuation report." };
+  }
+}
+
+export async function getExpiryReportAction(warningDays?: number) {
+  try {
+    const data = await getExpiryReport(warningDays);
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("getExpiryReportAction error:", error);
+    return { success: false, error: "Failed to load expiry report." };
+  }
+}
+
+export async function getLowStockReportAction() {
+  try {
+    const data = await getLowStockReport();
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("getLowStockReportAction error:", error);
+    return { success: false, error: "Failed to load low stock report." };
+  }
+}
+
+export async function getCustomerDueReportAction() {
+  try {
+    const data = await getCustomerDueReport();
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("getCustomerDueReportAction error:", error);
+    return { success: false, error: "Failed to load customer dues report." };
+  }
+}
+
+export async function getSupplierDueReportAction() {
+  try {
+    const data = await getSupplierDueReport();
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("getSupplierDueReportAction error:", error);
+    return { success: false, error: "Failed to load supplier dues report." };
+  }
+}
+
+export async function getMedicinePerformanceReportAction(params?: ReportFilterParams) {
+  try {
+    const data = await getMedicinePerformanceReport(params);
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("getMedicinePerformanceReportAction error:", error);
+    return { success: false, error: "Failed to load medicine performance report." };
+  }
+}
+
+export async function getPaymentReportAction(params?: ReportFilterParams) {
+  try {
+    const data = await getPaymentReport(params);
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("getPaymentReportAction error:", error);
+    return { success: false, error: "Failed to load payment reconciliation report." };
   }
 }
