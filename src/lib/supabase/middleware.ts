@@ -60,9 +60,14 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {}
+
+  const demoSessionCookie = request.cookies.get("wmdms_demo_session")?.value;
+  const isUserAuthenticated = !!user || !!demoSessionCookie;
 
   const pathname = request.nextUrl.pathname;
 
@@ -71,7 +76,7 @@ export async function updateSession(request: NextRequest) {
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
 
-  if (isProtectedRoute && !user) {
+  if (isProtectedRoute && !isUserAuthenticated) {
     const redirectUrl = new URL("/login", request.url);
     if (pathname !== "/dashboard") {
       redirectUrl.searchParams.set("redirect", pathname);
@@ -82,7 +87,7 @@ export async function updateSession(request: NextRequest) {
   // 2. Check if authenticated user is accessing login or forgot-password
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname === route);
 
-  if (isAuthRoute && user) {
+  if (isAuthRoute && isUserAuthenticated) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 

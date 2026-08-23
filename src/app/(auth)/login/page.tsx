@@ -26,6 +26,7 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -183,6 +184,70 @@ export default function LoginPage() {
               </>
             )}
           </Button>
+
+          {/* Quick Demo Fill Section */}
+          <div className="pt-2 border-t border-border/60">
+            <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+              ⚡ Quick Demo Credentials (Click to fill)
+            </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-auto py-1.5 px-2 flex flex-col items-start text-left text-[11px]"
+                onClick={() => {
+                  setValue("email", "admin@pharmadist.com");
+                  setValue("password", "admin123");
+                }}
+              >
+                <span className="font-semibold text-foreground">Super Admin</span>
+                <span className="text-[10px] text-muted-foreground truncate w-full">admin@pharmadist.com</span>
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-auto py-1.5 px-2 flex flex-col items-start text-left text-[11px]"
+                onClick={() => {
+                  setValue("email", "sales.manager@pharmadist.com");
+                  setValue("password", "admin123");
+                }}
+              >
+                <span className="font-semibold text-foreground">Sales Manager</span>
+                <span className="text-[10px] text-muted-foreground truncate w-full">sales.manager@pharmadist.com</span>
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-auto py-1.5 px-2 flex flex-col items-start text-left text-[11px]"
+                onClick={() => {
+                  setValue("email", "warehouse@pharmadist.com");
+                  setValue("password", "admin123");
+                }}
+              >
+                <span className="font-semibold text-foreground">Warehouse Mgr</span>
+                <span className="text-[10px] text-muted-foreground truncate w-full">warehouse@pharmadist.com</span>
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-auto py-1.5 px-2 flex flex-col items-start text-left text-[11px]"
+                onClick={() => {
+                  setValue("email", "accounts@pharmadist.com");
+                  setValue("password", "admin123");
+                }}
+              >
+                <span className="font-semibold text-foreground">Accounts Officer</span>
+                <span className="text-[10px] text-muted-foreground truncate w-full">accounts@pharmadist.com</span>
+              </Button>
+            </div>
+          </div>
 
           {/* Security Notice */}
           <div className="rounded-md bg-muted/40 p-2.5 border border-border/60 text-[11px] text-muted-foreground flex items-center gap-2">
