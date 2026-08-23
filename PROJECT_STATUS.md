@@ -3,8 +3,8 @@
 **Project**: Wholesale Medicine Distribution Management System (WMDMS)  
 **Repository**: [https://github.com/00tatheer00/WholeSale-Distributor-System.git](https://github.com/00tatheer00/WholeSale-Distributor-System.git)  
 **Branch**: `main`  
-**Current State**: **Phase 5 Complete — Ready for Phase 6**  
-**Last Updated**: 2026-08-22  
+**Current State**: **Phase 6 Complete — Ready for Phase 7**  
+**Last Updated**: 2026-08-23  
 
 ---
 
@@ -18,8 +18,8 @@
 | **Phase 3** | Authentication, RBAC & Admin Core | ✅ Completed | Supabase Auth integration, session management, middleware route guards, RBAC, profile & security settings. |
 | **Phase 4** | Admin Dashboard & Application Overview | ✅ Completed | Real-time cockpit at `/dashboard`, 8 core KPI cards, 4 operational indicators, Recharts sales/purchase trends, top medicines, P&L statement, customer/supplier dues, date range filter (`dashboard.service.ts`). |
 | **Phase 5** | Medicine, Category & Batch Management | ✅ Completed | Full Category CRUD at `/categories`, Medicine Master CRUD with server-side search, filtering, sorting, pagination at `/medicines`, Medicine Details & FEFO Batch Engine at `/medicines/[id]`, Expiry foundation (`src/lib/expiry-utils.ts`). |
-| **Phase 6** | Inventory & Stock Transactions | ⏳ **Upcoming** | Batch-level inventory ledger, physical count adjustments, damage/expiry write-offs, quarantine holding, stock transfer vouchers. |
-| **Phase 7** | Supplier Management & AP Ledger | ⏳ Planned | Vendor directory, Purchase terms, AP balance ledger, Statement generation. |
+| **Phase 6** | Inventory & Stock Management Engine | ✅ Completed | Authoritative batch-level stock in `MedicineBatch`, immutable `StockMovement` ledger, `/inventory` cockpit with live valuation, `/inventory/adjustments` voucher reconciliation with negative stock protection, `/inventory/movements` audit ledger, atomic `increaseStock` / `decreaseStock` / `adjustStock` services. |
+| **Phase 7** | Supplier Management & AP Ledger | ⏳ **Upcoming** | Vendor directory, Purchase terms, AP balance ledger, Statement generation. |
 | **Phase 8** | Procurement & Goods Received Notes (GRN) | ⏳ Planned | Purchase Orders, Consignment intake, Batch creation upon receipt, Supplier invoice reconciliation. |
 | **Phase 9** | Customer Pharmacies & Credit Barrier Engine | ⏳ Planned | Pharmacy onboarding, Drug license verification, Route assignment, Real-time credit limits & overdue holds. |
 | **Phase 10**| Wholesale Sales Booking & Tax Invoicing | ⏳ Planned | Order booking, FEFO automated batch allocation, Wholesale Tax Invoices & Delivery Challans (`InvoicePrintModal`). |
@@ -36,10 +36,10 @@
 
 - **Framework**: Next.js 15 (App Router, Server Components & Server Actions)
 - **Language**: TypeScript 5 (Strict mode, 0 errors on `npm run typecheck`)
-- **Database ORM**: Prisma 5.22 with PostgreSQL
+- **Database ORM**: Prisma 6 with PostgreSQL & Atomic `$transaction`
 - **UI Components**: Tailwind CSS, Radix UI primitives, Lucide React, TanStack Table v8, Recharts
 - **Form & Validation**: React Hook Form, Zod v3
 - **Verification Status**:
   - `npm run typecheck` $\rightarrow$ **0 Errors**
   - `npm run lint` $\rightarrow$ **0 Errors**
-  - `npm run build` $\rightarrow$ **22/22 Routes compiled and optimized successfully**
+  - `npm run build` $\rightarrow$ **24/24 Routes compiled and optimized successfully**
