@@ -360,6 +360,7 @@ export interface InvoiceRecord {
   grossProfit: number;
   paidAmount: number;
   dueAmount: number;
+  paymentStatus: string;
   status: string;
   deliveryStatus: string;
   items: InvoiceItemRecord[];

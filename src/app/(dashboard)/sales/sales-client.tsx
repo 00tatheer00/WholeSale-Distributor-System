@@ -1,22 +1,32 @@
 "use client";
 
 import * as React from "react";
-import { ColumnDef } from "@tanstack/react-table";
-import { FileSpreadsheet, Plus, CheckCircle2, AlertTriangle, ShieldCheck, Printer } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  ShoppingCart,
+  Plus,
+  Search,
+  SlidersHorizontal,
+  FileText,
+  Eye,
+  CheckCircle2,
+  AlertCircle,
+  XCircle,
+  TrendingUp,
+  CreditCard,
+  Building2,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Printer,
+  Ban,
+  Phone,
+} from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
-import { DataTable } from "@/components/shared/data-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -24,573 +34,579 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { createSaleOrderAction } from "@/server/actions/sales.actions";
-import { SaleOrderInput, SaleItemInput } from "@/validations/sales.schema";
-import { InvoicePrintModal, InvoicePrintData } from "@/components/shared/invoice-print-modal";
+import { SaleQueryResult, SaleSummaryItem } from "@/server/services/sales.service";
+import { cancelSaleAction } from "@/server/actions/sales.actions";
+import { CustomerRecord } from "@/types/models";
 
 interface SalesClientProps {
-  initialInvoices: any[];
-  customers: any[];
-  distributors: any[];
-  medicines: any[];
-  batches: any[];
+  initialSalesData?: SaleQueryResult;
+  customers: CustomerRecord[];
 }
 
-export function SalesClient({
-  initialInvoices,
-  customers,
-  distributors,
-  medicines,
-  batches,
-}: SalesClientProps) {
-  const [invoices, setInvoices] = React.useState(initialInvoices);
-  const [isAddOpen, setIsAddOpen] = React.useState(false);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+export function SalesClient({ initialSalesData, customers }: SalesClientProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [search, setSearch] = React.useState(searchParams.get("search") || "");
+  const [customerFilter, setCustomerFilter] = React.useState(searchParams.get("customer") || "ALL");
+  const [statusFilter, setStatusFilter] = React.useState(searchParams.get("status") || "ALL");
+  const [paymentFilter, setPaymentFilter] = React.useState(searchParams.get("payment") || "ALL");
+  const [deliveryFilter, setDeliveryFilter] = React.useState(searchParams.get("delivery") || "ALL");
+
+  const [cancelModalOpen, setCancelModalOpen] = React.useState(false);
+  const [selectedSaleToCancel, setSelectedSaleToCancel] = React.useState<SaleSummaryItem | null>(null);
+  const [cancelReason, setCancelReason] = React.useState("");
+  const [isCancelling, setIsCancelling] = React.useState(false);
   const [feedback, setFeedback] = React.useState<{ type: "success" | "error"; message: string } | null>(null);
 
-  // Print Modal
-  const [printInvoice, setPrintInvoice] = React.useState<InvoicePrintData | null>(null);
-  const [isPrintOpen, setIsPrintOpen] = React.useState(false);
-
-  // Form State
-  const [customerId, setCustomerId] = React.useState(customers[0]?.id || "");
-  const [distributorId, setDistributorId] = React.useState(distributors[0]?.id || "");
-  const [orderDate, setOrderDate] = React.useState(new Date().toISOString().split("T")[0]);
-  const [specialDiscountPercent, setSpecialDiscountPercent] = React.useState(0);
-  const [deliveryCharge, setDeliveryCharge] = React.useState(0);
-
-  const [items, setItems] = React.useState<SaleItemInput[]>([
-    {
-      medicineId: medicines[0]?.id || "",
-      batchId: batches[0]?.id || "",
-      quantity: 100,
-      bonusQuantity: 5,
-      unitTradePrice: medicines[0]?.unitTradePrice || 2.20,
-      unitCostPrice: batches[0]?.unitCostPrice || 1.85,
-      unitMrp: medicines[0]?.unitMrp || 2.50,
-      discountPercent: 2.0,
-      vatPercent: 0,
-    },
-  ]);
-
-  const selectedCustomer = customers.find((c) => c.id === customerId);
-
-  const columns: ColumnDef<any>[] = [
-    {
-      accessorKey: "invoiceNumber",
-      header: "Invoice & Challan #",
-      cell: ({ row }) => (
-        <div className="space-y-0.5 font-mono">
-          <div className="font-semibold text-foreground">{row.original.invoiceNumber}</div>
-          <div className="text-[11px] text-muted-foreground">{row.original.challanNumber}</div>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "customerName",
-      header: "Customer Pharmacy",
-      cell: ({ row }) => (
-        <div className="space-y-0.5">
-          <div className="font-semibold text-foreground">{row.original.customerName}</div>
-          <div className="text-[11px] text-muted-foreground">Rep: {row.original.salesmanName}</div>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "issueDate",
-      header: "Date / Due",
-      cell: ({ row }) => (
-        <div className="space-y-0.5 text-xs">
-          <div>{formatDate(row.original.issueDate)}</div>
-          <div className="text-[11px] text-muted-foreground">Due: {formatDate(row.original.dueDate)}</div>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "grandTotal",
-      header: "Net Billed Amount",
-      cell: ({ row }) => (
-        <div className="space-y-0.5">
-          <div className="font-bold text-foreground">
-            {formatCurrency(row.original.grandTotal)}
-          </div>
-          <div className="text-[10px] text-emerald-600 font-medium">
-            Profit: +{formatCurrency(row.original.grossProfit)}
-          </div>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "dueAmount",
-      header: "Outstanding Due",
-      cell: ({ row }) => (
-        <span className={`font-semibold ${row.original.dueAmount > 0 ? "text-amber-600" : "text-emerald-600"}`}>
-          {formatCurrency(row.original.dueAmount)}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "deliveryStatus",
-      header: "Dispatch Status",
-      cell: ({ row }) => (
-        <Badge variant={row.original.deliveryStatus === "DELIVERED" ? "success" : "secondary"} className="text-[10px]">
-          {row.original.deliveryStatus}
-        </Badge>
-      ),
-    },
-    {
-      id: "actions",
-      header: "Print / PDF",
-      cell: ({ row }) => (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            setPrintInvoice({
-              ...row.original,
-              company: {
-                name: "Apex Pharma Distributors Ltd.",
-                tradeLicenseNo: "TRAD-DH-2024-8849",
-                drugLicenseNo: "DL-DH-09182-W",
-                taxIdTin: "8291039182",
-                email: "info@apexpharmadist.com",
-                phone: "+880 1711 000111",
-                address: "Plot 14, Commercial Zone, Tejgaon Industrial Area, Dhaka",
-              },
-              customer: {
-                tradeName: row.original.customerName,
-                address: "Dhaka Retail Route 1",
-                drugLicenseNo: "DL-DH-84910",
-              },
-            });
-            setIsPrintOpen(true);
-          }}
-          className="h-8 px-2 text-xs gap-1"
-        >
-          <Printer className="h-3.5 w-3.5" />
-          Invoice
-        </Button>
-      ),
-    },
-  ];
-
-  const handleAddItem = () => {
-    const med = medicines[0];
-    const batch = batches.find((b) => b.medicineId === med?.id) || batches[0];
-    setItems([
-      ...items,
-      {
-        medicineId: med?.id || "",
-        batchId: batch?.id || "",
-        quantity: 50,
-        bonusQuantity: 0,
-        unitTradePrice: med?.unitTradePrice || 2.20,
-        unitCostPrice: batch?.unitCostPrice || 1.85,
-        unitMrp: med?.unitMrp || 2.50,
-        discountPercent: 0,
-        vatPercent: 0,
-      },
-    ]);
+  const data = initialSalesData || {
+    sales: [],
+    totalCount: 0,
+    totalRevenue: 0,
+    totalPaid: 0,
+    totalDue: 0,
+    totalGrossProfit: 0,
+    page: 1,
+    pageSize: 20,
+    totalPages: 1,
   };
 
-  const handleRemoveItem = (index: number) => {
-    setItems(items.filter((_, i) => i !== index));
+  const applyFilters = (newParams: Record<string, string | null>) => {
+    const current = new URLSearchParams(Array.from(searchParams.entries()));
+    Object.entries(newParams).forEach(([k, v]) => {
+      if (!v || v === "ALL") {
+        current.delete(k);
+      } else {
+        current.set(k, v);
+      }
+    });
+    if (!newParams.page) {
+      current.delete("page");
+    }
+    router.push(`/sales?${current.toString()}`);
   };
 
-  const handleCreateSale = async (e: React.FormEvent) => {
+  const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setFeedback(null);
+    applyFilters({ search: search.trim() || null });
+  };
 
-    const payload: SaleOrderInput = {
-      customerId,
-      distributorId,
-      orderDate,
-      specialDiscountPercent,
-      deliveryCharge,
-      items,
-      isDirectInvoice: true,
-    };
+  const handleConfirmCancel = async () => {
+    if (!selectedSaleToCancel || !cancelReason.trim()) return;
 
-    const res = await createSaleOrderAction(payload);
-    setIsSubmitting(false);
+    try {
+      setIsCancelling(true);
+      const res = await cancelSaleAction({
+        saleId: selectedSaleToCancel.id,
+        reason: cancelReason.trim(),
+      });
 
-    if (res.success) {
-      setFeedback({ type: "success", message: res.message || "Wholesale Order Invoiced." });
-      const invoiceNumber = res.data?.invoiceNumber || `INV-2026-${Math.floor(10000 + Math.random() * 90000)}`;
-      const subtotal = items.reduce((s, it) => s + it.quantity * it.unitTradePrice, 0);
-      const discountAmount = items.reduce((s, it) => s + (it.quantity * it.unitTradePrice * (it.discountPercent / 100)), 0);
-      const grandTotal = subtotal - discountAmount + deliveryCharge;
-      const cogsTotal = items.reduce((s, it) => s + ((it.quantity + it.bonusQuantity) * it.unitCostPrice), 0);
-
-      setInvoices((prev) => [
-        {
-          id: `inv-${Date.now()}`,
-          invoiceNumber,
-          challanNumber: `CH-${invoiceNumber.slice(4)}`,
-          customerId,
-          customerName: selectedCustomer?.tradeName || "Customer Pharmacy",
-          salesmanName: distributors.find((d) => d.id === distributorId)?.name || "Direct Sales",
-          issueDate: orderDate,
-          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-          subtotal,
-          discountAmount,
-          taxAmount: 0,
-          grandTotal,
-          cogsTotal,
-          grossProfit: grandTotal - cogsTotal,
-          paidAmount: 0,
-          dueAmount: grandTotal,
-          status: "ISSUED",
-          deliveryStatus: "DELIVERED",
-          items: items.map((it) => {
-            const med = medicines.find((m) => m.id === it.medicineId);
-            const b = batches.find((b) => b.id === it.batchId);
-            return {
-              medicineName: med?.brandName || "Medicine",
-              genericName: med?.genericName || "",
-              dosageForm: med?.dosageForm || "",
-              batchNumber: b?.batchNumber || "BATCH-01",
-              expiryDate: b?.expiryDate || "2027-12-31",
-              quantity: it.quantity,
-              bonusQuantity: it.bonusQuantity,
-              unitPrice: it.unitTradePrice,
-              tradePrice: it.unitTradePrice,
-              mrp: it.unitMrp,
-              totalAmount: it.quantity * it.unitTradePrice * (1 - it.discountPercent / 100),
-            };
-          }),
-        },
-        ...prev,
-      ]);
-
-      setTimeout(() => {
-        setIsAddOpen(false);
-        setFeedback(null);
-      }, 1200);
-    } else {
-      setFeedback({ type: "error", message: res.error || "Order failed." });
+      if (res.success) {
+        setFeedback({
+          type: "success",
+          message: `Sale ${selectedSaleToCancel.saleNumber} has been cancelled and batch stock was restored.`,
+        });
+        setCancelModalOpen(false);
+        setSelectedSaleToCancel(null);
+        setCancelReason("");
+        router.refresh();
+      } else {
+        setFeedback({ type: "error", message: res.error || "Failed to cancel sale." });
+      }
+    } catch {
+      setFeedback({ type: "error", message: "Unexpected error during cancellation." });
+    } finally {
+      setIsCancelling(false);
+      setTimeout(() => setFeedback(null), 5000);
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-[1400px] mx-auto pb-16">
+      {/* 1. Header Section */}
       <PageHeader
-        title="Wholesale Sales Orders & Invoicing"
-        description="Book field sales orders with First-Expire, First-Out (FEFO) batch allocation, customer credit barrier checks, and instant wholesale tax invoicing."
-        badge={<Badge variant="outline">Module M07 & M08</Badge>}
-        actions={
-          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-1.5 text-xs h-9">
-                <Plus className="h-3.5 w-3.5" />
-                Book Wholesale Order
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="text-base font-bold flex items-center gap-2">
-                  <FileSpreadsheet className="h-5 w-5 text-primary" />
-                  Wholesale Sales Order & Tax Invoicing
-                </DialogTitle>
-              </DialogHeader>
+        title="Wholesale Sales & Invoicing"
+        description="B2B sales orders, FEFO automated batch allocation, wholesale tax invoicing, and credit controls."
+      >
+        <Button
+          asChild
+          className="bg-[#0071E3] hover:bg-[#0077ED] text-white shadow-sm rounded-xl font-medium px-4 h-10 transition-all active:scale-95"
+        >
+          <Link href="/sales/new">
+            <Plus className="h-4 w-4 mr-1.5" />
+            New Wholesale Order
+          </Link>
+        </Button>
+      </PageHeader>
 
-              {feedback && (
-                <div
-                  className={`p-3 rounded-md text-xs font-medium ${
-                    feedback.type === "success"
-                      ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-                      : "bg-rose-50 text-rose-800 border border-rose-200"
-                  }`}
-                >
-                  {feedback.message}
-                </div>
-              )}
+      {/* Feedback Banner */}
+      {feedback && (
+        <div
+          className={`p-4 rounded-2xl flex items-center justify-between text-sm font-medium border animate-in fade-in duration-200 ${
+            feedback.type === "success"
+              ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+              : "bg-rose-50 text-rose-800 border-rose-200"
+          }`}
+        >
+          <span>{feedback.message}</span>
+          <button
+            onClick={() => setFeedback(null)}
+            className="text-xs font-semibold underline ml-4 hover:opacity-75"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
-              <form onSubmit={handleCreateSale} className="space-y-5 text-xs">
-                {/* Customer & Route Selection */}
-                <div className="grid grid-cols-3 gap-3 p-3 bg-muted/30 rounded-lg border">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-medium">Customer Pharmacy *</Label>
-                    <Select value={customerId} onValueChange={setCustomerId}>
-                      <SelectTrigger className="text-xs h-9">
-                        <SelectValue placeholder="Select pharmacy" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {customers.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>
-                            {c.tradeName} ({c.status === "BLOCKED_OVERDUE" ? "BLOCKED" : "ACTIVE"})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+      {/* 2. Top Metric Cards (Lightweight Colorful Aesthetic) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Total Revenue */}
+        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-4.5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-sky-800">Total Sales Revenue</span>
+            <div className="h-8 w-8 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-700">
+              <ShoppingCart className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-bold text-sky-950 font-mono">
+            {formatCurrency(data.totalRevenue)}
+          </div>
+          <div className="text-[11px] text-sky-600 mt-1">Across {data.totalCount} wholesale orders</div>
+        </div>
 
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-medium">Sales Representative (MR)</Label>
-                    <Select value={distributorId} onValueChange={setDistributorId}>
-                      <SelectTrigger className="text-xs h-9">
-                        <SelectValue placeholder="Select salesman" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {distributors.map((d) => (
-                          <SelectItem key={d.id} value={d.id}>
-                            {d.name} ({d.assignedTerritory})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+        {/* Total Collected */}
+        <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-4.5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-emerald-800">Collected at Booking</span>
+            <div className="h-8 w-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-700">
+              <CreditCard className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-bold text-emerald-950 font-mono">
+            {formatCurrency(data.totalPaid)}
+          </div>
+          <div className="text-[11px] text-emerald-600 mt-1">Total cash/bank receipts logged</div>
+        </div>
 
-                  <div className="space-y-1.5">
-                    <Label htmlFor="orderDate" className="text-xs font-medium">Invoice Date *</Label>
-                    <Input
-                      id="orderDate"
-                      type="date"
-                      value={orderDate}
-                      onChange={(e) => setOrderDate(e.target.value)}
-                      required
-                      className="text-xs h-9"
-                    />
-                  </div>
-                </div>
+        {/* Total Remaining Due */}
+        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-4.5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-amber-800">Accounts Receivable Due</span>
+            <div className="h-8 w-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700">
+              <Building2 className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-bold text-amber-950 font-mono">
+            {formatCurrency(data.totalDue)}
+          </div>
+          <div className="text-[11px] text-amber-600 mt-1">Pending customer pharmacy dues</div>
+        </div>
 
-                {/* Customer Credit Notice */}
-                {selectedCustomer && (
-                  <div className={`p-2.5 rounded-md border flex items-center justify-between text-xs ${
-                    selectedCustomer.status === "BLOCKED_OVERDUE"
-                      ? "bg-rose-50 border-rose-200 text-rose-800"
-                      : "bg-emerald-50 border-emerald-200 text-emerald-800"
-                  }`}>
-                    <span>
-                      <strong>Drug License:</strong> {selectedCustomer.drugLicenseNo} (Exp: {formatDate(selectedCustomer.drugLicenseExpiry)})
-                    </span>
-                    <span>
-                      <strong>Credit Limit:</strong> {formatCurrency(selectedCustomer.creditLimit)} | <strong>Current Dues:</strong> {formatCurrency(selectedCustomer.currentDue)}
-                    </span>
-                  </div>
-                )}
+        {/* Realized Gross Profit */}
+        <div className="bg-purple-50/70 border border-purple-100/80 rounded-2xl p-4.5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-purple-800">Gross Margin Profit</span>
+            <div className="h-8 w-8 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-700">
+              <TrendingUp className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-bold text-purple-950 font-mono">
+            {formatCurrency(data.totalGrossProfit)}
+          </div>
+          <div className="text-[11px] text-purple-600 mt-1">Historical batch COGS subtracted</div>
+        </div>
+      </div>
 
-                {/* Line Items */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-bold text-xs uppercase tracking-wider text-muted-foreground">
-                      Ordered Medicines & Batch Allocation ({items.length})
-                    </h4>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleAddItem}
-                      className="text-xs h-7 gap-1"
-                    >
-                      <Plus className="h-3 w-3" /> Add Item Line
+      {/* 3. Search & Filter Bar */}
+      <div className="bg-card border border-border/80 rounded-2xl p-4 shadow-sm space-y-3">
+        <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+          {/* Search Bar */}
+          <form onSubmit={handleSearchSubmit} className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search by order number (SO-...), invoice number, pharmacy name..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9.5 pr-20 h-10 rounded-xl bg-muted/30 border-muted-foreground/20 text-sm focus-visible:ring-1"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch("");
+                  applyFilters({ search: null });
+                }}
+                className="absolute right-12 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground"
+              >
+                Clear
+              </button>
+            )}
+            <Button
+              type="submit"
+              size="sm"
+              variant="ghost"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 h-7 text-xs font-medium text-[#0071E3]"
+            >
+              Search
+            </Button>
+          </form>
+
+          {/* Filters */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Customer Filter */}
+            <Select
+              value={customerFilter}
+              onValueChange={(val) => {
+                setCustomerFilter(val);
+                applyFilters({ customer: val });
+              }}
+            >
+              <SelectTrigger className="h-10 text-xs rounded-xl w-[160px] bg-background">
+                <SelectValue placeholder="All Customers" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Customers</SelectItem>
+                {customers.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.tradeName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Payment Status Filter */}
+            <Select
+              value={paymentFilter}
+              onValueChange={(val) => {
+                setPaymentFilter(val);
+                applyFilters({ payment: val });
+              }}
+            >
+              <SelectTrigger className="h-10 text-xs rounded-xl w-[130px] bg-background">
+                <SelectValue placeholder="Payment" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Payments</SelectItem>
+                <SelectItem value="PAID">Fully Paid</SelectItem>
+                <SelectItem value="PARTIALLY_PAID">Partial Paid</SelectItem>
+                <SelectItem value="UNPAID">Unpaid / Due</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Sale Status Filter */}
+            <Select
+              value={statusFilter}
+              onValueChange={(val) => {
+                setStatusFilter(val);
+                applyFilters({ status: val });
+              }}
+            >
+              <SelectTrigger className="h-10 text-xs rounded-xl w-[130px] bg-background">
+                <SelectValue placeholder="Sale Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Status</SelectItem>
+                <SelectItem value="CONFIRMED">Confirmed</SelectItem>
+                <SelectItem value="CANCELLED">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Sales Orders Table */}
+      <div className="bg-card border border-border/80 rounded-2xl overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-muted/40 border-b text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <tr>
+                <th className="px-5 py-3.5">Order & Invoice #</th>
+                <th className="px-4 py-3.5">Customer Pharmacy</th>
+                <th className="px-4 py-3.5">Date</th>
+                <th className="px-4 py-3.5">Items</th>
+                <th className="px-4 py-3.5 text-right">Grand Total</th>
+                <th className="px-4 py-3.5 text-right">Paid / Due</th>
+                <th className="px-4 py-3.5 text-center">Payment</th>
+                <th className="px-4 py-3.5 text-center">Status</th>
+                <th className="px-5 py-3.5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/60">
+              {data.sales.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="px-5 py-12 text-center text-muted-foreground">
+                    <ShoppingCart className="h-8 w-8 mx-auto mb-2 text-muted-foreground/40" />
+                    <p className="font-medium text-foreground">No sales orders found</p>
+                    <p className="text-xs mt-1">Book a new wholesale order or adjust search parameters.</p>
+                    <Button asChild size="sm" variant="outline" className="mt-4 rounded-xl">
+                      <Link href="/sales/new">
+                        <Plus className="h-3.5 w-3.5 mr-1" /> New Wholesale Order
+                      </Link>
                     </Button>
-                  </div>
-
-                  <div className="space-y-3">
-                    {items.map((item, idx) => {
-                      const availableBatches = batches.filter((b) => b.medicineId === item.medicineId && b.quantityOnHand > 0);
-                      return (
-                        <div key={idx} className="p-3 border rounded-lg bg-card space-y-3">
-                          <div className="grid grid-cols-4 gap-2">
-                            <div className="space-y-1">
-                              <Label className="text-[11px]">Medicine *</Label>
-                              <Select
-                                value={item.medicineId}
-                                onValueChange={(val) => {
-                                  const selectedMed = medicines.find((m) => m.id === val);
-                                  const matchingBatch = batches.find((b) => b.medicineId === val && b.quantityOnHand > 0) || batches[0];
-                                  const updated = [...items];
-                                  updated[idx] = {
-                                    ...updated[idx],
-                                    medicineId: val,
-                                    batchId: matchingBatch?.id || "",
-                                    unitTradePrice: selectedMed?.unitTradePrice || 2.20,
-                                    unitCostPrice: matchingBatch?.unitCostPrice || 1.85,
-                                    unitMrp: selectedMed?.unitMrp || 2.50,
-                                  };
-                                  setItems(updated);
-                                }}
-                              >
-                                <SelectTrigger className="text-xs h-8">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {medicines.map((m) => (
-                                    <SelectItem key={m.id} value={m.id}>
-                                      {m.brandName} ({m.strength})
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            <div className="space-y-1">
-                              <Label className="text-[11px]">FEFO Batch *</Label>
-                              <Select
-                                value={item.batchId}
-                                onValueChange={(val) => {
-                                  const selectedBatch = batches.find((b) => b.id === val);
-                                  const updated = [...items];
-                                  updated[idx] = {
-                                    ...updated[idx],
-                                    batchId: val,
-                                    unitCostPrice: selectedBatch?.unitCostPrice || 1.85,
-                                  };
-                                  setItems(updated);
-                                }}
-                              >
-                                <SelectTrigger className="text-xs h-8 font-mono">
-                                  <SelectValue placeholder="Select batch" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {availableBatches.length > 0 ? (
-                                    availableBatches.map((b) => (
-                                      <SelectItem key={b.id} value={b.id}>
-                                        {b.batchNumber} (Exp: {formatDate(b.expiryDate)} | {b.quantityOnHand}u)
-                                      </SelectItem>
-                                    ))
-                                  ) : (
-                                    <SelectItem value="none" disabled>No stock available</SelectItem>
-                                  )}
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            <div className="space-y-1">
-                              <Label className="text-[11px]">Billed Qty *</Label>
-                              <Input
-                                type="number"
-                                min="1"
-                                value={item.quantity}
-                                onChange={(e) => {
-                                  const updated = [...items];
-                                  updated[idx].quantity = parseInt(e.target.value) || 1;
-                                  setItems(updated);
-                                }}
-                                required
-                                className="text-xs h-8 font-bold"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <Label className="text-[11px]">Free Bonus Units</Label>
-                              <Input
-                                type="number"
-                                min="0"
-                                value={item.bonusQuantity}
-                                onChange={(e) => {
-                                  const updated = [...items];
-                                  updated[idx].bonusQuantity = parseInt(e.target.value) || 0;
-                                  setItems(updated);
-                                }}
-                                className="text-xs h-8 text-emerald-600 font-medium"
-                              />
-                            </div>
+                  </td>
+                </tr>
+              ) : (
+                data.sales.map((s) => (
+                  <tr key={s.id} className="hover:bg-muted/30 transition-colors group">
+                    {/* Order & Invoice # */}
+                    <td className="px-5 py-4">
+                      <div className="space-y-0.5">
+                        <Link
+                          href={`/sales/${s.id}`}
+                          className="font-mono font-bold text-foreground hover:text-[#0071E3] transition-colors"
+                        >
+                          {s.saleNumber}
+                        </Link>
+                        {s.invoiceNumber && (
+                          <div className="text-[11px] text-muted-foreground font-mono">
+                            Inv:{" "}
+                            <Link
+                              href={`/invoices/${s.invoiceNumber}`}
+                              className="text-foreground/80 hover:underline"
+                            >
+                              {s.invoiceNumber}
+                            </Link>
                           </div>
+                        )}
+                      </div>
+                    </td>
 
-                          <div className="grid grid-cols-4 gap-2">
-                            <div className="space-y-1">
-                              <Label className="text-[11px]">Trade Price (TP ৳) *</Label>
-                              <Input
-                                type="number"
-                                step="0.01"
-                                value={item.unitTradePrice}
-                                onChange={(e) => {
-                                  const updated = [...items];
-                                  updated[idx].unitTradePrice = parseFloat(e.target.value) || 0;
-                                  setItems(updated);
-                                }}
-                                required
-                                className="text-xs h-8"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <Label className="text-[11px]">Discount %</Label>
-                              <Input
-                                type="number"
-                                step="0.5"
-                                min="0"
-                                max="100"
-                                value={item.discountPercent}
-                                onChange={(e) => {
-                                  const updated = [...items];
-                                  updated[idx].discountPercent = parseFloat(e.target.value) || 0;
-                                  setItems(updated);
-                                }}
-                                className="text-xs h-8"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <Label className="text-[11px]">Line Net Total</Label>
-                              <div className="text-xs font-bold text-foreground h-8 flex items-center">
-                                {formatCurrency(item.quantity * item.unitTradePrice * (1 - item.discountPercent / 100))}
-                              </div>
-                            </div>
-
-                            {items.length > 1 && (
-                              <div className="flex items-end justify-end">
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleRemoveItem(idx)}
-                                  className="text-rose-600 hover:text-rose-700 h-8 px-2 text-xs"
-                                >
-                                  Remove
-                                </Button>
-                              </div>
-                            )}
-                          </div>
+                    {/* Customer */}
+                    <td className="px-4 py-4">
+                      <div className="space-y-0.5">
+                        <Link
+                          href={`/customers/${s.customerId}`}
+                          className="font-semibold text-foreground hover:underline"
+                        >
+                          {s.customerName}
+                        </Link>
+                        <div className="text-[11px] text-muted-foreground">
+                          {s.customerCode && <span className="font-mono">{s.customerCode} • </span>}
+                          {s.customerPhone}
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
+                      </div>
+                    </td>
 
-                <DialogFooter className="pt-2 border-t flex justify-between items-center">
-                  <div className="text-xs text-muted-foreground">
-                    Total: <strong className="text-foreground text-sm">
-                      {formatCurrency(items.reduce((s, it) => s + it.quantity * it.unitTradePrice * (1 - it.discountPercent / 100), 0))}
-                    </strong>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsAddOpen(false)}
-                      disabled={isSubmitting}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={isSubmitting} className="gap-1.5">
-                      {isSubmitting ? "Generating..." : "Generate Wholesale Tax Invoice"}
-                    </Button>
-                  </div>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        }
-      />
+                    {/* Date */}
+                    <td className="px-4 py-4 text-xs text-muted-foreground whitespace-nowrap">
+                      {formatDate(s.saleDate)}
+                    </td>
 
-      <DataTable
-        columns={columns}
-        data={invoices}
-        searchKey="invoiceNumber"
-        searchPlaceholder="Search invoice #, customer..."
-      />
+                    {/* Items */}
+                    <td className="px-4 py-4 text-xs font-medium">
+                      {s.itemsCount} lines
+                    </td>
 
-      {/* Invoice Print Modal */}
-      <InvoicePrintModal
-        open={isPrintOpen}
-        onOpenChange={setIsPrintOpen}
-        invoice={printInvoice}
-      />
+                    {/* Grand Total */}
+                    <td className="px-4 py-4 text-right">
+                      <div className="font-mono font-bold text-xs text-foreground">
+                        {formatCurrency(s.grandTotal)}
+                      </div>
+                      <div className="text-[10px] text-emerald-700">
+                        Profit: <strong>{formatCurrency(s.grossProfit)}</strong>
+                      </div>
+                    </td>
+
+                    {/* Paid vs Due */}
+                    <td className="px-4 py-4 text-right">
+                      <div className="text-xs font-mono text-emerald-700">
+                        Paid: <strong>{formatCurrency(s.paidAmount)}</strong>
+                      </div>
+                      <div className="text-xs font-mono font-semibold text-amber-700">
+                        Due: <strong>{formatCurrency(s.dueAmount)}</strong>
+                      </div>
+                    </td>
+
+                    {/* Payment Status */}
+                    <td className="px-4 py-4 text-center">
+                      {s.paymentStatus === "PAID" && (
+                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-medium">
+                          Paid
+                        </Badge>
+                      )}
+                      {s.paymentStatus === "PARTIALLY_PAID" && (
+                        <Badge className="bg-amber-50 text-amber-800 border-amber-200 text-[10px] font-medium">
+                          Partial
+                        </Badge>
+                      )}
+                      {s.paymentStatus === "UNPAID" && (
+                        <Badge variant="outline" className="text-rose-600 border-rose-200 text-[10px] font-medium">
+                          Unpaid
+                        </Badge>
+                      )}
+                    </td>
+
+                    {/* Status */}
+                    <td className="px-4 py-4 text-center">
+                      {s.status === "CONFIRMED" && (
+                        <Badge className="bg-sky-50 text-[#0071E3] border-sky-200 text-[10px] font-medium">
+                          Confirmed
+                        </Badge>
+                      )}
+                      {s.status === "CANCELLED" && (
+                        <Badge variant="destructive" className="text-[10px] font-medium">
+                          Cancelled
+                        </Badge>
+                      )}
+                    </td>
+
+                    {/* Actions */}
+                    <td className="px-5 py-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Button
+                          asChild
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2.5 text-xs text-[#0071E3] hover:bg-sky-50 rounded-lg"
+                        >
+                          <Link href={`/sales/${s.id}`}>
+                            <Eye className="h-3.5 w-3.5 mr-1" /> View
+                          </Link>
+                        </Button>
+
+                        {s.invoiceNumber && (
+                          <Button
+                            asChild
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground rounded-lg"
+                          >
+                            <Link href={`/invoices/${s.invoiceNumber}`}>
+                              <FileText className="h-3.5 w-3.5" />
+                            </Link>
+                          </Button>
+                        )}
+
+                        {s.status === "CONFIRMED" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedSaleToCancel(s);
+                              setCancelModalOpen(true);
+                            }}
+                            title="Cancel Wholesale Sale & Restore Batch Inventory"
+                            className="h-8 w-8 p-0 text-muted-foreground hover:text-rose-600 rounded-lg"
+                          >
+                            <Ban className="h-3.5 w-3.5 text-rose-500" />
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* 5. Pagination */}
+        {data.totalPages > 1 && (
+          <div className="flex items-center justify-between px-5 py-3.5 bg-muted/20 border-t border-border/80 text-xs text-muted-foreground">
+            <div>
+              Showing <span className="font-semibold text-foreground">{(data.page - 1) * data.pageSize + 1}</span> to{" "}
+              <span className="font-semibold text-foreground">
+                {Math.min(data.page * data.pageSize, data.totalCount)}
+              </span>{" "}
+              of <span className="font-semibold text-foreground">{data.totalCount}</span> orders
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={data.page <= 1}
+                onClick={() => applyFilters({ page: String(data.page - 1) })}
+                className="h-8 px-2.5 rounded-lg text-xs"
+              >
+                <ChevronLeft className="h-3.5 w-3.5 mr-1" /> Previous
+              </Button>
+
+              <span className="px-2 text-xs font-medium text-foreground">
+                Page {data.page} of {data.totalPages}
+              </span>
+
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={data.page >= data.totalPages}
+                onClick={() => applyFilters({ page: String(data.page + 1) })}
+                className="h-8 px-2.5 rounded-lg text-xs"
+              >
+                Next <ChevronRight className="h-3.5 w-3.5 ml-1" />
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 6. Cancel Sale Dialog */}
+      <Dialog open={cancelModalOpen} onOpenChange={setCancelModalOpen}>
+        <DialogContent className="max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-rose-600 text-base">
+              <AlertCircle className="h-5 w-5" />
+              Cancel Sale {selectedSaleToCancel?.saleNumber}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3 py-2 text-xs">
+            <p className="text-muted-foreground">
+              Cancelling this order will automatically:
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-muted-foreground bg-muted/30 p-3 rounded-xl">
+              <li>Restore all deducted batch quantities to active inventory.</li>
+              <li>Record a <code className="font-mono text-foreground font-semibold">SALE_RETURN</code> stock movement audit ledger.</li>
+              <li>Reverse customer accounts receivable due of <strong className="text-foreground">{formatCurrency(selectedSaleToCancel?.dueAmount || 0)}</strong>.</li>
+              <li>Mark wholesale tax invoice as <code className="font-mono text-rose-600">CANCELLED</code>.</li>
+            </ul>
+
+            <div className="space-y-1.5 pt-2">
+              <Label className="text-xs font-semibold text-foreground">
+                Cancellation Reason <span className="text-rose-500">*</span>
+              </Label>
+              <Textarea
+                placeholder="e.g. Pharmacy customer rejected delivery or order booked in error..."
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                rows={3}
+                className="rounded-xl bg-muted/20 text-xs resize-none"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCancelModalOpen(false)}
+              className="rounded-xl"
+            >
+              Close
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={isCancelling || !cancelReason.trim()}
+              onClick={handleConfirmCancel}
+              className="rounded-xl font-medium"
+            >
+              {isCancelling ? "Processing Reversal..." : "Confirm Cancellation"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

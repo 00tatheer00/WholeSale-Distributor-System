@@ -1,152 +1,78 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma } from "@/lib/prisma";
+import { customerPaymentSchema, CustomerPaymentInput } from "@/validations/payment.schema";
 import {
-  customerPaymentSchema,
-  CustomerPaymentInput,
-} from "@/validations/payment.schema";
-import { MOCK_PAYMENTS } from "./mock-data";
-import { ActionResult } from "./medicine.actions";
+  getPayments,
+  getPaymentById,
+  recordCustomerPayment,
+  PaymentQueryParams,
+  PaymentQueryResult,
+  PaymentDetailRecord,
+} from "@/server/services/payment.service";
 import { PaymentRecord } from "@/types/models";
 
-export async function getPaymentsAction(): Promise<ActionResult<PaymentRecord[]>> {
+export interface ActionResult<T = any> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}
+
+export async function getPaymentsAction(
+  params?: PaymentQueryParams
+): Promise<ActionResult<PaymentQueryResult>> {
   try {
-    const payments = await prisma.customerPayment.findMany({
-      include: {
-        customer: true,
-        distributor: true,
-      },
-      orderBy: { paymentDate: "desc" },
-    });
-
-    if (payments && payments.length > 0) {
-      const formatted: PaymentRecord[] = payments.map((p) => ({
-        id: p.id,
-        receiptNo: p.receiptNumber,
-        customerId: p.customerId,
-        customerName: p.customer?.pharmacyName || "Unknown",
-        amount: Number(p.amount),
-        paymentMethod: p.paymentMethod as string,
-        paymentDate: p.paymentDate.toISOString().split("T")[0],
-        status: p.status as string,
-        chequeNumber: p.chequeNumber || undefined,
-        bankName: p.bankName || undefined,
-        chequeStatus: p.chequeStatus as string,
-        distributorName: p.distributor?.name || "Direct Cashier",
-      }));
-      return { success: true, data: formatted };
-    }
-
-    return { success: true, data: MOCK_PAYMENTS };
-  } catch (error) {
-    return { success: true, data: MOCK_PAYMENTS };
+    const result = await getPayments(params);
+    return { success: true, data: result };
+  } catch (error: any) {
+    console.error("getPaymentsAction error:", error);
+    return { success: false, error: "Failed to fetch customer payment records." };
   }
 }
 
-export async function recordCustomerPaymentAction(data: CustomerPaymentInput): Promise<ActionResult> {
+export async function getPaymentByIdAction(
+  id: string
+): Promise<ActionResult<PaymentDetailRecord>> {
+  try {
+    if (!id) return { success: false, error: "Missing payment ID" };
+    const payment = await getPaymentById(id);
+    if (!payment) return { success: false, error: "Payment receipt not found." };
+    return { success: true, data: payment };
+  } catch (error: any) {
+    console.error("getPaymentByIdAction error:", error);
+    return { success: false, error: "Failed to fetch payment receipt details." };
+  }
+}
+
+export async function recordCustomerPaymentAction(
+  data: CustomerPaymentInput
+): Promise<ActionResult<{ paymentId: string; receiptNumber: string }>> {
   try {
     const parsed = customerPaymentSchema.safeParse(data);
     if (!parsed.success) {
       return { success: false, error: parsed.error.errors[0]?.message || "Invalid payment data" };
     }
 
-    const {
-      customerId,
-      amount,
-      paymentMethod,
-      paymentDate,
-      referenceNo,
-      bankName,
-      chequeNumber,
-      chequeMaturityDate,
-      distributorId,
-      notes,
-    } = parsed.data;
-
-    const receiptNumber = `MR-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`;
-
-    try {
-      const defaultUser = await prisma.user.findFirst();
-
-      await prisma.$transaction(async (tx) => {
-        // 1. Create CustomerPayment
-        const payment = await tx.customerPayment.create({
-          data: {
-            customerId,
-            distributorId: distributorId || undefined,
-            createdById: defaultUser?.id || "",
-            receiptNumber,
-            amount,
-            paymentMethod,
-            paymentDate: new Date(paymentDate),
-            referenceNumber: referenceNo,
-            bankName,
-            chequeNumber,
-            chequeDate: chequeMaturityDate ? new Date(chequeMaturityDate) : undefined,
-            chequeStatus: paymentMethod === "CHEQUE" ? "HOLDING" : "NOT_APPLICABLE",
-            status: "CONFIRMED",
-            notes,
-          },
-        });
-
-        // 2. Reduce Customer Due
-        await tx.customer.update({
-          where: { id: customerId },
-          data: {
-            currentDue: { decrement: amount },
-            totalPaid: { increment: amount },
-          },
-        });
-
-        // 3. FIFO Invoice Reconciliation
-        const unpaidInvoices = await tx.invoice.findMany({
-          where: { customerId, dueAmount: { gt: 0 } },
-          orderBy: { invoiceDate: "asc" },
-        });
-
-        let remainingAllocation = amount;
-        for (const inv of unpaidInvoices) {
-          if (remainingAllocation <= 0) break;
-          const due = Number(inv.dueAmount);
-          const allocated = Math.min(remainingAllocation, due);
-
-          await tx.paymentInvoiceAllocation.create({
-            data: {
-              customerPaymentId: payment.id,
-              invoiceId: inv.id,
-              allocatedAmount: allocated,
-            },
-          });
-
-          const newDue = due - allocated;
-          const newPaid = Number(inv.paidAmount) + allocated;
-
-          await tx.invoice.update({
-            where: { id: inv.id },
-            data: {
-              paidAmount: newPaid,
-              dueAmount: newDue,
-              status: newDue === 0 ? "PAID" : inv.status,
-            },
-          });
-
-          remainingAllocation -= allocated;
-        }
-      });
-
-      revalidatePath("/payments");
-      revalidatePath("/customers");
-      revalidatePath("/invoices");
-      revalidatePath("/dashboard");
-      return { success: true, message: `Money Receipt ${receiptNumber} for ৳${amount} issued successfully.` };
-    } catch {
-      return {
-        success: true,
-        message: `Payment ${receiptNumber} recorded in collection ledger.`,
-      };
+    const result = await recordCustomerPayment(parsed.data);
+    if (!result.success) {
+      return { success: false, error: result.error };
     }
-  } catch (err) {
-    return { success: false, error: "Failed to record payment receipt." };
+
+    revalidatePath("/payments");
+    revalidatePath("/customers");
+    revalidatePath("/invoices");
+    revalidatePath("/sales");
+    revalidatePath("/dashboard");
+    revalidatePath("/reports");
+
+    return {
+      success: true,
+      data: result.data,
+      message: `Money Receipt ${result.data?.receiptNumber} recorded and allocated successfully.`,
+    };
+  } catch (error: any) {
+    console.error("recordCustomerPaymentAction error:", error);
+    return { success: false, error: "Failed to record customer payment receipt." };
   }
 }
