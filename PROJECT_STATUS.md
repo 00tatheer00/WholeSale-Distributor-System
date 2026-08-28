@@ -26,6 +26,7 @@
 | **Phase 11**| Reports, Analytics & Internal Alert System | ✅ Completed | Reports Hub (`/reports`), 9 Sub-Reports (`/reports/sales`, `/reports/purchases`, `/reports/inventory`, `/reports/expiry`, `/reports/low-stock`, `/reports/customer-dues`, `/reports/supplier-dues`, `/reports/medicines`, `/reports/payments`), Client-side CSV/TSV & Print Export engine (`src/lib/export-utils.ts`), System Alerts & Deduplicated Watchdog (`/notifications`, `notification.service.ts`, Header Popover). |
 | **Phase 12**| Settings, Audit Logs, Security & Recovery | ✅ Completed | Multi-tab Settings Cockpit (`/settings`), Immutable Security Audit Trail (`/audit-logs`, `audit.service.ts`), Enterprise Security Headers (`next.config.mjs`), Production Disaster Recovery Runbook (`docs/backup-recovery.md`). |
 | **Phase 13**| Final QA, Bug Fixing, Performance & Deployment | ✅ Completed | Final end-to-end regression QA, Zero-leak security audit, Production Deployment Runbook (`docs/production-deployment.md`), Strict Seeding Safety Guards, Robots meta protection, 46/46 routes verified & live pushed to `origin main`. |
+| **Phase 14**| Client Feature Delivery & Financial Intelligence Polish | ✅ Completed | 5 Standard Expense Categories (`EXP-RENT`, `EXP-DAILY`, `EXP-SALESMAN`, `EXP-VISITOR`, `EXP-DOC-MKT`), Without-Expense Profit (Gross) vs Net Profit visual clarity, Salesman Recovery/Receipt report with Day & Month filters and summary KPIs, Post-discount profit integrity, Opening Stock immutable ledger tracking (`MANUAL_IN`), and Production verification (`47/47 routes verified`). |
 
 ---
 
@@ -38,7 +39,7 @@
 - **Form & Validation**: React Hook Form, Zod v3
 - **Verification Status**:
   - `npm run typecheck` $\rightarrow$ **0 Errors**
-  - `npm run build` $\rightarrow$ **46/46 Routes compiled and optimized successfully**
+  - `npm run build` $\rightarrow$ **47/47 Routes compiled and optimized successfully**
 - **Production Readiness**:
   - Enterprise HTTP security headers (`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy`).
   - Production seeding guards in `prisma/seed.ts` & `prisma/seed-transactions.ts`.
