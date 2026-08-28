@@ -11,6 +11,7 @@ export default async function PaymentsReportPage({
     preset?: string;
     start?: string;
     end?: string;
+    distributorId?: string;
   }>;
 }) {
   const params = await searchParams;
@@ -19,6 +20,7 @@ export default async function PaymentsReportPage({
     preset: params.preset || "this_month",
     startDate: params.start,
     endDate: params.end,
+    distributorId: params.distributorId,
   });
 
   return <PaymentsReportClient reportData={res.data} />;

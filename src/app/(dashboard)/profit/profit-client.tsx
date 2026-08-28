@@ -239,6 +239,24 @@ export function ProfitClient({ initialData }: ProfitClientProps) {
         </div>
       </div>
 
+      {/* 2.5 Financial Formula Intelligence Bar */}
+      <div className="bg-muted/30 border border-border/80 rounded-2xl p-3.5 px-5 flex flex-col md:flex-row items-center justify-between gap-3 text-xs shadow-sm">
+        <div className="flex items-center gap-2.5">
+          <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="font-semibold text-foreground">
+            Profit Calculation Engine:
+          </span>
+        </div>
+        <div className="flex flex-wrap items-center gap-4 text-muted-foreground font-mono text-[11px]">
+          <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-800 px-2.5 py-1 rounded-lg border border-emerald-200">
+            <span className="font-bold">Gross Profit (Without Expenses)</span> = Revenue (After Discounts) − COGS
+          </div>
+          <div className="flex items-center gap-1.5 bg-purple-50 text-purple-800 px-2.5 py-1 rounded-lg border border-purple-200">
+            <span className="font-bold">Net Profit (With Expenses)</span> = Gross Profit − Total Expenses
+          </div>
+        </div>
+      </div>
+
       {/* 3. Trend Visualizations Section */}
       <div className="bg-card border border-border/80 rounded-2xl p-5 shadow-sm space-y-4">
         <div className="flex items-center justify-between">

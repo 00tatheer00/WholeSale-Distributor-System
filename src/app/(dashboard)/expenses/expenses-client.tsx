@@ -704,7 +704,37 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
           <div className="space-y-6 pt-2">
             {/* Create Category Form */}
             <form onSubmit={handleCreateCategory} className="p-4 rounded-xl bg-muted/20 border border-border/60 space-y-3">
-              <div className="text-xs font-bold text-foreground">Add New Category Head</div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-foreground">Add New Category Head</span>
+                <span className="text-[10px] text-muted-foreground">Click a template below or type custom</span>
+              </div>
+
+              {/* Quick Template Chips */}
+              <div className="flex flex-wrap gap-1.5 pt-0.5 pb-1">
+                {[
+                  { name: "Office Monthly Rent", desc: "Monthly office & warehouse facility rent", isDirect: false },
+                  { name: "Daily Expense", desc: "Daily refreshments, tea & petty cash", isDirect: false },
+                  { name: "Salesman Expense", desc: "Field salesman conveyance & daily allowances", isDirect: true },
+                  { name: "Visitor Expense", desc: "Medical rep / Field visitor tour expenses", isDirect: true },
+                  { name: "Expense on Doctor for Marketing", desc: "Doctor promotional visits & marketing gifts", isDirect: true },
+                ].map((item) => (
+                  <button
+                    key={item.name}
+                    type="button"
+                    onClick={() => setCategoryForm({
+                      name: item.name,
+                      code: item.name.toUpperCase().replace(/[^A-Z0-9]/g, "-").slice(0, 15),
+                      description: item.desc,
+                      isDirectCost: item.isDirect,
+                      isActive: true,
+                    })}
+                    className="text-[10px] font-medium bg-background hover:bg-sky-50 hover:text-[#0071E3] hover:border-sky-300 border border-border/80 px-2 py-0.5 rounded-md transition-all text-muted-foreground"
+                  >
+                    + {item.name}
+                  </button>
+                ))}
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label className="text-[11px] font-semibold">Category Name</Label>

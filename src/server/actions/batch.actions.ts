@@ -137,27 +137,48 @@ export async function createBatchAction(
       };
     }
 
-    const created = await prisma.medicineBatch.create({
-      data: {
-        medicineId,
-        warehouseId,
-        rackId: rackId || undefined,
-        supplierId: supplierId || undefined,
-        batchNumber: batchNumber.trim().toUpperCase(),
-        mfgDate: mfgDate ? new Date(mfgDate) : null,
-        expiryDate: new Date(expiryDate),
-        purchaseCostPrice,
-        tradePrice,
-        mrp,
-        quantityOnHand: initialQuantity,
-        quantityAvailable: initialQuantity,
-        status,
-      },
-      include: {
-        medicine: { select: { brandName: true, genericName: true } },
-        warehouse: { select: { name: true } },
-        rack: { select: { rackCode: true } },
-      },
+    const created = await prisma.$transaction(async (tx) => {
+      const batch = await tx.medicineBatch.create({
+        data: {
+          medicineId,
+          warehouseId,
+          rackId: rackId || undefined,
+          supplierId: supplierId || undefined,
+          batchNumber: batchNumber.trim().toUpperCase(),
+          mfgDate: mfgDate ? new Date(mfgDate) : null,
+          expiryDate: new Date(expiryDate),
+          purchaseCostPrice,
+          tradePrice,
+          mrp,
+          quantityOnHand: initialQuantity,
+          quantityAvailable: initialQuantity,
+          status,
+        },
+        include: {
+          medicine: { select: { brandName: true, genericName: true } },
+          warehouse: { select: { name: true } },
+          rack: { select: { rackCode: true } },
+        },
+      });
+
+      if (initialQuantity > 0) {
+        await tx.stockMovement.create({
+          data: {
+            medicineId,
+            batchId: batch.id,
+            warehouseId,
+            movementType: "MANUAL_IN",
+            quantityDelta: initialQuantity,
+            quantityBefore: 0,
+            quantityAfter: initialQuantity,
+            unitCostPrice: purchaseCostPrice,
+            referenceNumber: batch.batchNumber,
+            reason: "Opening Stock Intake: Initial warehouse batch registration",
+          },
+        });
+      }
+
+      return batch;
     });
 
     revalidatePath("/medicines");

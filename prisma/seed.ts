@@ -493,19 +493,63 @@ async function main() {
 
   console.log(`✅ Seeded 3 Customer Pharmacies & Hospital Dispensaries`);
 
-  // 11. Seed Expense Categories
-  const expRent = await prisma.expenseCategory.create({
+  // 11. Seed Standard Expense Categories (Client Required)
+  await prisma.expenseCategory.create({
     data: {
       companyId: company.id,
-      name: "Warehouse Rent & Facility",
+      name: "Office Monthly Rent",
       code: "EXP-RENT",
-      description: "Monthly warehouse lease and security charges",
+      description: "Monthly office and warehouse lease and facility rent",
       isDirectCost: false,
       isActive: true,
     },
   });
 
-  const expLogistics = await prisma.expenseCategory.create({
+  await prisma.expenseCategory.create({
+    data: {
+      companyId: company.id,
+      name: "Daily Expense",
+      code: "EXP-DAILY",
+      description: "Daily office supplies, refreshments, tea, and petty cash",
+      isDirectCost: false,
+      isActive: true,
+    },
+  });
+
+  await prisma.expenseCategory.create({
+    data: {
+      companyId: company.id,
+      name: "Salesman Expense",
+      code: "EXP-SALESMAN",
+      description: "Field salesman daily conveyance, food allowance, and route expenses",
+      isDirectCost: true,
+      isActive: true,
+    },
+  });
+
+  await prisma.expenseCategory.create({
+    data: {
+      companyId: company.id,
+      name: "Visitor Expense",
+      code: "EXP-VISITOR",
+      description: "Medical rep / Field visitor tour and travel allowances",
+      isDirectCost: true,
+      isActive: true,
+    },
+  });
+
+  await prisma.expenseCategory.create({
+    data: {
+      companyId: company.id,
+      name: "Expense on Doctor for Marketing",
+      code: "EXP-DOC-MKT",
+      description: "Doctor promotional visits, medicine samples, and marketing gifts",
+      isDirectCost: true,
+      isActive: true,
+    },
+  });
+
+  await prisma.expenseCategory.create({
     data: {
       companyId: company.id,
       name: "Delivery Van Fuel & Logistics",
@@ -516,7 +560,7 @@ async function main() {
     },
   });
 
-  const expUtilities = await prisma.expenseCategory.create({
+  await prisma.expenseCategory.create({
     data: {
       companyId: company.id,
       name: "Electricity & Cold Chain Utilities",
@@ -527,7 +571,7 @@ async function main() {
     },
   });
 
-  const expSalaries = await prisma.expenseCategory.create({
+  await prisma.expenseCategory.create({
     data: {
       companyId: company.id,
       name: "Staff Salaries & Allowances",

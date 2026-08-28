@@ -627,15 +627,55 @@ export async function getMedicinePerformanceReport(params: ReportFilterParams = 
  * 10. COLLECTIONS & PAYMENTS REPORT
  */
 export async function getPaymentReport(params: ReportFilterParams = {}) {
-  const { preset = "this_month", startDate: customStart, endDate: customEnd } = params;
-  const { startDate, endDate, startDateStr, endDateStr } = resolveProfitDateRange(preset, customStart, customEnd);
+  const {
+    preset = "this_month",
+    startDate: customStart,
+    endDate: customEnd,
+    distributorId,
+    customerId,
+    supplierId,
+  } = params;
+  const { startDate, endDate, startDateStr, endDateStr } = resolveProfitDateRange(
+    preset,
+    customStart,
+    customEnd
+  );
 
-  const [customerPayments, supplierPayments] = await Promise.all([
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+  const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+  const customerPaymentWhere: any = {
+    status: "CONFIRMED",
+    paymentDate: { gte: startDate, lte: endDate },
+  };
+  if (distributorId && distributorId !== "ALL") {
+    customerPaymentWhere.distributorId = distributorId;
+  }
+  if (customerId && customerId !== "ALL") {
+    customerPaymentWhere.customerId = customerId;
+  }
+
+  const supplierPaymentWhere: any = {
+    status: "CONFIRMED",
+    paymentDate: { gte: startDate, lte: endDate },
+  };
+  if (supplierId && supplierId !== "ALL") {
+    supplierPaymentWhere.supplierId = supplierId;
+  }
+
+  const [
+    customerPayments,
+    supplierPayments,
+    todayCollectionsAgg,
+    monthCollectionsAgg,
+    distributors,
+  ] = await Promise.all([
     prisma.customerPayment.findMany({
-      where: {
-        status: "CONFIRMED",
-        paymentDate: { gte: startDate, lte: endDate },
-      },
+      where: customerPaymentWhere,
       include: {
         customer: true,
         distributor: true,
@@ -643,19 +683,59 @@ export async function getPaymentReport(params: ReportFilterParams = {}) {
       orderBy: { paymentDate: "desc" },
     }),
     prisma.supplierPayment.findMany({
-      where: {
-        status: "CONFIRMED",
-        paymentDate: { gte: startDate, lte: endDate },
-      },
+      where: supplierPaymentWhere,
       include: {
         supplier: true,
       },
       orderBy: { paymentDate: "desc" },
     }),
+    prisma.customerPayment.aggregate({
+      where: {
+        status: "CONFIRMED",
+        paymentDate: { gte: todayStart, lte: todayEnd },
+        ...(distributorId && distributorId !== "ALL" ? { distributorId } : {}),
+      },
+      _sum: { amount: true },
+      _count: { id: true },
+    }),
+    prisma.customerPayment.aggregate({
+      where: {
+        status: "CONFIRMED",
+        paymentDate: { gte: monthStart, lte: monthEnd },
+        ...(distributorId && distributorId !== "ALL" ? { distributorId } : {}),
+      },
+      _sum: { amount: true },
+      _count: { id: true },
+    }),
+    prisma.distributor.findMany({
+      where: { status: "ACTIVE" },
+      select: { id: true, name: true, employeeCode: true, assignedTerritory: true },
+      orderBy: { name: "asc" },
+    }),
   ]);
 
   const totalCollected = customerPayments.reduce((s, p) => s + Number(p.amount), 0);
   const totalDisbursed = supplierPayments.reduce((s, p) => s + Number(p.amount), 0);
+
+  // Collector / Salesman breakdown
+  const collectorMap = new Map<string, { name: string; territory: string; count: number; total: number }>();
+  customerPayments.forEach((p) => {
+    const colId = p.distributorId || "direct";
+    const colName = p.distributor?.name || "Direct Cashier / Office Counter";
+    const territory = p.distributor?.assignedTerritory || "General";
+    const existing = collectorMap.get(colId) || { name: colName, territory, count: 0, total: 0 };
+    existing.count += 1;
+    existing.total += Number(p.amount);
+    collectorMap.set(colId, existing);
+  });
+
+  const collectorBreakdown = Array.from(collectorMap.entries()).map(([id, val]) => ({
+    id,
+    name: val.name,
+    territory: val.territory,
+    receiptsCount: val.count,
+    totalCollected: Math.round(val.total),
+  })).sort((a, b) => b.totalCollected - a.totalCollected);
 
   return {
     startDate: startDateStr,
@@ -664,10 +744,23 @@ export async function getPaymentReport(params: ReportFilterParams = {}) {
     totalCollected,
     totalDisbursed,
     netCashFlow: totalCollected - totalDisbursed,
+    collectedToday: Number(todayCollectionsAgg._sum.amount || 0),
+    receiptsTodayCount: todayCollectionsAgg._count.id,
+    collectedThisMonth: Number(monthCollectionsAgg._sum.amount || 0),
+    receiptsThisMonthCount: monthCollectionsAgg._count.id,
+    collectorBreakdown,
+    availableDistributors: distributors.map((d) => ({
+      id: d.id,
+      name: d.name,
+      code: d.employeeCode || "",
+      territory: d.assignedTerritory || "",
+    })),
     customerPayments: customerPayments.map((p) => ({
       id: p.id,
       receiptNumber: p.receiptNumber,
+      customerId: p.customerId,
       customerName: p.customer.pharmacyName,
+      distributorId: p.distributorId,
       collectorName: p.distributor?.name || "Direct Cashier",
       paymentDate: p.paymentDate.toISOString().split("T")[0],
       amount: Number(p.amount),
