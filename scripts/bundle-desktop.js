@@ -45,6 +45,12 @@ if (fs.existsSync(dbSrc)) {
   fs.copyFileSync(dbSrc, path.join(standaloneRoot, 'wmdms.db'));
   fs.copyFileSync(dbSrc, path.join(standaloneRoot, 'prisma', 'wmdms.db'));
 }
+// Copy .prisma query engine if available
+const prismaClientEngine = path.join(projectRoot, 'node_modules', '.prisma');
+if (fs.existsSync(prismaClientEngine)) {
+  copyFolderSync(prismaClientEngine, path.join(standaloneRoot, 'node_modules', '.prisma'));
+}
+
 console.log('✅ SQLite database & Prisma schema copied to standalone.');
 
 console.log('🎉 Standalone desktop bundle is 100% ready for packaging!');

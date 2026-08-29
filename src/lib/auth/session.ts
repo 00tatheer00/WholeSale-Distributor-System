@@ -60,7 +60,8 @@ export async function getCurrentUser(): Promise<AuthenticatedUserContext | null>
     return null;
   }
 
-  const normalizedEmail = sessionEmail.trim().toLowerCase();
+  const rawEmail = sessionEmail.trim();
+  const normalizedEmail = (rawEmail.includes("%") ? decodeURIComponent(rawEmail) : rawEmail).toLowerCase();
 
   // Find corresponding user profile in local SQLite database
   try {

@@ -65,6 +65,17 @@ async function startNextServer() {
   process.env.HOSTNAME = '0.0.0.0';
   process.env.NODE_ENV = 'production';
 
+  // Ensure Node resolution finds all modules in both root and standalone directories
+  const standaloneDir = path.join(projectRoot, '.next', 'standalone');
+  const nodePaths = [
+    path.join(projectRoot, 'node_modules'),
+    path.join(standaloneDir, 'node_modules'),
+  ].join(path.delimiter);
+  process.env.NODE_PATH = nodePaths;
+  if (require('module').Module && require('module').Module._initPaths) {
+    require('module').Module._initPaths();
+  }
+
   if (isDev) {
     console.log('Running in Development mode with local Next.js dev server...');
     return true;
@@ -74,11 +85,17 @@ async function startNextServer() {
   const standaloneServer = path.join(projectRoot, '.next', 'standalone', 'server.js');
   if (fs.existsSync(standaloneServer)) {
     console.log('Starting standalone Next.js server directly in-process...');
-    process.chdir(path.dirname(standaloneServer));
-    require(standaloneServer);
-    return true;
-  } else {
-    console.warn('Standalone server not found, falling back to dynamic import...');
+    try {
+      process.chdir(path.dirname(standaloneServer));
+      require(standaloneServer);
+      return true;
+    } catch (err) {
+      console.error('Failed to start in-process standalone server:', err);
+    }
+  }
+
+  console.warn('Standalone server fallback to Next.js programmatic server...');
+  try {
     const next = require('next');
     const nextApp = next({ dev: false, dir: projectRoot, hostname: '0.0.0.0', port: Number(PORT) });
     const handle = nextApp.getRequestHandler();
@@ -86,6 +103,9 @@ async function startNextServer() {
     const server = http.createServer((req, res) => handle(req, res));
     server.listen(Number(PORT), '0.0.0.0');
     return true;
+  } catch (err) {
+    console.error('Programmatic server startup error:', err);
+    return false;
   }
 }
 
