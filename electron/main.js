@@ -3,8 +3,10 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const http = require('http');
+const { spawn } = require('child_process');
 
 let mainWindow = null;
+let serverProcess = null;
 const PORT = process.env.PORT || 3000;
 
 // Get Local LAN IP Addresses for Multi-PC / Mobile access
@@ -23,7 +25,7 @@ function getLocalIpAddresses() {
 }
 
 // Wait for Next.js HTTP server to respond
-function waitForServer(url, timeoutMs = 15000) {
+function waitForServer(url, timeoutMs = 25000) {
   return new Promise((resolve) => {
     const startTime = Date.now();
     const check = () => {
@@ -52,7 +54,7 @@ function waitForServer(url, timeoutMs = 15000) {
   });
 }
 
-// Start Standalone Next.js Server on 0.0.0.0:3000
+// Start Next.js Server (Dedicated Node.js child process in production)
 async function startNextServer() {
   const isDev = !app.isPackaged;
   const projectRoot = isDev
@@ -65,46 +67,45 @@ async function startNextServer() {
   process.env.HOSTNAME = '0.0.0.0';
   process.env.NODE_ENV = 'production';
 
-  // Ensure Node resolution finds all modules in both root and standalone directories
-  const standaloneDir = path.join(projectRoot, '.next', 'standalone');
-  const nodePaths = [
-    path.join(projectRoot, 'node_modules'),
-    path.join(standaloneDir, 'node_modules'),
-  ].join(path.delimiter);
-  process.env.NODE_PATH = nodePaths;
-  if (require('module').Module && require('module').Module._initPaths) {
-    require('module').Module._initPaths();
-  }
-
   if (isDev) {
     console.log('Running in Development mode with local Next.js dev server...');
     return true;
   }
 
-  // Load Standalone Next.js Server directly in-process
+  // In packaged desktop mode, spawn standalone server via Electron's bundled Node.js engine
   const standaloneServer = path.join(projectRoot, '.next', 'standalone', 'server.js');
   if (fs.existsSync(standaloneServer)) {
-    console.log('Starting standalone Next.js server directly in-process...');
-    try {
-      process.chdir(path.dirname(standaloneServer));
-      require(standaloneServer);
-      return true;
-    } catch (err) {
-      console.error('Failed to start in-process standalone server:', err);
-    }
-  }
+    console.log('Spawning standalone Next.js server child process...');
+    const env = {
+      ...process.env,
+      PORT: PORT.toString(),
+      HOSTNAME: '0.0.0.0',
+      NODE_ENV: 'production',
+      DATABASE_URL: `file:${dbPath.replace(/\\/g, '/')}`,
+      ELECTRON_RUN_AS_NODE: '1',
+    };
 
-  console.warn('Standalone server fallback to Next.js programmatic server...');
-  try {
-    const next = require('next');
-    const nextApp = next({ dev: false, dir: projectRoot, hostname: '0.0.0.0', port: Number(PORT) });
-    const handle = nextApp.getRequestHandler();
-    await nextApp.prepare();
-    const server = http.createServer((req, res) => handle(req, res));
-    server.listen(Number(PORT), '0.0.0.0');
+    serverProcess = spawn(process.execPath, [standaloneServer], {
+      env,
+      cwd: path.dirname(standaloneServer),
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+
+    serverProcess.stdout.on('data', (d) => {
+      console.log(`[Next.js Server]: ${d.toString().trim()}`);
+    });
+
+    serverProcess.stderr.on('data', (d) => {
+      console.error(`[Next.js Server Error]: ${d.toString().trim()}`);
+    });
+
+    serverProcess.on('exit', (code) => {
+      console.log(`Next.js server child process exited with code ${code}`);
+    });
+
     return true;
-  } catch (err) {
-    console.error('Programmatic server startup error:', err);
+  } else {
+    console.warn('Standalone server.js not found at:', standaloneServer);
     return false;
   }
 }
@@ -198,7 +199,10 @@ function createWindow() {
 app.whenReady().then(async () => {
   try {
     await startNextServer();
-    await waitForServer(`http://localhost:${PORT}`);
+    const ready = await waitForServer(`http://localhost:${PORT}`);
+    if (!ready) {
+      console.warn('Server wait timed out, attempting window load anyway...');
+    }
     createWindow();
   } catch (err) {
     console.error('Failed to start ERP application:', err);
@@ -215,7 +219,22 @@ app.whenReady().then(async () => {
   });
 });
 
+app.on('will-quit', () => {
+  if (serverProcess) {
+    try {
+      serverProcess.kill();
+    } catch (e) {}
+    serverProcess = null;
+  }
+});
+
 app.on('window-all-closed', () => {
+  if (serverProcess) {
+    try {
+      serverProcess.kill();
+    } catch (e) {}
+    serverProcess = null;
+  }
   if (process.platform !== 'darwin') {
     app.quit();
   }
