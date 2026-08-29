@@ -100,6 +100,7 @@ Open [http://localhost:3000](http://localhost:3000) to access the application.
 
 ## 5. Production Deployment & Disaster Recovery
 
+- **د سیسټم بشپړ لارښود په پښتو کې (Pashto System Guide)**: [`docs/SYSTEM_GUIDE_PASHTO.md`](./docs/SYSTEM_GUIDE_PASHTO.md)
 - **Production Deployment Runbook**: [`docs/production-deployment.md`](./docs/production-deployment.md)
 - **Disaster Recovery & Backup Runbook**: [`docs/backup-recovery.md`](./docs/backup-recovery.md)
 - **Project Progress & Phase Continuation**: [`docs/PROJECT_STATUS.md`](./docs/PROJECT_STATUS.md)
