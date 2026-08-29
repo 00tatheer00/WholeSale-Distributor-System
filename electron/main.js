@@ -5,7 +5,6 @@ const os = require('os');
 const http = require('http');
 
 let mainWindow = null;
-let serverInstance = null;
 const PORT = process.env.PORT || 3000;
 
 // Get Local LAN IP Addresses for Multi-PC / Mobile access
@@ -23,7 +22,37 @@ function getLocalIpAddresses() {
   return addresses.length > 0 ? addresses : ['127.0.0.1'];
 }
 
-// Start in-process Next.js Server on 0.0.0.0:3000
+// Wait for Next.js HTTP server to respond
+function waitForServer(url, timeoutMs = 15000) {
+  return new Promise((resolve) => {
+    const startTime = Date.now();
+    const check = () => {
+      http
+        .get(url, (res) => {
+          if (res.statusCode >= 200 && res.statusCode < 500) {
+            resolve(true);
+          } else {
+            retry();
+          }
+        })
+        .on('error', () => {
+          retry();
+        });
+    };
+
+    const retry = () => {
+      if (Date.now() - startTime > timeoutMs) {
+        resolve(false);
+      } else {
+        setTimeout(check, 300);
+      }
+    };
+
+    check();
+  });
+}
+
+// Start Standalone Next.js Server on 0.0.0.0:3000
 async function startNextServer() {
   const isDev = !app.isPackaged;
   const projectRoot = isDev
@@ -41,36 +70,23 @@ async function startNextServer() {
     return true;
   }
 
-  console.log(`Starting in-process Next.js server from ${projectRoot}...`);
-  const next = require('next');
-  const nextApp = next({
-    dev: false,
-    dir: projectRoot,
-    hostname: '0.0.0.0',
-    port: Number(PORT),
-  });
-
-  const handle = nextApp.getRequestHandler();
-  await nextApp.prepare();
-
-  return new Promise((resolve, reject) => {
-    serverInstance = http.createServer((req, res) => {
-      handle(req, res);
-    });
-
-    serverInstance.listen(Number(PORT), '0.0.0.0', (err) => {
-      if (err) {
-        return reject(err);
-      }
-      console.log(`PharmaDist ERP server successfully listening on http://0.0.0.0:${PORT}`);
-      resolve(true);
-    });
-
-    serverInstance.on('error', (err) => {
-      console.error('Server instance error:', err);
-      reject(err);
-    });
-  });
+  // Load Standalone Next.js Server directly in-process
+  const standaloneServer = path.join(projectRoot, '.next', 'standalone', 'server.js');
+  if (fs.existsSync(standaloneServer)) {
+    console.log('Starting standalone Next.js server directly in-process...');
+    process.chdir(path.dirname(standaloneServer));
+    require(standaloneServer);
+    return true;
+  } else {
+    console.warn('Standalone server not found, falling back to dynamic import...');
+    const next = require('next');
+    const nextApp = next({ dev: false, dir: projectRoot, hostname: '0.0.0.0', port: Number(PORT) });
+    const handle = nextApp.getRequestHandler();
+    await nextApp.prepare();
+    const server = http.createServer((req, res) => handle(req, res));
+    server.listen(Number(PORT), '0.0.0.0');
+    return true;
+  }
 }
 
 // Create Native Desktop App Window
@@ -162,6 +178,7 @@ function createWindow() {
 app.whenReady().then(async () => {
   try {
     await startNextServer();
+    await waitForServer(`http://localhost:${PORT}`);
     createWindow();
   } catch (err) {
     console.error('Failed to start ERP application:', err);
@@ -179,20 +196,7 @@ app.whenReady().then(async () => {
 });
 
 app.on('window-all-closed', () => {
-  if (serverInstance) {
-    try {
-      serverInstance.close();
-    } catch {}
-  }
   if (process.platform !== 'darwin') {
     app.quit();
-  }
-});
-
-app.on('before-quit', () => {
-  if (serverInstance) {
-    try {
-      serverInstance.close();
-    } catch {}
   }
 });
