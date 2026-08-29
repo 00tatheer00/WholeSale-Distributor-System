@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PharmaDist Wholesale ERP — Comprehensive System Guide & Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-secondary: #111827;
+      --bg-card: rgba(17, 24, 39, 0.85);
+      --bg-card-hover: rgba(31, 41, 55, 0.95);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(59, 130, 246, 0.3);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #8b5cf6;
+      --glow-blue: rgba(59, 130, 246, 0.15);
+      --font-latin: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-rtl: 'Noto Sans Arabic', 'Segoe UI', Tahoma, Arial, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-latin);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body[dir="rtl"] {
+      font-family: var(--font-rtl);
+    }
+
+    /* Ambient Background Gradients */
+    .ambient-glow {
+      position: fixed;
+      top: -20%;
+      left: 10%;
+      width: 60vw;
+      height: 60vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.07) 0%, rgba(6, 182, 212, 0.03) 50%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .ambient-glow-2 {
+      position: fixed;
+      bottom: -20%;
+      right: 5%;
+      width: 50vw;
+      height: 50vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, rgba(16, 185, 129, 0.03) 50%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Top Sticky Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(11, 15, 25, 0.85);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: white;
+      font-size: 20px;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.35);
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Language Switcher Toolbar */
+    .lang-switcher {
+      display: flex;
+      align-items: center;
+      background: var(--bg-secondary);
+      padding: 4px;
+      border-radius: 30px;
+      border: 1px solid var(--border-color);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .lang-btn:hover {
+      color: #fff;
+    }
+
+    .lang-btn.active {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
+    }
+
+    .print-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .print-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Main Container Layout */
+    .main-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px 24px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 36px;
+    }
+
+    /* Sidebar Table of Contents */
+    .sidebar {
+      position: sticky;
+      top: 90px;
+      height: calc(100vh - 120px);
+      overflow-y: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      backdrop-filter: blur(12px);
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    .sidebar-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-blue);
+      margin-bottom: 8px;
+      padding-left: 8px;
+    }
+
+    body[dir="rtl"] .sidebar-title {
+      padding-left: 0;
+      padding-right: 8px;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 9px 14px;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: #fff;
+      background: rgba(59, 130, 246, 0.12);
+      border-left: 3px solid var(--accent-blue);
+    }
+
+    body[dir="rtl"] .nav-link:hover, body[dir="rtl"] .nav-link.active {
+      border-left: none;
+      border-right: 3px solid var(--accent-blue);
+    }
+
+    /* Content Area */
+    .content-area {
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+    }
+
+    /* Hero Banner */
+    .hero-card {
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(17, 24, 39, 0.9) 60%, rgba(15, 23, 42, 0.95) 100%);
+      border: 1px solid var(--border-accent);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.15), transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      color: #60a5fa;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+
+    .hero-title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.25;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg, #ffffff 30%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 800px;
+      line-height: 1.7;
+    }
+
+    /* Key Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .metric-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .metric-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* Section Cards */
+    .doc-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+      padding: 34px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Step Cards / Feature Cards */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .feature-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 22px;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+    }
+
+    .feature-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 6px;
+      width: fit-content;
+    }
+
+    .tag-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+    .tag-green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .tag-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .tag-rose { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
+    .tag-purple { background: rgba(139, 92, 246, 0.15); color: #c084fc; }
+
+    .feature-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .feature-text {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Tables */
+    .doc-table-wrapper {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      margin-top: 16px;
+    }
+
+    .doc-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13.5px;
+    }
+
+    body[dir="rtl"] .doc-table {
+      text-align: right;
+    }
+
+    .doc-table th {
+      background: rgba(255, 255, 255, 0.04);
+      color: #fff;
+      font-weight: 600;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .doc-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    .doc-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .doc-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+      color: #fff;
+    }
+
+    /* Highlight Callouts */
+    .callout {
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin: 18px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 13.5px;
+    }
+
+    .callout-info {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      color: #93c5fd;
+    }
+
+    .callout-success {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #6ee7b7;
+    }
+
+    .callout-warning {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      color: #fde68a;
+    }
+
+    .callout-icon {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    /* Code Snippets */
+    .code-pill {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: monospace;
+      color: #38bdf8;
+      font-size: 12.5px;
+    }
+
+    /* Step Sequence */
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .step-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .step-body h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .step-body p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .main-wrapper {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .hero-title {
+        font-size: 24px;
+      }
+      .doc-section {
+        padding: 20px;
+      }
+    }
+
+    @media print {
+      header, .sidebar, .lang-switcher, .print-btn {
+        display: none !important;
+      }
+      body {
+        background: #fff !important;
+        color: #000 !important;
+      }
+      .doc-section, .hero-card {
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+        color: #000 !important;
+        box-shadow: none !important;
+      }
+      .hero-title, .section-title, .feature-name {
+        color: #000 !important;
+        -webkit-text-fill-color: initial !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow"></div>
+  <div class="ambient-glow-2"></div>
+
+  <!-- Sticky Top Header -->
+  <header>
+    <div class="brand-container">
+      <div class="brand-logo">💊</div>
+      <div>
+        <div class="brand-title">PharmaDist ERP</div>
+        <div class="brand-subtitle">Wholesale Distribution Management System</div>
+      </div>
+    </div>
+
+    <!-- Language Selector Buttons -->
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLanguage('en')">
+        🇬🇧 English
+      </button>
+      <button class="lang-btn" onclick="setLanguage('ur')">
+        🇵🇰 اردو (Urdu)
+      </button>
+      <button class="lang-btn" onclick="setLanguage('ps')">
+        🇦🇫 پښتو (Pashto)
+      </button>
+    </div>
+
+    <button class="print-btn" onclick="window.print()">
+      🖨️ Print Guide
+    </button>
+  </header>
+
+  <!-- Main Container -->
+  <div class="main-wrapper">
+    <!-- Table of Contents Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-title" id="toc-title">Table of Contents</div>
+      <a href="#section-overview" class="nav-link" id="nav-overview">📌 1. System Overview</a>
+      <a href="#section-delivery" class="nav-link" id="nav-delivery">💾 2. USB & Installation</a>
+      <a href="#section-logins" class="nav-link" id="nav-logins">🔑 3. Login Credentials</a>
+      <a href="#section-network" class="nav-link" id="nav-network">🌐 4. Multi-PC & Mobile LAN</a>
+      <a href="#section-modules" class="nav-link" id="nav-modules">📦 5. Core ERP Modules</a>
+      <a href="#section-fefo" class="nav-link" id="nav-fefo">⏳ 6. FEFO & Expiry Rules</a>
+      <a href="#section-billing" class="nav-link" id="nav-billing">🧾 7. Sales, Invoices & Dues</a>
+      <a href="#section-profit" class="nav-link" id="nav-profit">📈 8. Profit & Financials</a>
+      <a href="#section-backup" class="nav-link" id="nav-backup">🛡️ 9. Backup & Safety</a>
+      <a href="#section-faq" class="nav-link" id="nav-faq">❓ 10. FAQ & Help</a>
+    </aside>
+
+    <!-- Main Content Stream -->
+    <main class="content-area" id="dynamic-content">
+      <!-- Content populated dynamically based on active language -->
+    </main>
+  </div>
+
+  <script>
+    // Trilingual Content Data Dictionary
+    const contentData = {
+      en: {
+        dir: 'ltr',
+        tocTitle: 'Table of Contents',
+        nav: {
+          overview: '📌 1. System Overview',
+          delivery: '💾 2. USB & Installation',
+          logins: '🔑 3. Login Credentials',
+          network: '🌐 4. Multi-PC & Mobile LAN',
+          modules: '📦 5. Core ERP Modules',
+          fefo: '⏳ 6. FEFO & Expiry Rules',
+          billing: '🧾 7. Sales, Invoices & Dues',
+          profit: '📈 8. Profit & Financials',
+          backup: '🛡️ 9. Backup & Safety',
+          faq: '❓ 10. FAQ & Help'
+        },
+        html: `
+          <!-- Hero Banner -->
+          <div class="hero-card">
+            <div class="hero-badge">100% Offline Desktop & Multi-PC Edition</div>
+            <h1 class="hero-title">PharmaDist Wholesale Distributor ERP</h1>
+            <p class="hero-desc">
+              Comprehensive Enterprise Resource Planning (ERP) platform built specifically for pharmaceutical wholesale distributors, medicine importers, and warehouse managers. Features automated First-Expiry, First-Out (FEFO) batch inventory, double-entry financial ledgers, and zero-configuration local network access.
+            </p>
+            <div class="metrics-grid">
+              <div class="metric-pill">
+                <div class="metric-value">⚡ 100% Offline</div>
+                <div class="metric-label">Embedded SQLite Database</div>
+              </div>
+              <div class="metric-pill">
+                <div class="metric-value">🖥️ Multi-PC LAN</div>
+                <div class="metric-label">Connect all office PCs & Mobiles</div>
+              </div>
+              <div class="metric-pill">
+                <div class="metric-value">؋ Afghanistan AFN</div>
+                <div class="metric-label">Localized Currency & Decimals</div>
+              </div>
+              <div class="metric-pill">
+                <div class="metric-value">🔒 Strict FEFO</div>
+                <div class="metric-label">Zero Expired Stock Loss</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 1: System Overview -->
+          <section id="section-overview" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">🏛️</div>
+              <div>
+                <h2 class="section-title">1. System Overview & Architecture</h2>
+                <div class="section-subtitle">Understanding how the software runs and stores records</div>
+              </div>
+            </div>
+            <p class="feature-text">
+              PharmaDist ERP is a standalone, full-featured desktop management system. Unlike cloud-only software that stops working when the internet drops, PharmaDist ERP runs <strong>locally on the Main PC</strong> using a high-speed embedded SQLite database engine.
+            </p>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <span class="feature-tag tag-blue">Single-File Database</span>
+                <div class="feature-name">Embedded SQLite (wmdms.db)</div>
+                <p class="feature-text">Zero background servers (No SQL Server or PostgreSQL installation required). All records, transactions, medicines, and invoices are saved securely in a single file.</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-green">Zero-Install Clients</span>
+                <div class="feature-name">Browser LAN Access</div>
+                <p class="feature-text">Install the software once on the Main PC. Cashiers, salesmen, and warehouse staff on other PCs or mobile phones simply open Chrome and connect via Wi-Fi.</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-purple">Bcrypt Security</span>
+                <div class="feature-name">Role-Based Access Control</div>
+                <p class="feature-text">Separate operational profiles for Super Admin, Sales Manager, and Cashier with encrypted passwords and immutable security audit trails.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 2: USB Delivery & Installation -->
+          <section id="section-delivery" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">💾</div>
+              <div>
+                <h2 class="section-title">2. USB Delivery & Client Installation</h2>
+                <div class="section-subtitle">Step-by-step instructions to deliver and install on client PC</div>
+              </div>
+            </div>
+
+            <div class="callout callout-success">
+              <div class="callout-icon">💡</div>
+              <div><strong>USB Requirement:</strong> Any standard 4 GB or 8 GB USB flash drive is more than enough. The entire setup installer is only <strong>~150 MB to 250 MB</strong>.</div>
+            </div>
+
+            <div class="steps-list">
+              <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-body">
+                  <h4>Copy Setup File to USB</h4>
+                  <p>Copy the <span class="code-pill">PharmaDist Wholesale ERP Setup.exe</span> installer onto your USB flash drive.</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-body">
+                  <h4>Run Installer on Main PC</h4>
+                  <p>Plug the USB into the client's Main Office PC and double-click the installer. It will automatically install and place a shortcut icon on the Windows Desktop.</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-body">
+                  <h4>Double Click to Launch</h4>
+                  <p>Double-click the desktop icon. The application will start the background engine and open the ERP window immediately without needing any internet connection!</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 3: Login Credentials -->
+          <section id="section-logins" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">🔑</div>
+              <div>
+                <h2 class="section-title">3. Default Login Credentials</h2>
+                <div class="section-subtitle">Pre-configured accounts ready for immediate operation</div>
+              </div>
+            </div>
+
+            <div class="doc-table-wrapper">
+              <table class="doc-table">
+                <thead>
+                  <tr>
+                    <th>User Role</th>
+                    <th>Email Address</th>
+                    <th>Default Password</th>
+                    <th>Permission Scope</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>👑 Super Admin</strong></td>
+                    <td><span class="code-pill">admin@erp.com</span></td>
+                    <td><span class="code-pill">admin@123</span></td>
+                    <td>Full access to profit analysis, settings, user accounts, and system backups.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>👔 Sales Manager</strong></td>
+                    <td><span class="code-pill">manager@erp.com</span></td>
+                    <td><span class="code-pill">manager@123</span></td>
+                    <td>Sales approvals, distributor performance, credit limits, and reports.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>🧾 Cashier</strong></td>
+                    <td><span class="code-pill">cashier@erp.com</span></td>
+                    <td><span class="code-pill">cashier@123</span></td>
+                    <td>Fast wholesale invoicing, receipt creation, customer ledger balance inquiry.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="callout callout-warning">
+              <div class="callout-icon">⚠️</div>
+              <div><strong>Important:</strong> After logging in for the first time, change your password by navigating to <strong>Settings > Profile & Security</strong>.</div>
+            </div>
+          </section>
+
+          <!-- Section 4: Multi-PC & Mobile LAN -->
+          <section id="section-network" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">🌐</div>
+              <div>
+                <h2 class="section-title">4. Multi-PC & Mobile Wi-Fi Access</h2>
+                <div class="section-subtitle">How to share the ERP with other office computers and smartphones</div>
+              </div>
+            </div>
+
+            <p class="feature-text">
+              You do not need to install the software on other computers. When the Main PC runs the application, it automatically broadcasts the ERP over your office Wi-Fi router / Local Area Network (LAN).
+            </p>
+
+            <div class="steps-list">
+              <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-body">
+                  <h4>Find the Server IP on Main PC</h4>
+                  <p>In the desktop application menu, click <strong>File > Local Network IP</strong>. A popup will show your Main PC's IP address (e.g. <span class="code-pill">http://192.168.1.50:3000</span>).</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-body">
+                  <h4>Connect Other Devices to Office Wi-Fi</h4>
+                  <p>Ensure other cashier laptops, desktop PCs, or mobile phones are connected to the same office Wi-Fi network or router.</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-body">
+                  <h4>Open Browser and Login</h4>
+                  <p>Open Google Chrome, Microsoft Edge, or Safari on the second PC/Mobile and type the address: <span class="code-pill">http://192.168.1.50:3000</span>. All devices will work simultaneously on the same live database!</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 5: Core ERP Modules -->
+          <section id="section-modules" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">📦</div>
+              <div>
+                <h2 class="section-title">5. Core ERP Modules & Operations</h2>
+                <div class="section-subtitle">Guide to daily wholesale workflow and inventory operations</div>
+              </div>
+            </div>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <span class="feature-tag tag-blue">M01 — Inventory</span>
+                <div class="feature-name">Medicine & Batch Master</div>
+                <p class="feature-text">Create brand names, generics, dosage forms (tablets, syrups, injections), storage conditions (Cold Chain 2-8°C, Narcotics safe), and rack locations.</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-green">M02 — Purchases</span>
+                <div class="feature-name">Supplier Procurement (GRN)</div>
+                <p class="feature-text">Intake supplier consignments with batch numbers, manufacturing dates, expiry dates, purchase cost, bonus strips, and accounts payable ledger.</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-purple">M03 — Customers</span>
+                <div class="feature-name">Pharmacies & Credit Limits</div>
+                <p class="feature-text">Manage pharmacy clients, drug license expiration alerts, credit limit holds, territory routing, and chronological statement ledgers.</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-amber">M04 — Billing</span>
+                <div class="feature-name">Sales & Tax Invoices</div>
+                <p class="feature-text">High-speed wholesale billing with automated FEFO batch allocation, historical COGS locking, challan printouts, and tax invoices.</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-rose">M05 — Collections</span>
+                <div class="feature-name">Customer Money Receipts</div>
+                <p class="feature-text">Record cash, bank transfers, cheques, and mobile wallet payments. Automatically reconciles unpaid invoices on a FIFO basis.</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-blue">M06 — Field Sales</span>
+                <div class="feature-name">Distributors & Reps</div>
+                <p class="feature-text">Track salesmen targets, field expense submissions, commission derivation, and route recovery collections.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 6: FEFO Rules -->
+          <section id="section-fefo" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">⏳</div>
+              <div>
+                <h2 class="section-title">6. Strict FEFO (First-Expire, First-Out) Engine</h2>
+                <div class="section-subtitle">How the system prevents expired medicine losses</div>
+              </div>
+            </div>
+
+            <p class="feature-text">
+              When creating a wholesale sale order, PharmaDist ERP automatically searches all warehouse racks and allocates batches that have the <strong>earliest expiration date</strong> first.
+            </p>
+
+            <div class="callout callout-info">
+              <div class="callout-icon">🛡️</div>
+              <div>
+                <strong>Batch Status Stages:</strong>
+                <br>🟢 <strong>ACTIVE:</strong> Valid stock, available for automated allocation.
+                <br>🟡 <strong>NEAR EXPIRY:</strong> Stock expiring within 90 days (highlighted with visual warning badges).
+                <br>🔴 <strong>EXPIRED / QUARANTINE:</strong> Stock that has reached expiration is immediately blocked from sales billing to prevent regulatory non-compliance.
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 7: Profit & Financials -->
+          <section id="section-profit" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">📈</div>
+              <div>
+                <h2 class="section-title">7. Financial Intelligence & Profit Analysis</h2>
+                <div class="section-subtitle">Deriving accurate Gross and Net profit margins</div>
+              </div>
+            </div>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <span class="feature-tag tag-green">Gross Profit</span>
+                <div class="feature-name">Historical COGS Locking</div>
+                <p class="feature-text">Every sale item locks the exact purchase cost of the specific batch sold. <br><code>Gross Profit = Total Revenue − Total Batch COGS</code></p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-purple">Net Profit</span>
+                <div class="feature-name">Operating Expenses Derivation</div>
+                <p class="feature-text">Accounts for warehouse electricity, delivery transport, generator fuel, and staff salaries. <br><code>Net Profit = Gross Profit − Business Expenses</code></p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 8: Backup & Safety -->
+          <section id="section-backup" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">🛡️</div>
+              <div>
+                <h2 class="section-title">8. Database Backup & Disaster Recovery</h2>
+                <div class="section-subtitle">Keeping business records 100% safe from hardware failure</div>
+              </div>
+            </div>
+
+            <div class="steps-list">
+              <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-body">
+                  <h4>Locate the Database File</h4>
+                  <p>Your entire ERP database is stored in the single file named <span class="code-pill">prisma/wmdms.db</span> inside the installation directory.</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-body">
+                  <h4>Weekly USB Backup</h4>
+                  <p>Once a week, close the software and copy the <span class="code-pill">wmdms.db</span> file to an external USB flash drive or external hard drive.</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-body">
+                  <h4>Instant 1-Click Restore</h4>
+                  <p>If the computer gets damaged or stolen, simply install the ERP on a new computer and replace its <span class="code-pill">wmdms.db</span> with your backup file. All sales, customers, and inventory records will be restored instantly!</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 9: FAQ -->
+          <section id="section-faq" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">❓</div>
+              <div>
+                <h2 class="section-title">9. Frequently Asked Questions (FAQ)</h2>
+                <div class="section-subtitle">Quick answers to common operational questions</div>
+              </div>
+            </div>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <div class="feature-name">Q: Does this software need an active internet connection?</div>
+                <p class="feature-text"><strong>A:</strong> No! It is 100% offline. It runs on the local computer and local Wi-Fi without needing internet.</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-name">Q: Can cashiers access from mobile phones?</div>
+                <p class="feature-text"><strong>A:</strong> Yes! Just connect the mobile to the same office Wi-Fi and open the Main PC IP address in Chrome.</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-name">Q: Can I export reports to Excel or Print?</div>
+                <p class="feature-text"><strong>A:</strong> Yes! Every table and report has <strong>Export to CSV</strong> and <strong>Print</strong> buttons for easy spreadsheet export.</p>
+              </div>
+            </div>
+          </section>
+        `
+      },
+      ur: {
+        dir: 'rtl',
+        tocTitle: 'فہرست مندرجات',
+        nav: {
+          overview: '📌 1. سافٹ ویئر کا تعارف',
+          delivery: '💾 2. یو ایس بی اور انسٹالیشن',
+          logins: '🔑 3. یوزر لاگ ان تفصیلات',
+          network: '🌐 4. ملٹی پی سی اور موبائل وائی فائی',
+          modules: '📦 5. اہم ای آر پی ماڈیولز',
+          fefo: '⏳ 6. میعاد (FEFO) اور ایکسپائری اصول',
+          billing: '🧾 7. بلنگ، انوائس اور بقایا جات',
+          profit: '📈 8. منافع اور مالیاتی رپورٹ',
+          backup: '🛡️ 9. ڈیٹا بیک اپ اور حفاظت',
+          faq: '❓ 10. عمومی سوالات اور مدد'
+        },
+        html: `
+          <!-- Hero Banner -->
+          <div class="hero-card">
+            <div class="hero-badge">100% آف لائن ڈیسک ٹاپ اور ملٹی پی سی ایڈیشن</div>
+            <h1 class="hero-title">فارما ڈسٹ ہول سیل ڈسٹری بیوٹر ای آر پی</h1>
+            <p class="hero-desc">
+              میڈیسن ہول سیل ڈسٹری بیوٹرز، فارماسیوٹیکل امپورٹرز اور میڈیسن گوداموں کے لیے مکمل بزنس مینجمنٹ سافٹ ویئر۔ اس میں خودکار FEFO بیچ انوینٹری، ڈبل انٹری فنانشل لیجر، اور بغیر انٹرنیٹ کے پورے دفتر کے کمپیوٹرز اور موبائل پر چلنے کی سہولت موجود ہے۔
+            </p>
+            <div class="metrics-grid">
+              <div class="metric-pill">
+                <div class="metric-value">⚡ 100% آف لائن</div>
+                <div class="metric-label">انٹرنیٹ کے بغیر لوکل ڈیٹا بیس</div>
+              </div>
+              <div class="metric-pill">
+                <div class="metric-value">🖥️ ملٹی پی سی وائی فائی</div>
+                <div class="metric-label">دفتر کے تمام کمپیوٹرز اور موبائلز کنیکٹ</div>
+              </div>
+              <div class="metric-pill">
+                <div class="metric-value">؋ افغانستان کرنسی (AFN)</div>
+                <div class="metric-label">لوکل کرنسی اور اعشاریہ فارمیٹ</div>
+              </div>
+              <div class="metric-pill">
+                <div class="metric-value">🔒 سخت FEFO سسٹم</div>
+                <div class="metric-label">ایکسپائری کے نقصان سے مکمل حفاظت</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 1: Overview -->
+          <section id="section-overview" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">🏛️</div>
+              <div>
+                <h2 class="section-title">1. سافٹ ویئر کا تعارف اور ساخت</h2>
+                <div class="section-subtitle">سافٹ ویئر کیسے کام کرتا ہے اور ڈیٹا کہاں محفوظ ہوتا ہے</div>
+              </div>
+            </div>
+            <p class="feature-text">
+              فارما ڈسٹ ای آر پی ایک مکمل طور پر خود مختار ڈیسک ٹاپ سافٹ ویئر ہے۔ یہ کلاؤڈ سرورز پر منحصر نہیں ہے، اس لیے انٹرنیٹ بند ہونے کی صورت میں بھی بغیر کسی رکاوٹ کے <strong>مین کمپیوٹر</strong> پر ہائی سپیڈ SQLite ڈیٹا بیس کے ذریعے چلتا رہتا ہے۔
+            </p>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <span class="feature-tag tag-blue">سنگل فائل ڈیٹا بیس</span>
+                <div class="feature-name">ایمبیڈڈ SQLite (wmdms.db)</div>
+                <p class="feature-text">کسی الگ ڈیٹا بیس سرور (SQL Server یا PostgreSQL) کی انسٹالیشن کی ضرورت نہیں۔ تمام ادویات، انوائسز اور اکاؤنٹس کا ریکارڈ ایک ہی محفوظ فائل میں رہتا ہے۔</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-green">بغیر انسٹالیشن کلائنٹس</span>
+                <div class="feature-name">براؤزر LAN کنکشن</div>
+                <p class="feature-text">صرف مین پی سی پر انسٹال کریں۔ کیشئرز اور سیلز مین دوسرے کمپیوٹرز یا موبائل پر صرف گوگل کروم کھول کر وائی فائی کے ذریعے کام کر سکتے ہیں۔</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-purple">مکمل سیکیورٹی</span>
+                <div class="feature-name">رول بیسڈ ایکسس کنٹرول</div>
+                <p class="feature-text">ایڈمن، سیلز مینیجر اور کیشیئر کے الگ الگ اختیارات اور انکرپٹڈ پاس ورڈز کے ساتھ سیکیورٹی آڈٹ لاگ۔</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 2: USB Delivery -->
+          <section id="section-delivery" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">💾</div>
+              <div>
+                <h2 class="section-title">2. یو ایس بی سے کلائنٹ کو ڈیلیوری اور انسٹالیشن</h2>
+                <div class="section-subtitle">کلائنٹ کے کمپیوٹر پر سافٹ ویئر انسٹال کرنے کا آسان طریقہ</div>
+              </div>
+            </div>
+
+            <div class="callout callout-success">
+              <div class="callout-icon">💡</div>
+              <div><strong>یو ایس بی سائز:</strong> کوئی بھی عام <strong>4 GB یا 8 GB</strong> کی یو ایس بی ڈرائیو کافی ہے۔ سافٹ ویئر کا انسٹالر صرف <strong>~150 MB سے 250 MB</strong> کا ہے۔</div>
+            </div>
+
+            <div class="steps-list">
+              <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-body">
+                  <h4>سیٹ اپ فائل یو ایس بی میں کاپی کریں</h4>
+                  <p><span class="code-pill">PharmaDist Wholesale ERP Setup.exe</span> فائل کو اپنی یو ایس بی میں کاپی کر لیں۔</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-body">
+                  <h4>مین کمپیوٹر پر انسٹال کریں</h4>
+                  <p>کلائنٹ کے مین کمپیوٹر میں یو ایس بی لگائیں اور انسٹالر پر ڈبل کلک کریں۔ سافٹ ویئر خود بخود انسٹال ہو کر ڈیسک ٹاپ پر شارٹ کٹ آئیکون بنا دے گا۔</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-body">
+                  <h4>ڈبل کلک کر کے چلائیں</h4>
+                  <p>ڈیسک ٹاپ کے آئیکون پر ڈبل کلک کریں۔ سافٹ ویئر فوری طور پر 100% آف لائن بغیر انٹرنیٹ کے کھل جائے گا!</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 3: Logins -->
+          <section id="section-logins" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">🔑</div>
+              <div>
+                <h2 class="section-title">3. ابتدائی لاگ ان تفصیلات (Default Logins)</h2>
+                <div class="section-subtitle">پہلے سے بنے ہوئے یوزر اکاؤنٹس</div>
+              </div>
+            </div>
+
+            <div class="doc-table-wrapper">
+              <table class="doc-table">
+                <thead>
+                  <tr>
+                    <th>یوزر رول</th>
+                    <th>ای میل ایڈریس</th>
+                    <th>ڈیفالٹ پاس ورڈ</th>
+                    <th>اختیارات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>👑 سپر ایڈمن (Super Admin)</strong></td>
+                    <td><span class="code-pill">admin@erp.com</span></td>
+                    <td><span class="code-pill">admin@123</span></td>
+                    <td>مکمل سسٹم کا کنٹرول، منافع کی رپورٹس، یوزر اکاؤنٹس اور بیک اپ۔</td>
+                  </tr>
+                  <tr>
+                    <td><strong>👔 سیلز مینیجر (Sales Manager)</strong></td>
+                    <td><span class="code-pill">manager@erp.com</span></td>
+                    <td><span class="code-pill">manager@123</span></td>
+                    <td>سیلز کی منظوری، ڈسٹری بیوٹرز کی کارکردگی اور ادھار کی حد کی منظوری۔</td>
+                  </tr>
+                  <tr>
+                    <td><strong>🧾 کیشیئر (Cashier)</strong></td>
+                    <td><span class="code-pill">cashier@erp.com</span></td>
+                    <td><span class="code-pill">cashier@123</span></td>
+                    <td>فاسٹ بلنگ، انوائس پرنٹ، کسٹمر کی ادائیگیوں کی رسیدیں بنانا۔</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="callout callout-warning">
+              <div class="callout-icon">⚠️</div>
+              <div><strong>ضروری ہدایت:</strong> پہلی بار لاگ ان کرنے کے بعد <strong>Settings > Profile</strong> میں جا کر اپنا پاس ورڈ ضرور تبدیل کر لیں۔</div>
+            </div>
+          </section>
+
+          <!-- Section 4: Multi-PC LAN -->
+          <section id="section-network" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">🌐</div>
+              <div>
+                <h2 class="section-title">4. دوسرے کمپیوٹرز اور موبائلز سے کنیکٹ کرنا</h2>
+                <div class="section-subtitle">دفتر کے ایک ہی وائی فائی پر تمام ڈیوائسز کیسے جوڑیں</div>
+              </div>
+            </div>
+
+            <p class="feature-text">
+              آپ کو دوسرے کمپیوٹرز پر سافٹ ویئر انسٹال کرنے کی ضرورت نہیں ہے۔ جب مین پی سی پر سافٹ ویئر کھلا ہوگا، تو وہ خود بخود دفتر کے وائی فائی راؤٹر پر کنکشن شیئر کر دے گا۔
+            </p>
+
+            <div class="steps-list">
+              <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-body">
+                  <h4>مین پی سی کا آئی پی ایڈریس دیکھیں</h4>
+                  <p>مین پی سی کے سافٹ ویئر میں اوپر مینو پر <strong>File > Local Network IP</strong> پر کلک کریں۔ وہاں آپ کا آئی پی نظر آئے گا (مثلاً <span class="code-pill">http://192.168.1.50:3000</span>)۔</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-body">
+                  <h4>دوسرے کمپیوٹرز اور موبائل کو اسی وائی فائی سے جوڑیں</h4>
+                  <p>یقینی بنائیں کہ دوسرے کیشئرز کے لیپ ٹاپ یا موبائل اسی دفتر کے وائی فائی سے کنیکٹ ہیں۔</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-body">
+                  <h4>گوگل کروم میں ایڈریس کھولیں</h4>
+                  <p>دوسرے پی سی یا موبائل پر گوگل کروم کھولیں اور وہ آئی پی ایڈریس لکھیں: <span class="code-pill">http://192.168.1.50:3000</span>۔ سب ڈیوائسز ایک ہی ڈیٹا بیس پر کام کریں گی!</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 5: Core Modules -->
+          <section id="section-modules" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">📦</div>
+              <div>
+                <h2 class="section-title">5. اہم ای آر پی ماڈیولز اور طریقہ کار</h2>
+                <div class="section-subtitle">روزمرہ کے ہول سیل کاموں کی گائیڈ</div>
+              </div>
+            </div>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <span class="feature-tag tag-blue">M01 — ادویات</span>
+                <div class="feature-name">ادویات اور بیچ مینجمنٹ</div>
+                <p class="feature-text">برانڈ نام، جینرک، فارمولا، پیک سائز (ڈبے، پتے، گولیاں)، گودام کے ریک اور کولڈ چین (2-8°C) کی معلومات کا اندراج۔</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-green">M02 — خریداری</span>
+                <div class="feature-name">سپلائر اور خریداری انٹیک (GRN)</div>
+                <p class="feature-text">کمپنیوں سے آنے والی ادویات کے بیچ نمبر، ایکسپائری، خریداری ریٹ، بونس گولیاں اور سپلائر کا ادھار کھاتہ۔</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-purple">M03 — میڈیکل اسٹورز</span>
+                <div class="feature-name">کسٹمرز اور ادھار کی حد</div>
+                <p class="feature-text">فارمیسی کسٹمرز کا ڈیٹا، ڈرگ لائسنس ایکسپائری، ادھار کی حد (Credit Limit)، روٹ اور مکمل کھاتہ (Ledger)۔</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-amber">M04 — سیلز اور بلنگ</span>
+                <div class="feature-name">سیلز انوائس اور ڈلیوری چالان</div>
+                <p class="feature-text">تیز رفتار ہول سیل بلنگ، خودکار FEFO بیچ کٹوتی، خریدی قیمت (COGS) کا خودکار حساب، چالان اور ٹیکس انوائس۔</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-rose">M05 — وصولیاں</span>
+                <div class="feature-name">پیمنٹ اور منی رسیدیں</div>
+                <p class="feature-text">نقد، بینک ٹرانسفر یا چیک کے ذریعے فارمیسیوں سے ریکوری کی رسیدیں بنانا اور پرانے بلوں کی خودکار ایڈجسٹمنٹ۔</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-blue">M06 — سیلز ریپ</span>
+                <div class="feature-name">ڈسٹری بیوٹرز اور اخراجات</div>
+                <p class="feature-text">سیلز مینز کا ماہانہ ٹارگٹ، کمیشن، مارکیٹ کے اخراجات اور ڈیلی ریکوری رپورٹ۔</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 6: FEFO -->
+          <section id="section-fefo" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">⏳</div>
+              <div>
+                <h2 class="section-title">6. سخت FEFO اور ایکسپائری کنٹرول</h2>
+                <div class="section-subtitle">سافٹ ویئر ایکسپائری کے نقصان سے کیسے بچاتا ہے</div>
+              </div>
+            </div>
+
+            <p class="feature-text">
+              سیل بل بناتے وقت سافٹ ویئر خود بخود گودام کی تمام لاٹس میں سے وہ بیچ پہلے منتخب کرتا ہے جس کی <strong>ایکسپائری تاریخ سب سے قریب</strong> ہو۔
+            </p>
+
+            <div class="callout callout-info">
+              <div class="callout-icon">🛡️</div>
+              <div>
+                <strong>اسٹاک کی 3 اہم حالتیں:</strong>
+                <br>🟢 <strong>ACTIVE (تازہ مال):</strong> عام فروخت کے لیے تیار۔
+                <br>🟡 <strong>NEAR EXPIRY (قریب المیعاد):</strong> جس مال میں 90 دن سے کم بچے ہوں (فوری فروخت کے لیے الرٹ)۔
+                <br>🔴 <strong>EXPIRED (ایکسپائرڈ):</strong> ایکسپائر شدہ مال کو سافٹ ویئر خود بخود بلنگ سے بلاک کر دیتا ہے تاکہ غلطی سے بھی فروخت نہ ہو۔
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 7: Profit -->
+          <section id="section-profit" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">📈</div>
+              <div>
+                <h2 class="section-title">7. منافع اور مالیاتی انٹیلیجنس</h2>
+                <div class="section-subtitle">خام منافع (Gross) اور خالص منافع (Net Profit) کا درست حساب</div>
+              </div>
+            </div>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <span class="feature-tag tag-green">خام منافع (Gross Profit)</span>
+                <div class="feature-name">بیچ کی اصل خریداری لاگت</div>
+                <p class="feature-text">ہر سیل پر بیچے گئے مخصوص بیچ کی لاگت مائنس ہوتی ہے۔ <br><code>Gross Profit = ٹوٹل سیلز − ادویات کی خریداری لاگت (COGS)</code></p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-purple">خالص منافع (Net Profit)</span>
+                <div class="feature-name">کاروباری اخراجات کے بعد کا منافع</div>
+                <p class="feature-text">گودام کا کرایہ، بجلی، جنریٹر کا ڈیزل اور ملازمین کی تنخواہوں کو مائنس کر کے۔ <br><code>Net Profit = خام منافع − کل دفتری اخراجات</code></p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 8: Backup -->
+          <section id="section-backup" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">🛡️</div>
+              <div>
+                <h2 class="section-title">8. ڈیٹا بیک اپ اور حفاظت کا طریقہ</h2>
+                <div class="section-subtitle">کمپیوٹر خراب ہونے کی صورت میں ڈیٹا کو محفوظ رکھنا</div>
+              </div>
+            </div>
+
+            <div class="steps-list">
+              <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-body">
+                  <h4>ڈیٹا بیس فائل کہاں ہوتی ہے؟</h4>
+                  <p>آپ کا تمام ڈیٹا ایک ہی فائل <span class="code-pill">prisma/wmdms.db</span> میں محفوظ ہوتا ہے۔</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-body">
+                  <h4>ہفتہ وار یو ایس بی بیک اپ</h4>
+                  <p>ہفتے میں ایک بار سافٹ ویئر بند کر کے <span class="code-pill">wmdms.db</span> فائل کو اپنی یو ایس بی یا بیرونی ہارڈ ڈرائیو میں کاپی کر لیں۔</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-body">
+                  <h4>1-کلک بحالی (Restore)</h4>
+                  <p>اگر کمپیوٹر خراب یا چوری ہو جائے، تو نئے پی سی پر سافٹ ویئر انسٹال کر کے صرف اپنی پرانی <span class="code-pill">wmdms.db</span> فائل تبدیل کر دیں۔ تمام پرانا ریکارڈ منٹوں میں واپس آ جائے گا!</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 9: FAQ -->
+          <section id="section-faq" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">❓</div>
+              <div>
+                <h2 class="section-title">9. عمومی سوالات (FAQ)</h2>
+                <div class="section-subtitle">عام پوچھے جانے والے سوالات کے جوابات</div>
+              </div>
+            </div>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <div class="feature-name">س: کیا اس کے لیے انٹرنیٹ ضروری ہے؟</div>
+                <p class="feature-text"><strong>ج:</strong> جی نہیں! یہ 100% آف لائن ہے۔ یہ بغیر انٹرنیٹ کے آپ کے دفتر کے کمپیوٹر اور وائی فائی پر چلتا ہے۔</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-name">س: کیا موبائل فون سے بل بن سکتے ہیں؟</div>
+                <p class="feature-text"><strong>ج:</strong> جی ہاں! موبائل کو دفتر کے وائی فائی سے جوڑیں اور گوگل کروم میں مین پی سی کا آئی پی ایڈریس کھولیں۔</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-name">س: کیا رپورٹ ایکسل میں ڈاؤنلوڈ ہو سکتی ہے؟</div>
+                <p class="feature-text"><strong>ج:</strong> جی ہاں! ہر رپورٹ کے اوپر <strong>Export to CSV</strong> اور <strong>Print</strong> کا بٹن موجود ہے۔</p>
+              </div>
+            </div>
+          </section>
+        `
+      },
+      ps: {
+        dir: 'rtl',
+        tocTitle: 'د محتویاتو لړلیک',
+        nav: {
+          overview: '📌 ۱. د سیستم پیژندنه',
+          delivery: '💾 ۲. یو ایس بی او انسټالیشن',
+          logins: '🔑 ۳. د کاروونکو حسابونه',
+          network: '🌐 ۴. ملټي پی سي او وای فای',
+          modules: '📦 ۵. مهم ماډیولونه',
+          fefo: '⏳ ۶. د میعاد (FEFO) اصول',
+          billing: '🧾 ۷. خرڅلاو او بلونه',
+          profit: '📈 ۸. ګټه او مالي راپورونه',
+          backup: '🛡️ ۹. د ډیټا بیک اپ او خوندیتوب',
+          faq: '❓ ۱۰. عامې پوښتنې او مرسته'
+        },
+        html: `
+          <!-- Hero Banner -->
+          <div class="hero-card">
+            <div class="hero-badge">۱۰۰٪ آفلاین ډیسکټاپ او ملټي پی سي ایډیشن</div>
+            <h1 class="hero-title">فارما ډیسټ د درملو د عمده ویش مدیریت سیستم</h1>
+            <p class="hero-desc">
+              د درملو عمده پلورونکو، واردونکو شرکتونو او ګودامونو لپاره یو پیاوړی او هر اړخیز مدیریت سیستم. دا سیستم د انټرنیټ پرته ۱۰۰٪ آفلاین کار کوي، د FEFO اتوماتیک بیچ کنټرول لري، او د دفتر په ټولو کمپیوټرونو او موبایلونو کې یو ځای چلیږي.
+            </p>
+            <div class="metrics-grid">
+              <div class="metric-pill">
+                <div class="metric-value">⚡ ۱۰۰٪ آفلاین</div>
+                <div class="metric-label">د انټرنیټ پرته محلي ډیټابیس</div>
+              </div>
+              <div class="metric-pill">
+                <div class="metric-value">🖥️ ملټي پی سي وای فای</div>
+                <div class="metric-label">د دفتر ټول کمپیوټرونه او موبایلونه</div>
+              </div>
+              <div class="metric-pill">
+                <div class="metric-value">؋ افغانۍ (AFN)</div>
+                <div class="metric-label">د افغانستان محلي اسعار او حسابونه</div>
+              </div>
+              <div class="metric-pill">
+                <div class="metric-value">🔒 کلک FEFO سیستم</div>
+                <div class="metric-label">د تاریخ تیر درملو د زیان مخنیوی</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 1: Overview -->
+          <section id="section-overview" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">🏛️</div>
+              <div>
+                <h2 class="section-title">۱. د سیستم پیژندنه او جوړښت</h2>
+                <div class="section-subtitle">سیستم څنګه کار کوي او ریکارډونه چیرته خوندي کیږي</div>
+              </div>
+            </div>
+            <p class="feature-text">
+              فارما ډیسټ ای آر پی یو بشپړ خپلواک ډیسکټاپ سافټویر دی. دا په کلاوډ سرورونو پورې تړلی نه دی، نو که انټرنیټ قطع هم وي، سیستم په <strong>اصلي کمپیوټر (Main PC)</strong> کې په خورا لوړ سرعت سره کار کوي.
+            </p>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <span class="feature-tag tag-blue">یو فایلي ډیټابیس</span>
+                <div class="feature-name">ایمبیډډ SQLite (wmdms.db)</div>
+                <p class="feature-text">هیڅ اضافي سرور انسټالیشن ته اړتیا نشته. د ټولو درملو، بلونو او حسابونو معلومات په یو واحد خوندي فایل کې ساتل کیږي.</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-green">بې انسټالیشن ډیوایسونه</span>
+                <div class="feature-name">د براوزر LAN نښلول</div>
+                <p class="feature-text">یوازې په اصلي کمپیوټر کې انسټال کړئ. نور کارکوونکي او کیشیران په خپلو کمپیوټرونو یا موبایلونو کې د کروم براوزر له لارې وصل کیږي.</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-purple">بشپړ امنیت</span>
+                <div class="feature-name">د رول پر بنسټ لاسرسی</div>
+                <p class="feature-text">د اډمین، د پلور مدیر او کیشیر لپاره جلا حسابونه د کوډ شوي پاسورډونو او امنیتي لاګ سره.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 2: Delivery -->
+          <section id="section-delivery" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">💾</div>
+              <div>
+                <h2 class="section-title">۲. په USB کې تحویلي او انسټالیشن</h2>
+                <div class="section-subtitle">د پیرودونکي په کمپیوټر کې د سافټویر لګولو لارښود</div>
+              </div>
+            </div>
+
+            <div class="callout callout-success">
+              <div class="callout-icon">💡</div>
+              <div><strong>د USB اندازه:</strong> هر ډول معمولي <strong>4 GB یا 8 GB</strong> USB کافي ده. د سافټویر بشپړ انسټالر یوازې <strong>~150 MB څخه تر 250 MB</strong> پورې دی.</div>
+            </div>
+
+            <div class="steps-list">
+              <div class="step-item">
+                <div class="step-number">۱</div>
+                <div class="step-body">
+                  <h4>انسټالر په USB کې کاپي کړئ</h4>
+                  <p>د <span class="code-pill">PharmaDist Wholesale ERP Setup.exe</span> فایل خپل USB فلش ډرایو ته ولیږئ.</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">۲</div>
+                <div class="step-body">
+                  <h4>په اصلي کمپیوټر کې انسټال کړئ</h4>
+                  <p>USB د پیرودونکي په اصلي کمپیوټر کې واچوئ او په انسټالر دوه ځله کلیک وکړئ. سافټویر به اتومات انسټال شي او په ډیسکټاپ به یې آیکون جوړ شي.</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">۳</div>
+                <div class="step-body">
+                  <h4>په آیکون کلیک او پرانیزئ</h4>
+                  <p>د ډیسکټاپ په آیکون کلیک وکړئ. سافټویر سمدلاسه ۱۰۰٪ آفلاین د انټرنیټ پرته خلاصیږي!</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 3: Logins -->
+          <section id="section-logins" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">🔑</div>
+              <div>
+                <h2 class="section-title">۳. لومړني کاروونکي او پاسورډونه</h2>
+                <div class="section-subtitle">د سیستم د پیل لپاره جوړ شوي ډیفالټ حسابونه</div>
+              </div>
+            </div>
+
+            <div class="doc-table-wrapper">
+              <table class="doc-table">
+                <thead>
+                  <tr>
+                    <th>د کاروونکي رول</th>
+                    <th>بریښنالیک (Email)</th>
+                    <th>ډیفالټ پاسورډ</th>
+                    <th>د لاسرسي واکونه</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>👑 عمومي مدیر (Super Admin)</strong></td>
+                    <td><span class="code-pill">admin@erp.com</span></td>
+                    <td><span class="code-pill">admin@123</span></td>
+                    <td>د سیستم بشپړ کنټرول، د ګټې راپورونه، د کاروونکو تنظیم او بیک اپ.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>👔 د پلور مدیر (Sales Manager)</strong></td>
+                    <td><span class="code-pill">manager@erp.com</span></td>
+                    <td><span class="code-pill">manager@123</span></td>
+                    <td>د خرڅلاو تصویب، د پلورونکو څارنه او د ادھار د حد تاییدول.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>🧾 کیشیر (Cashier)</strong></td>
+                    <td><span class="code-pill">cashier@erp.com</span></td>
+                    <td><span class="code-pill">cashier@123</span></td>
+                    <td>ګړندي بلونه جوړول، د رسیدونو چاپول او د درملتونونو د حسابونو کتل.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="callout callout-warning">
+              <div class="callout-icon">⚠️</div>
+              <div><strong>مهمه سپارښتنه:</strong> د لومړي ځل ننوتلو وروسته په <strong>Settings > Profile</strong> کې خپل پاسورډ بدل کړئ.</div>
+            </div>
+          </section>
+
+          <!-- Section 4: Multi-PC LAN -->
+          <section id="section-network" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">🌐</div>
+              <div>
+                <h2 class="section-title">۴. نورو کمپیوټرونو او موبایلونو سره نښلول</h2>
+                <div class="section-subtitle">د دفتر په ورته وای فای کې ګډ کار کول</div>
+              </div>
+            </div>
+
+            <p class="feature-text">
+              تاسو اړتیا نلرئ په نورو کمپیوټرونو کې سافټویر انسټال کړئ. کله چې اصلي کمپیوټر پرانیستی وي، دا پخپله په وای فای شبکه کې خپریږي.
+            </p>
+
+            <div class="steps-list">
+              <div class="step-item">
+                <div class="step-number">۱</div>
+                <div class="step-body">
+                  <h4>د اصلي کمپیوټر IP وګورئ</h4>
+                  <p>په سافټویر کې د مینو له لارې په <strong>File > Local Network IP</strong> کلیک وکړئ. هلته به ستاسو IP وښودل شي (لکه <span class="code-pill">http://192.168.1.50:3000</span>)۔</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">۲</div>
+                <div class="step-body">
+                  <h4>نور ډیوایسونه له ورته وای فای سره وصل کړئ</h4>
+                  <p>ډاډ ترلاسه کړئ چې نور لیپټاپونه یا موبایلونه له ورته وای فای راوټر سره وصل دي.</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">۳</div>
+                <div class="step-body">
+                  <h4>په کروم براوزر کې پرانیزئ</h4>
+                  <p>په دوهم کمپیوټر یا موبایل کې ګوګل کروم پرانیزئ او دا پته ولیکئ: <span class="code-pill">http://192.168.1.50:3000</span>. ټول به په یو وخت په یو ډیټابیس کار وکړي!</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 5: Modules -->
+          <section id="section-modules" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">📦</div>
+              <div>
+                <h2 class="section-title">۵. د سیستم مهم ماډیولونه او لارښود</h2>
+                <div class="section-subtitle">د ورځني هول سیل کارونو بشپړ بهیر</div>
+              </div>
+            </div>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <span class="feature-tag tag-blue">M01 — درمل</span>
+                <div class="feature-name">د درملو او بیچونو تنظیم</div>
+                <p class="feature-text">د درملو نومونه، فارمول، د پاکټ اندازه (قطۍ، پټۍ، ګولۍ)، د ګودام المارۍ او کولډ چین (2-8°C) مشخصات ثبتول.</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-green">M02 — پیرودنه</span>
+                <div class="feature-name">د عرضه کوونکو پیرود (GRN)</div>
+                <p class="feature-text">له شرکتونو څخه راغلي مال ثبتول: د بیچ شمیره، د میعاد تاریخ، د پیرود بیه، بونس او د شرکتونو پورونه.</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-purple">M03 — درملتونونه</span>
+                <div class="feature-name">پیرودونکي او د ادھار حد</div>
+                <p class="feature-text">د درملتونونو حسابونه، د جواز تاریخ، د پور حد (Credit Limit)، او بشپړ مالي حساب (Ledger)۔</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-amber">M04 — بلونه</span>
+                <div class="feature-name">د خرڅلاو بلونه او چالانونه</div>
+                <p class="feature-text">ګړندی بل جوړول، د نږدې تاریخ لرونکي مال اتوماتیک کمول (FEFO)، د اصل قیمت اتومات محاسبه، چالان او انوائس.</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-rose">M05 — پیسې ترلاسه کول</span>
+                <div class="feature-name">رسیدونه او ریکوري</div>
+                <p class="feature-text">نغدې پیسې، بانک او چک ثبتول، او د پخوانیو بلونو اتوماتیک خلاصول.</p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-blue">M06 — ویشونکي</span>
+                <div class="feature-name">د پلور استازي او مصارف</div>
+                <p class="feature-text">د پلورونکو میاشتنۍ موخې (Targets)، کمیشن، بازار مصارف او د ورځني راټولولو راپورونه.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 6: FEFO -->
+          <section id="section-fefo" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">⏳</div>
+              <div>
+                <h2 class="section-title">۶. د میعاد (FEFO) کلک اصول</h2>
+                <div class="section-subtitle">سیستم څنګه د تاریخ تیر مال له زیان څخه مخنیوی کوي</div>
+              </div>
+            </div>
+
+            <p class="feature-text">
+              د بل جوړولو پر مهال سیستم پخپله په ګودام کې هغه درمل لومړی ټاکي چې <strong>د ختمیدو نیټه یې نږدې وي</strong>.
+            </p>
+
+            <div class="callout callout-info">
+              <div class="callout-icon">🛡️</div>
+              <div>
+                <strong>د درملو ۳ مهم حالتونه:</strong>
+                <br>🟢 <strong>ACTIVE (تازه مال):</strong> د عادي خرڅلاو لپاره شتون لري.
+                <br>🟡 <strong>NEAR EXPIRY (نږدې تاریخ):</strong> هغه مال چې تر ۹۰ ورځو کم وخت لري (د عاجل خرڅلاو خبرداری).
+                <br>🔴 <strong>EXPIRED (تاریخ تیر):</strong> تاریخ تیر درمل په اتوماتیک ډول د پلور څخه بندیږي ترڅو غلطي ونشي.
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 7: Profit -->
+          <section id="section-profit" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">📈</div>
+              <div>
+                <h2 class="section-title">۷. مالي ګټه او دقیق حسابونه</h2>
+                <div class="section-subtitle">د ناخالصې (Gross) او خالصې (Net) ګټې محاسبه</div>
+              </div>
+            </div>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <span class="feature-tag tag-green">ناخالصه ګټه (Gross Profit)</span>
+                <div class="feature-name">د بیچ اصل پیرود قیمت</div>
+                <p class="feature-text">په هر بل کې د بیچ اصل پیرود بیه مائنس کیږي. <br><code>Gross Profit = ټول پلور − د درملو اصل پیرود بیه (COGS)</code></p>
+              </div>
+
+              <div class="feature-card">
+                <span class="feature-tag tag-purple">خالصه ګټه (Net Profit)</span>
+                <div class="feature-name">د دفتري مصارفو وروسته ګټه</div>
+                <p class="feature-text">د ګودام کرایه، بریښنا، د جنراتور تیل او د کارکوونکو معاشونه منفي کیږي. <br><code>Net Profit = ناخالصه ګټه − ټول عملیاتي مصارف</code></p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 8: Backup -->
+          <section id="section-backup" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">🛡️</div>
+              <div>
+                <h2 class="section-title">۸. د ډیټا بیک اپ او خوندیتوب لارښود</h2>
+                <div class="section-subtitle">د کمپیوټر خرابیدو په وخت کې د معلوماتو ساتنه</div>
+              </div>
+            </div>
+
+            <div class="steps-list">
+              <div class="step-item">
+                <div class="step-number">۱</div>
+                <div class="step-body">
+                  <h4>د ډیټابیس فایل موندل</h4>
+                  <p>ستاسو ټول حسابونه او معلومات په <span class="code-pill">prisma/wmdms.db</span> فایل کې ساتل کیږي.</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">۲</div>
+                <div class="step-body">
+                  <h4>اوونیزه USB کاپي</h4>
+                  <p>په اوونۍ کې یو ځل سافټویر بند کړئ او دا <span class="code-pill">wmdms.db</span> فایل خپل USB ته کاپي کړئ.</p>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-number">۳</div>
+                <div class="step-body">
+                  <h4>په ۱-کلیک بیرته راګرځول (Restore)</h4>
+                  <p>که چیرې کمپیوټر خراب شي، په نوي کمپیوټر کې سافټویر واچوئ او یوازې خپل پخوانی <span class="code-pill">wmdms.db</span> پکې کیږدئ. ټول تاریخچه سمدلاسه بیرته راځي!</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 9: FAQ -->
+          <section id="section-faq" class="doc-section">
+            <div class="section-header">
+              <div class="section-icon">❓</div>
+              <div>
+                <h2 class="section-title">۹. پرله پسې پوښتنې (FAQ)</h2>
+                <div class="section-subtitle">د عمومي پوښتنو لنډ ځوابونه</div>
+              </div>
+            </div>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <div class="feature-name">پوښتنه: آیا دا سیستم انټرنیټ ته اړتیا لري؟</div>
+                <p class="feature-text"><strong>ځواب:</strong> نه! دا ۱۰۰٪ آفلاین دی او ستاسو په محلي وای فای او کمپیوټر کې چلیږي.</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-name">پوښتنه: آیا په موبایل کې بلونه جوړیدای شي؟</div>
+                <p class="feature-text"><strong>ځواب:</strong> هو! موبایل له وای فای سره وصل کړئ او د اصلي کمپیوټر IP په ګوګل کروم کې ووهئ.</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-name">پوښتنه: آیا راپورونه ایکسل (Excel) ته ځي؟</div>
+                <p class="feature-text"><strong>ځواب:</strong> هو! د هر راپور په سر کې د <strong>Export to CSV</strong> او <strong>Print</strong> بټنونه شته.</p>
+              </div>
+            </div>
+          </section>
+        `
+      }
+    };
+
+    function setLanguage(lang) {
+      const data = contentData[lang] || contentData.en;
+      
+      // Update HTML direction and body
+      document.documentElement.setAttribute('lang', lang);
+      document.documentElement.setAttribute('dir', data.dir);
+      document.body.setAttribute('dir', data.dir);
+
+      // Update TOC Nav Titles
+      document.getElementById('toc-title').innerText = data.tocTitle;
+      document.getElementById('nav-overview').innerText = data.nav.overview;
+      document.getElementById('nav-delivery').innerText = data.nav.delivery;
+      document.getElementById('nav-logins').innerText = data.nav.logins;
+      document.getElementById('nav-network').innerText = data.nav.network;
+      document.getElementById('nav-modules').innerText = data.nav.modules;
+      document.getElementById('nav-fefo').innerText = data.nav.fefo;
+      document.getElementById('nav-billing').innerText = data.nav.billing;
+      document.getElementById('nav-profit').innerText = data.nav.profit;
+      document.getElementById('nav-backup').innerText = data.nav.backup;
+      document.getElementById('nav-faq').innerText = data.nav.faq;
+
+      // Update Dynamic Content
+      document.getElementById('dynamic-content').innerHTML = data.html;
+
+      // Update Active Button
+      const buttons = document.querySelectorAll('.lang-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      if (lang === 'en') buttons[0].classList.add('active');
+      if (lang === 'ur') buttons[1].classList.add('active');
+      if (lang === 'ps') buttons[2].classList.add('active');
+
+      // Scroll to top smoothly
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Initialize with English
+    setLanguage('en');
+  </script>
+</body>
+</html>
