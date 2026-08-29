@@ -112,6 +112,13 @@ export const NAVIGATION_SECTIONS: NavigationSection[] = [
         iconName: "Shield",
         description: "Immutable forensic audit trail of all transactions",
       },
+      {
+        title: "System Guide (لارښود)",
+        href: "/help",
+        iconName: "BookOpen",
+        badge: "پښتو",
+        description: "Complete operations manual & user guide (Pashto / Urdu / English)",
+      },
     ],
   },
 ];
