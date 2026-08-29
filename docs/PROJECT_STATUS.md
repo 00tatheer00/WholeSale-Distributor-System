@@ -27,7 +27,7 @@
 | **Phase 12**| Settings, Audit Logs, Security & Recovery | ✅ Completed | Multi-tab Settings Cockpit (`/settings`), Immutable Security Audit Trail (`/audit-logs`, `audit.service.ts`), Enterprise Security Headers (`next.config.mjs`), Production Disaster Recovery Runbook (`docs/backup-recovery.md`). |
 | **Phase 13**| Final QA, Bug Fixing, Performance & Deployment | ✅ Completed | Final end-to-end regression QA, Zero-leak security audit, Production Deployment Runbook (`docs/production-deployment.md`), Strict Seeding Safety Guards, Robots meta protection, 46/46 routes verified & live pushed to `origin main`. |
 | **Phase 14**| Client Feature Delivery & Financial Intelligence Polish | ✅ Completed | 5 Standard Expense Categories (`EXP-RENT`, `EXP-DAILY`, `EXP-SALESMAN`, `EXP-VISITOR`, `EXP-DOC-MKT`), Without-Expense Profit (Gross) vs Net Profit visual clarity, Salesman Recovery/Receipt report with Day & Month filters and summary KPIs, Post-discount profit integrity, Opening Stock immutable ledger tracking (`MANUAL_IN`), and Production verification (`47/47 routes verified`). |
-| **Phase 15**| Afghanistan Client Localization & Pashto Operations Manual | ✅ Completed | Comprehensive Pashto System Guide & Operations Manual (`docs/SYSTEM_GUIDE_PASHTO.md`) covering all 16 ERP modules, FEFO rules, AFN / ؋ currency, credit hold barriers, sales/challan workflows, daily routine SOPs, and recovery steps. |
+| **Phase 15**| Afghanistan Client Localization & Pashto Operations Manual | ✅ Completed | Comprehensive Pashto System Guide & Operations Manual (`docs/SYSTEM_GUIDE_PASHTO.md`), Interactive Pashto/Urdu/English UI Guide Modal (`InfoGuideModal`), Dedicated `/help` Hub route, and Sidebar navigation. |
 
 ---
 
@@ -40,9 +40,9 @@
 - **Form & Validation**: React Hook Form, Zod v3
 - **Verification Status**:
   - `npm run typecheck` $\rightarrow$ **0 Errors**
-  - `npm run build` $\rightarrow$ **47/47 Routes compiled and optimized successfully**
+  - `npm run build` $\rightarrow$ **48/48 Routes compiled and optimized successfully**
 - **Production Readiness**:
   - Enterprise HTTP security headers (`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy`).
   - Production seeding guards in `prisma/seed.ts` & `prisma/seed-transactions.ts`.
-  - Comprehensive Pashto System Guide in `docs/SYSTEM_GUIDE_PASHTO.md`.
+  - Comprehensive Pashto System Guide in `docs/SYSTEM_GUIDE_PASHTO.md` & interactive UI at `/help`.
   - Comprehensive Production Runbook in `docs/production-deployment.md` and Backup Runbook in `docs/backup-recovery.md`.
