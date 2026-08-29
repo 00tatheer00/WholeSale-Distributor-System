@@ -22,13 +22,10 @@
     "appId": "com.pharmadist.erp",
     "productName": "PharmaDist Wholesale ERP",
     "win": {
-      "target": "nsis"
+      "target": "dir",
+      "signAndEditExecutable": false
     },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "shortcutName": "PharmaDist Wholesale ERP"
-    },
+    "forceCodeSigning": false,
     "files": [
       "electron/**/*",
       ".next/**/*",

@@ -2,7 +2,7 @@ const { app, BrowserWindow, Menu, Tray, dialog, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
-const { spawn, execSync } = require('child_process');
+const { spawn } = require('child_process');
 const http = require('http');
 
 let mainWindow = null;
@@ -56,7 +56,7 @@ function waitForServer(url, timeoutMs = 45000) {
 }
 
 // Start background Next.js Server on 0.0.0.0:3000
-function startNextServer() {
+async function startNextServer() {
   const isDev = !app.isPackaged;
   const projectRoot = isDev
     ? path.join(__dirname, '..')
@@ -67,26 +67,43 @@ function startNextServer() {
     PORT: PORT.toString(),
     HOSTNAME: '0.0.0.0', // Listen on all network interfaces for Multi-PC & Mobile LAN access
     NODE_ENV: isDev ? 'development' : 'production',
+    ELECTRON_RUN_AS_NODE: '1',
   };
 
   if (isDev) {
     console.log('Running in Development mode with local Next.js dev server...');
-  } else {
-    // In packaged standalone mode
-    const serverScript = path.join(projectRoot, '.next', 'standalone', 'server.js');
-    if (fs.existsSync(serverScript)) {
-      nextServerProcess = spawn(process.execPath, [serverScript], {
-        cwd: projectRoot,
-        env,
-        stdio: 'inherit',
-      });
-    } else {
-      nextServerProcess = spawn('node', ['node_modules/next/dist/bin/next', 'start'], {
-        cwd: projectRoot,
-        env,
-        stdio: 'inherit',
-      });
-    }
+    return;
+  }
+
+  // Packaged mode: Use Electron runtime as Node to avoid missing Node.js on client PC
+  const standaloneServer = path.join(projectRoot, '.next', 'standalone', 'server.js');
+  if (fs.existsSync(standaloneServer)) {
+    nextServerProcess = spawn(process.execPath, [standaloneServer], {
+      cwd: path.dirname(standaloneServer),
+      env,
+      stdio: 'ignore',
+    });
+    return;
+  }
+
+  // Try programmatic Next.js launch
+  try {
+    const next = require('next');
+    const nextApp = next({ dev: false, dir: projectRoot });
+    const handle = nextApp.getRequestHandler();
+    await nextApp.prepare();
+    const server = http.createServer((req, res) => handle(req, res));
+    server.listen(PORT, '0.0.0.0', () => {
+      console.log(`Next.js server listening on http://0.0.0.0:${PORT}`);
+    });
+  } catch (err) {
+    console.warn('Programmatic start failed, spawning next binary with Electron node runtime:', err.message);
+    const nextBin = path.join(projectRoot, 'node_modules', 'next', 'dist', 'bin', 'next');
+    nextServerProcess = spawn(process.execPath, [nextBin, 'start', '-p', PORT.toString(), '-H', '0.0.0.0'], {
+      cwd: projectRoot,
+      env,
+      stdio: 'ignore',
+    });
   }
 }
 
@@ -178,7 +195,7 @@ function createWindow() {
 // App lifecycle
 app.whenReady().then(async () => {
   try {
-    startNextServer();
+    await startNextServer();
     await waitForServer(`http://localhost:${PORT}`);
     createWindow();
   } catch (err) {
