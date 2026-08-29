@@ -1,10 +1,11 @@
 import * as React from "react";
-import { getDashboardDataAction } from "@/server/actions/dashboard.actions";
+import { getDashboardMetrics } from "@/server/services/dashboard.service";
 import { DashboardClient } from "@/components/dashboard/dashboard-client";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
-  const result = await getDashboardDataAction("last_30_days");
-  const initialData = result.data!;
+  const initialData = await getDashboardMetrics("last_30_days");
 
   return <DashboardClient initialData={initialData} />;
 }

@@ -88,7 +88,6 @@ export async function loginAction(
             sameSite: "lax",
           });
 
-          revalidatePath("/", "layout");
           return { success: true };
         }
       }
@@ -115,7 +114,6 @@ export async function loginAction(
         sameSite: "lax",
       });
 
-      revalidatePath("/", "layout");
       return { success: true };
     }
 
