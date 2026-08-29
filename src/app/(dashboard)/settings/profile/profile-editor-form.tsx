@@ -103,7 +103,7 @@ export function ProfileEditorForm({
           <Label htmlFor="email" className="text-xs font-medium">
             Login Email Address
           </Label>
-          <span className="text-[10px] text-muted-foreground">Managed via Supabase Auth</span>
+          <span className="text-[10px] text-muted-foreground">Primary Login Identifier</span>
         </div>
         <div className="relative">
           <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />

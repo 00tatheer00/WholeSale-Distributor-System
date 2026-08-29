@@ -76,13 +76,13 @@ export async function getCustomers(params: CustomerQueryParams = {}): Promise<Cu
 
     if (search.trim()) {
       whereClause.OR = [
-        { pharmacyName: { contains: search.trim(), mode: "insensitive" } },
-        { proprietorName: { contains: search.trim(), mode: "insensitive" } },
-        { phone: { contains: search.trim(), mode: "insensitive" } },
-        { email: { contains: search.trim(), mode: "insensitive" } },
-        { customerCode: { contains: search.trim(), mode: "insensitive" } },
-        { drugLicenseNo: { contains: search.trim(), mode: "insensitive" } },
-        { city: { contains: search.trim(), mode: "insensitive" } },
+        { pharmacyName: { contains: search.trim() } },
+        { proprietorName: { contains: search.trim() } },
+        { phone: { contains: search.trim() } },
+        { email: { contains: search.trim() } },
+        { customerCode: { contains: search.trim() } },
+        { drugLicenseNo: { contains: search.trim() } },
+        { city: { contains: search.trim() } },
       ];
     }
 
@@ -578,12 +578,12 @@ export async function createCustomer(
             action: "CREATE",
             entityName: "Customer",
             entityId: created.id,
-            newValues: {
+            newValues: JSON.stringify({
               pharmacyName: created.pharmacyName,
               customerCode: created.customerCode,
               creditLimit: input.creditLimit,
               openingBalance: openingBal,
-            },
+            }),
           },
         });
       }
@@ -684,11 +684,11 @@ export async function updateCustomer(
             action: "UPDATE",
             entityName: "Customer",
             entityId: id,
-            newValues: {
+            newValues: JSON.stringify({
               pharmacyName: res.pharmacyName,
               customerCode: res.customerCode,
               creditLimit: input.creditLimit,
-            },
+            }),
           },
         });
       }
@@ -779,10 +779,10 @@ export async function toggleCustomerStatus(
             action: "UPDATE",
             entityName: "Customer",
             entityId: id,
-            newValues: {
+            newValues: JSON.stringify({
               previousStatus: customer.status,
               newStatus,
-            },
+            }),
           },
         });
       }

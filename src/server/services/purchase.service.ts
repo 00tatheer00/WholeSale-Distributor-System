@@ -54,9 +54,9 @@ export async function getPurchases(params: PurchaseQueryParams = {}): Promise<Pu
 
     if (search.trim()) {
       whereClause.OR = [
-        { purchaseNumber: { contains: search.trim(), mode: "insensitive" } },
-        { supplierInvoiceNumber: { contains: search.trim(), mode: "insensitive" } },
-        { supplier: { name: { contains: search.trim(), mode: "insensitive" } } },
+        { purchaseNumber: { contains: search.trim() } },
+        { supplierInvoiceNumber: { contains: search.trim() } },
+        { supplier: { name: { contains: search.trim() } } },
       ];
     }
 
@@ -614,13 +614,13 @@ export async function createAndConfirmPurchase(data: PurchaseOrderInput, userId?
         action: "PURCHASE_CONFIRMED",
         entityName: "Purchase",
         entityId: purchase.id,
-        newValues: {
+        newValues: JSON.stringify({
           poNumber,
           supplierName: supplier.name,
           grandTotal,
           paidAmount,
           itemsCount: validatedItems.length,
-        },
+        }),
       },
     });
 
@@ -772,12 +772,12 @@ export async function cancelPurchase(purchaseId: string, reason: string, userId?
         action: "PURCHASE_CANCELLED",
         entityName: "Purchase",
         entityId: purchaseId,
-        newValues: {
+        newValues: JSON.stringify({
           purchaseNumber: purchase.purchaseNumber,
           supplierName: purchase.supplier.name,
           reversedAmount: grandTotal,
           cancellationReason: reason.trim(),
-        },
+        }),
       },
     });
 

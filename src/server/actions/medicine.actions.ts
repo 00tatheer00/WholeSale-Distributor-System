@@ -43,10 +43,10 @@ export async function getMedicinesAction(
     if (params?.search && params.search.trim() !== "") {
       const q = params.search.trim();
       whereClause.OR = [
-        { brandName: { contains: q, mode: "insensitive" } },
-        { genericName: { contains: q, mode: "insensitive" } },
-        { skuCode: { contains: q, mode: "insensitive" } },
-        { darNumber: { contains: q, mode: "insensitive" } },
+        { brandName: { contains: q } },
+        { genericName: { contains: q } },
+        { skuCode: { contains: q } },
+        { darNumber: { contains: q } },
       ];
     }
 

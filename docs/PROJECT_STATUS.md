@@ -3,7 +3,7 @@
 **Project**: Wholesale Medicine Distribution Management System (WMDMS)  
 **Repository**: [https://github.com/00tatheer00/WholeSale-Distributor-System.git](https://github.com/00tatheer00/WholeSale-Distributor-System.git)  
 **Branch**: `main`  
-**Current State**: **Phase 15 Complete — All 16 Modules + Pashto System Guide 100% Production Ready**  
+**Current State**: **Phase 16 Complete — 100% Offline Desktop Edition (.exe) & SQLite Conversion Ready**  
 **Last Updated**: 2026-08-29  
 
 ---
@@ -28,21 +28,22 @@
 | **Phase 13**| Final QA, Bug Fixing, Performance & Deployment | ✅ Completed | Final end-to-end regression QA, Zero-leak security audit, Production Deployment Runbook (`docs/production-deployment.md`), Strict Seeding Safety Guards, Robots meta protection, 46/46 routes verified & live pushed to `origin main`. |
 | **Phase 14**| Client Feature Delivery & Financial Intelligence Polish | ✅ Completed | 5 Standard Expense Categories (`EXP-RENT`, `EXP-DAILY`, `EXP-SALESMAN`, `EXP-VISITOR`, `EXP-DOC-MKT`), Without-Expense Profit (Gross) vs Net Profit visual clarity, Salesman Recovery/Receipt report with Day & Month filters and summary KPIs, Post-discount profit integrity, Opening Stock immutable ledger tracking (`MANUAL_IN`), and Production verification (`47/47 routes verified`). |
 | **Phase 15**| Afghanistan Client Localization & Pashto Operations Manual | ✅ Completed | Comprehensive Pashto System Guide & Operations Manual (`docs/SYSTEM_GUIDE_PASHTO.md`), Interactive Pashto/Urdu/English UI Guide Modal (`InfoGuideModal`), Dedicated `/help` Hub route, and Sidebar navigation. |
+| **Phase 16**| 100% Offline Desktop Edition (.exe) & Multi-PC LAN | ✅ Completed | SQLite zero-install database conversion (`wmdms.db`), local bcrypt session authentication, Electron Desktop wrapper with auto-server & LAN IP discovery, offline seed script (`prisma/seed-offline.ts`), client delivery runbook (`docs/OFFLINE_DESKTOP_GUIDE.md`). |
 
 ---
 
 ## 2. Technical Stack & Integrity Check
 
 - **Framework**: Next.js 15 (App Router, Server Components & Server Actions)
+- **Desktop Runtime**: Electron 34 with background Next.js server & LAN broadcast
 - **Language**: TypeScript 5 (Strict mode, 0 errors on `npm run typecheck`)
-- **Database ORM**: Prisma 6 with PostgreSQL & Atomic `$transaction`
+- **Database ORM**: Prisma 6 with embedded SQLite & Atomic Transactions
+- **Authentication**: Local bcrypt password encryption (Offline sessions)
 - **UI Components**: Tailwind CSS, Radix UI primitives, Lucide React, TanStack Table v8, Recharts
-- **Form & Validation**: React Hook Form, Zod v3
 - **Verification Status**:
   - `npm run typecheck` $\rightarrow$ **0 Errors**
   - `npm run build` $\rightarrow$ **48/48 Routes compiled and optimized successfully**
-- **Production Readiness**:
-  - Enterprise HTTP security headers (`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy`).
-  - Production seeding guards in `prisma/seed.ts` & `prisma/seed-transactions.ts`.
-  - Comprehensive Pashto System Guide in `docs/SYSTEM_GUIDE_PASHTO.md` & interactive UI at `/help`.
-  - Comprehensive Production Runbook in `docs/production-deployment.md` and Backup Runbook in `docs/backup-recovery.md`.
+- **Desktop & Multi-PC LAN Support**:
+  - Main PC runs `.exe` standalone application with embedded database.
+  - Other PCs and Mobile devices on the same Wi-Fi connect via browser (`http://[Server-IP]:3000`) without any client-side installation.
+  - Complete Client Delivery Guide created in `docs/OFFLINE_DESKTOP_GUIDE.md`.

@@ -41,11 +41,11 @@ export async function getDistributors(
 
     if (search.trim()) {
       whereClause.OR = [
-        { name: { contains: search.trim(), mode: "insensitive" } },
-        { phone: { contains: search.trim(), mode: "insensitive" } },
-        { employeeCode: { contains: search.trim(), mode: "insensitive" } },
-        { assignedTerritory: { contains: search.trim(), mode: "insensitive" } },
-        { assignedRoute: { contains: search.trim(), mode: "insensitive" } },
+        { name: { contains: search.trim() } },
+        { phone: { contains: search.trim() } },
+        { employeeCode: { contains: search.trim() } },
+        { assignedTerritory: { contains: search.trim() } },
+        { assignedRoute: { contains: search.trim() } },
       ];
     }
 
@@ -354,11 +354,11 @@ export async function createDistributor(
             action: "CREATE",
             entityName: "Distributor",
             entityId: dist.id,
-            newValues: {
+            newValues: JSON.stringify({
               name: dist.name,
               employeeCode,
               territory: dist.assignedTerritory,
-            },
+            }),
           },
         });
       }
@@ -412,11 +412,11 @@ export async function updateDistributor(
             action: "UPDATE",
             entityName: "Distributor",
             entityId: id,
-            newValues: {
+            newValues: JSON.stringify({
               name: input.name,
               territory: input.assignedTerritory,
               status: input.status,
-            },
+            }),
           },
         });
       }
@@ -451,10 +451,10 @@ export async function toggleDistributorStatus(
             action: "UPDATE",
             entityName: "Distributor",
             entityId: id,
-            newValues: {
+            newValues: JSON.stringify({
               previousStatus: dist.status,
               newStatus,
-            },
+            }),
           },
         });
       }
@@ -504,11 +504,11 @@ export async function recordDistributorExpense(
             action: "CREATE",
             entityName: "DistributorExpense",
             entityId: exp.id,
-            newValues: {
+            newValues: JSON.stringify({
               distributorName: distributor.name,
               amount: input.amount,
               description: input.description,
-            },
+            }),
           },
         });
       }

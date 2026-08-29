@@ -1,11 +1,16 @@
 import "server-only";
 import { redirect } from "next/navigation";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
+import { cookies } from "next/headers";
+import { MOCK_USERS, MOCK_COMPANY } from "@/server/actions/mock-data";
 
 export interface AuthenticatedUserContext {
-  supabaseUser: {
+  authUser: {
+    id: string;
+    email: string;
+  };
+  supabaseUser?: {
     id: string;
     email: string;
   };
@@ -26,65 +31,42 @@ export interface AuthenticatedUserContext {
 }
 
 /**
- * Retrieves the current Supabase session without redirecting.
+ * Retrieves the current session cookie value.
  */
 export async function getCurrentSession() {
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession();
+  const cookieStore = await cookies();
+  const sessionEmail =
+    cookieStore.get("wmdms_session")?.value ||
+    cookieStore.get("wmdms_demo_session")?.value;
 
-  if (error || !session) {
+  if (!sessionEmail) {
     return null;
   }
 
-  return session;
+  return { email: sessionEmail };
 }
-
-import { cookies } from "next/headers";
-import { MOCK_USERS, MOCK_COMPANY } from "@/server/actions/mock-data";
 
 /**
  * Retrieves the authenticated user and their matching Prisma database profile.
+ * 100% Offline with local SQLite database lookup.
  */
 export async function getCurrentUser(): Promise<AuthenticatedUserContext | null> {
   const cookieStore = await cookies();
-  const demoEmail = cookieStore.get("wmdms_demo_session")?.value;
+  const sessionEmail =
+    cookieStore.get("wmdms_session")?.value ||
+    cookieStore.get("wmdms_demo_session")?.value;
 
-  let authEmail: string | null = null;
-  let authId: string = "demo-user-id";
-
-  try {
-    const supabase = await createServerSupabaseClient();
-    const {
-      data: { user: supabaseUser },
-    } = await supabase.auth.getUser();
-
-    if (supabaseUser && supabaseUser.email) {
-      authEmail = supabaseUser.email;
-      authId = supabaseUser.id;
-    }
-  } catch {
-    // Supabase unavailable in local test
-  }
-
-  if (!authEmail && demoEmail) {
-    authEmail = demoEmail;
-  }
-
-  if (!authEmail) {
+  if (!sessionEmail) {
     return null;
   }
 
-  // Find corresponding application user profile in PostgreSQL or fallback to seed mock profile
+  const normalizedEmail = sessionEmail.trim().toLowerCase();
+
+  // Find corresponding user profile in local SQLite database
   try {
     const profile = await prisma.user.findFirst({
       where: {
-        OR: [
-          { supabaseAuthId: authId },
-          { email: authEmail.toLowerCase() },
-        ],
+        email: normalizedEmail,
       },
       include: {
         company: {
@@ -98,23 +80,33 @@ export async function getCurrentUser(): Promise<AuthenticatedUserContext | null>
     });
 
     if (profile) {
-      return {
+      const userContext: AuthenticatedUserContext = {
+        authUser: {
+          id: profile.id,
+          email: profile.email,
+        },
         supabaseUser: {
-          id: authId,
-          email: authEmail,
+          id: profile.id,
+          email: profile.email,
         },
         profile: profile as any,
       };
+      return userContext;
     }
-  } catch {
-    // Fallback to demo profile
+  } catch (err) {
+    console.error("Local SQLite session lookup error:", err);
   }
 
-  const mockUser = MOCK_USERS.find(
-    (u) => u.email.toLowerCase() === authEmail?.toLowerCase()
-  ) || MOCK_USERS[0];
+  // Fallback to mock user profile if database is initialising
+  const mockUser =
+    MOCK_USERS.find((u) => u.email.toLowerCase() === normalizedEmail) ||
+    MOCK_USERS[0];
 
   return {
+    authUser: {
+      id: mockUser.id,
+      email: mockUser.email,
+    },
     supabaseUser: {
       id: mockUser.id,
       email: mockUser.email,
@@ -157,7 +149,6 @@ export async function requireAdmin(): Promise<AuthenticatedUserContext> {
   const authContext = await requireAuth();
 
   if (!authContext.profile || authContext.profile.role !== UserRole.SUPER_ADMIN) {
-    // If not super admin, check if elevated executive
     if (authContext.profile?.role !== UserRole.SALES_MANAGER) {
       redirect("/dashboard");
     }

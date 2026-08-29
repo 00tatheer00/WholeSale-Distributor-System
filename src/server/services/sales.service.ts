@@ -124,10 +124,10 @@ export async function getSales(params: SaleQueryParams = {}): Promise<SaleQueryR
 
     if (search.trim()) {
       whereClause.OR = [
-        { saleNumber: { contains: search.trim(), mode: "insensitive" } },
-        { customer: { pharmacyName: { contains: search.trim(), mode: "insensitive" } } },
-        { customer: { customerCode: { contains: search.trim(), mode: "insensitive" } } },
-        { invoice: { invoiceNumber: { contains: search.trim(), mode: "insensitive" } } },
+        { saleNumber: { contains: search.trim() } },
+        { customer: { pharmacyName: { contains: search.trim() } } },
+        { customer: { customerCode: { contains: search.trim() } } },
+        { invoice: { invoiceNumber: { contains: search.trim() } } },
       ];
     }
 
@@ -731,7 +731,7 @@ export async function createSale(
             action: "CREATE",
             entityName: "Sale",
             entityId: sale.id,
-            newValues: {
+            newValues: JSON.stringify({
               saleNumber,
               invoiceNumber,
               customerId,
@@ -740,7 +740,7 @@ export async function createSale(
               paidAmount,
               dueAmount,
               itemsCount: validatedItems.length,
-            },
+            }),
           },
         });
       }
@@ -868,10 +868,10 @@ export async function cancelSale(
             action: "CANCEL",
             entityName: "Sale",
             entityId: id,
-            newValues: {
+            newValues: JSON.stringify({
               saleNumber: sale.saleNumber,
               reason,
-            },
+            }),
           },
         });
       }

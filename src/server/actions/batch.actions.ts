@@ -33,7 +33,6 @@ export async function getBatchesByMedicineIdAction(
     if (params?.search && params.search.trim() !== "") {
       whereClause.batchNumber = {
         contains: params.search.trim(),
-        mode: "insensitive",
       };
     }
 
@@ -126,7 +125,7 @@ export async function createBatchAction(
       where: {
         medicineId,
         warehouseId,
-        batchNumber: { equals: batchNumber.trim(), mode: "insensitive" },
+        batchNumber: { equals: batchNumber.trim() },
       },
     });
 

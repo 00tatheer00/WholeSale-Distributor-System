@@ -63,11 +63,11 @@ export async function getPayments(params: PaymentQueryParams = {}): Promise<Paym
 
     if (search.trim()) {
       whereClause.OR = [
-        { receiptNumber: { contains: search.trim(), mode: "insensitive" } },
-        { referenceNumber: { contains: search.trim(), mode: "insensitive" } },
-        { chequeNumber: { contains: search.trim(), mode: "insensitive" } },
-        { customer: { pharmacyName: { contains: search.trim(), mode: "insensitive" } } },
-        { customer: { customerCode: { contains: search.trim(), mode: "insensitive" } } },
+        { receiptNumber: { contains: search.trim() } },
+        { referenceNumber: { contains: search.trim() } },
+        { chequeNumber: { contains: search.trim() } },
+        { customer: { pharmacyName: { contains: search.trim() } } },
+        { customer: { customerCode: { contains: search.trim() } } },
       ];
     }
 
@@ -374,13 +374,13 @@ export async function recordCustomerPayment(
             action: "CREATE",
             entityName: "CustomerPayment",
             entityId: payment.id,
-            newValues: {
+            newValues: JSON.stringify({
               receiptNumber,
               customerId,
               pharmacyName: customer.pharmacyName,
               amount,
               paymentMethod,
-            },
+            }),
           },
         });
       }

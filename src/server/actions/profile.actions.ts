@@ -1,9 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { requireAuth } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 import {
   updateProfileSchema,
   updatePasswordSchema,
@@ -50,23 +50,27 @@ export async function updateProfileAction(
       },
     });
 
-    // Write audit log
-    await prisma.auditLog.create({
-      data: {
-        userId: updatedUser.id,
-        action: "UPDATE_PROFILE",
-        entityName: "User",
-        entityId: updatedUser.id,
-        oldValues: {
-          name: authContext.profile.name,
-          phone: authContext.profile.phone,
+    // Write audit log with JSON.stringify for SQLite compatibility
+    try {
+      await prisma.auditLog.create({
+        data: {
+          userId: updatedUser.id,
+          action: "UPDATE_PROFILE",
+          entityName: "User",
+          entityId: updatedUser.id,
+          oldValues: JSON.stringify({
+            name: authContext.profile.name,
+            phone: authContext.profile.phone,
+          }),
+          newValues: JSON.stringify({
+            name: updatedUser.name,
+            phone: updatedUser.phone,
+          }),
         },
-        newValues: {
-          name: updatedUser.name,
-          phone: updatedUser.phone,
-        },
-      },
-    });
+      });
+    } catch (auditErr) {
+      console.error("Audit log error:", auditErr);
+    }
 
     revalidatePath("/settings/profile");
     revalidatePath("/", "layout");
@@ -85,13 +89,19 @@ export async function updateProfileAction(
 }
 
 /**
- * Server Action for changing password from authenticated admin profile.
+ * Server Action for changing password from authenticated admin profile in offline desktop ERP.
  */
 export async function updatePasswordAction(
   data: UpdatePasswordInput
 ): Promise<ProfileActionResult> {
   try {
     const authContext = await requireAuth();
+    if (!authContext.profile) {
+      return {
+        success: false,
+        error: "User profile not found.",
+      };
+    }
 
     const parsed = updatePasswordSchema.safeParse(data);
     if (!parsed.success) {
@@ -102,30 +112,29 @@ export async function updatePasswordAction(
     }
 
     const { newPassword } = parsed.data;
-    const supabase = await createServerSupabaseClient();
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword,
+    // Update in local SQLite database
+    await prisma.user.update({
+      where: { id: authContext.profile.id },
+      data: {
+        passwordHash: hashedPassword,
+      },
     });
 
-    if (error) {
-      return {
-        success: false,
-        error: error.message || "Failed to update password. Please check your inputs.",
-      };
-    }
-
     // Write audit log
-    if (authContext.profile) {
+    try {
       await prisma.auditLog.create({
         data: {
           userId: authContext.profile.id,
           action: "CHANGE_PASSWORD",
           entityName: "User",
           entityId: authContext.profile.id,
-          newValues: { passwordChanged: true },
+          newValues: JSON.stringify({ passwordChanged: true }),
         },
       });
+    } catch (auditErr) {
+      console.error("Audit log error:", auditErr);
     }
 
     revalidatePath("/settings/profile");

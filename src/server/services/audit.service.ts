@@ -39,7 +39,7 @@ function sanitizeAuditPayload(data: any): any {
 }
 
 /**
- * Record an Immutable Audit Log Entry
+ * Record an Immutable Audit Log Entry in SQLite
  */
 export async function recordAuditLog(params: CreateAuditLogParams) {
   try {
@@ -51,8 +51,8 @@ export async function recordAuditLog(params: CreateAuditLogParams) {
         action: params.action,
         entityName: params.entityName,
         entityId: params.entityId,
-        oldValues: sanitizedOld,
-        newValues: sanitizedNew,
+        oldValues: sanitizedOld ? (typeof sanitizedOld === "string" ? sanitizedOld : JSON.stringify(sanitizedOld)) : null,
+        newValues: sanitizedNew ? (typeof sanitizedNew === "string" ? sanitizedNew : JSON.stringify(sanitizedNew)) : null,
         userId: params.userId,
         ipAddress: params.ipAddress,
         userAgent: params.userAgent,
@@ -97,10 +97,10 @@ export async function getAuditLogs(params: AuditLogQueryParams = {}) {
 
   if (search.trim()) {
     whereClause.OR = [
-      { action: { contains: search.trim(), mode: "insensitive" } },
-      { entityName: { contains: search.trim(), mode: "insensitive" } },
-      { entityId: { contains: search.trim(), mode: "insensitive" } },
-      { user: { name: { contains: search.trim(), mode: "insensitive" } } },
+      { action: { contains: search.trim() } },
+      { entityName: { contains: search.trim() } },
+      { entityId: { contains: search.trim() } },
+      { user: { name: { contains: search.trim() } } },
     ];
   }
 
@@ -133,7 +133,7 @@ export async function getAuditLogs(params: AuditLogQueryParams = {}) {
       userEmail: l.user?.email || "system@pharmadist.local",
       userRole: l.user?.role || "SYSTEM",
       ipAddress: l.ipAddress || "Internal",
-      userAgent: l.userAgent || "Web Application",
+      userAgent: l.userAgent || "Desktop Application",
       oldValues: l.oldValues,
       newValues: l.newValues,
       createdAt: l.createdAt.toISOString(),

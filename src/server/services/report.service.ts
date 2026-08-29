@@ -130,8 +130,8 @@ export async function getSalesReport(params: ReportFilterParams = {}) {
   if (distributorId && distributorId !== "ALL") whereClause.distributorId = distributorId;
   if (search.trim()) {
     whereClause.OR = [
-      { saleNumber: { contains: search.trim(), mode: "insensitive" } },
-      { customer: { pharmacyName: { contains: search.trim(), mode: "insensitive" } } },
+      { saleNumber: { contains: search.trim() } },
+      { customer: { pharmacyName: { contains: search.trim() } } },
     ];
   }
 
@@ -209,9 +209,9 @@ export async function getPurchaseReport(params: ReportFilterParams = {}) {
   if (supplierId && supplierId !== "ALL") whereClause.supplierId = supplierId;
   if (search.trim()) {
     whereClause.OR = [
-      { purchaseNumber: { contains: search.trim(), mode: "insensitive" } },
-      { supplierInvoiceNumber: { contains: search.trim(), mode: "insensitive" } },
-      { supplier: { name: { contains: search.trim(), mode: "insensitive" } } },
+      { purchaseNumber: { contains: search.trim() } },
+      { supplierInvoiceNumber: { contains: search.trim() } },
+      { supplier: { name: { contains: search.trim() } } },
     ];
   }
 
@@ -271,9 +271,9 @@ export async function getInventoryReport(params: ReportFilterParams = {}) {
   if (supplierId && supplierId !== "ALL") whereClause.medicine = { ...whereClause.medicine, supplierId };
   if (search.trim()) {
     whereClause.OR = [
-      { batchNumber: { contains: search.trim(), mode: "insensitive" } },
-      { medicine: { brandName: { contains: search.trim(), mode: "insensitive" } } },
-      { medicine: { genericName: { contains: search.trim(), mode: "insensitive" } } },
+      { batchNumber: { contains: search.trim() } },
+      { medicine: { brandName: { contains: search.trim() } } },
+      { medicine: { genericName: { contains: search.trim() } } },
     ];
   }
 

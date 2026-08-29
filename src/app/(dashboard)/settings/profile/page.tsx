@@ -11,7 +11,7 @@ import { ShieldCheck, Calendar, Building2, UserCircle } from "lucide-react";
 export default async function AdminProfilePage() {
   const authContext = await requireAuth();
   const profile = authContext.profile;
-  const userEmail = authContext.supabaseUser.email;
+  const userEmail = profile?.email || authContext.authUser?.email || "admin@pharmadist.local";
 
   const initials = profile?.name
     ? profile.name
@@ -109,7 +109,7 @@ export default async function AdminProfilePage() {
               <CardTitle className="text-sm font-bold">Change Password</CardTitle>
             </div>
             <CardDescription className="text-xs">
-              Update your account password using Supabase Auth encryption.
+              Update your account password using secure local bcrypt encryption.
             </CardDescription>
           </CardHeader>
           <CardContent>

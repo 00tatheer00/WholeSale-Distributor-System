@@ -308,10 +308,10 @@ export async function getInventoryItems(params?: InventoryQueryParams): Promise<
     if (params?.search && params.search.trim() !== "") {
       const q = params.search.trim();
       whereClause.OR = [
-        { batchNumber: { contains: q, mode: "insensitive" } },
-        { medicine: { brandName: { contains: q, mode: "insensitive" } } },
-        { medicine: { genericName: { contains: q, mode: "insensitive" } } },
-        { medicine: { skuCode: { contains: q, mode: "insensitive" } } },
+        { batchNumber: { contains: q } },
+        { medicine: { brandName: { contains: q } } },
+        { medicine: { genericName: { contains: q } } },
+        { medicine: { skuCode: { contains: q } } },
       ];
     }
 
@@ -546,10 +546,10 @@ export async function getStockMovements(params?: {
     if (params?.search && params.search.trim() !== "") {
       const q = params.search.trim();
       whereClause.OR = [
-        { referenceNumber: { contains: q, mode: "insensitive" } },
-        { reason: { contains: q, mode: "insensitive" } },
-        { batch: { batchNumber: { contains: q, mode: "insensitive" } } },
-        { medicine: { brandName: { contains: q, mode: "insensitive" } } },
+        { referenceNumber: { contains: q } },
+        { reason: { contains: q } },
+        { batch: { batchNumber: { contains: q } } },
+        { medicine: { brandName: { contains: q } } },
       ];
     }
 

@@ -19,9 +19,9 @@ export async function getCategoriesAction(
 
     if (search && search.trim() !== "") {
       whereClause.OR = [
-        { name: { contains: search, mode: "insensitive" } },
-        { code: { contains: search, mode: "insensitive" } },
-        { description: { contains: search, mode: "insensitive" } },
+        { name: { contains: search } },
+        { code: { contains: search } },
+        { description: { contains: search } },
       ];
     }
 
@@ -80,7 +80,7 @@ export async function createCategoryAction(
   try {
     // Check duplicate name
     const existing = await prisma.medicineCategory.findFirst({
-      where: { name: { equals: data.name.trim(), mode: "insensitive" } },
+      where: { name: { equals: data.name.trim() } },
     });
 
     if (existing) {
@@ -144,7 +144,7 @@ export async function updateCategoryAction(
     const duplicate = await prisma.medicineCategory.findFirst({
       where: {
         id: { not: id },
-        name: { equals: data.name.trim(), mode: "insensitive" },
+        name: { equals: data.name.trim() },
       },
     });
 

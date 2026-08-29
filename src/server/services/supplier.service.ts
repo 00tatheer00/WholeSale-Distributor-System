@@ -50,11 +50,11 @@ export async function getSuppliers(params: SupplierQueryParams = {}): Promise<Su
 
     if (search.trim()) {
       whereClause.OR = [
-        { name: { contains: search.trim(), mode: "insensitive" } },
-        { contactPerson: { contains: search.trim(), mode: "insensitive" } },
-        { phone: { contains: search.trim(), mode: "insensitive" } },
-        { email: { contains: search.trim(), mode: "insensitive" } },
-        { code: { contains: search.trim(), mode: "insensitive" } },
+        { name: { contains: search.trim() } },
+        { contactPerson: { contains: search.trim() } },
+        { phone: { contains: search.trim() } },
+        { email: { contains: search.trim() } },
+        { code: { contains: search.trim() } },
       ];
     }
 
@@ -505,7 +505,7 @@ export async function createSupplier(data: SupplierInput, userId?: string) {
     // Check duplicate name
     const existing = await tx.supplier.findFirst({
       where: {
-        name: { equals: data.name.trim(), mode: "insensitive" },
+        name: { equals: data.name.trim() },
       },
     });
 
@@ -544,12 +544,12 @@ export async function createSupplier(data: SupplierInput, userId?: string) {
         action: "SUPPLIER_CREATED",
         entityName: "Supplier",
         entityId: supplier.id,
-        newValues: {
+        newValues: JSON.stringify({
           name: supplier.name,
           phone: supplier.phone,
           openingBalance: opBal,
           creditDays: supplier.creditPeriodDays,
-        },
+        }),
       },
     });
 
@@ -589,8 +589,8 @@ export async function updateSupplier(id: string, data: Partial<SupplierInput>, u
         action: "SUPPLIER_UPDATED",
         entityName: "Supplier",
         entityId: id,
-        oldValues: { name: supplier.name, phone: supplier.phone, status: supplier.status },
-        newValues: { name: updated.name, phone: updated.phone, status: updated.status },
+        oldValues: JSON.stringify({ name: supplier.name, phone: supplier.phone, status: supplier.status }),
+        newValues: JSON.stringify({ name: updated.name, phone: updated.phone, status: updated.status }),
       },
     });
 
@@ -617,7 +617,7 @@ export async function toggleSupplierStatus(id: string, status: "ACTIVE" | "INACT
         action: status === "ACTIVE" ? "SUPPLIER_ACTIVATED" : "SUPPLIER_DEACTIVATED",
         entityName: "Supplier",
         entityId: id,
-        newValues: { status },
+        newValues: JSON.stringify({ status }),
       },
     });
 
@@ -712,12 +712,12 @@ export async function recordSupplierPayment(data: SupplierPaymentInput, userId?:
         action: "SUPPLIER_PAYMENT_RECORDED",
         entityName: "SupplierPayment",
         entityId: payment.id,
-        newValues: {
+        newValues: JSON.stringify({
           voucherNumber,
           supplierName: supplier.name,
           amount: data.amount,
           paymentMethod: data.paymentMethod,
-        },
+        }),
       },
     });
 

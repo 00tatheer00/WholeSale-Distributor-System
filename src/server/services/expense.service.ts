@@ -78,7 +78,7 @@ export async function createExpenseCategory(
     const existing = await prisma.expenseCategory.findFirst({
       where: {
         companyId: company.id,
-        name: { equals: input.name.trim(), mode: "insensitive" },
+        name: { equals: input.name.trim() },
       },
     });
 
@@ -104,7 +104,7 @@ export async function createExpenseCategory(
           action: "CREATE",
           entityName: "ExpenseCategory",
           entityId: created.id,
-          newValues: { name: created.name },
+          newValues: JSON.stringify({ name: created.name }),
         },
       });
     }
@@ -137,7 +137,7 @@ export async function toggleExpenseCategoryStatus(
           action: "UPDATE",
           entityName: "ExpenseCategory",
           entityId: id,
-          newValues: { isActive },
+          newValues: JSON.stringify({ isActive }),
         },
       });
     }
@@ -171,10 +171,10 @@ export async function getExpenses(params: ExpenseQueryParams = {}): Promise<Expe
 
     if (search.trim()) {
       whereClause.OR = [
-        { voucherNumber: { contains: search.trim(), mode: "insensitive" } },
-        { description: { contains: search.trim(), mode: "insensitive" } },
-        { paidTo: { contains: search.trim(), mode: "insensitive" } },
-        { referenceNumber: { contains: search.trim(), mode: "insensitive" } },
+        { voucherNumber: { contains: search.trim() } },
+        { description: { contains: search.trim() } },
+        { paidTo: { contains: search.trim() } },
+        { referenceNumber: { contains: search.trim() } },
       ];
     }
 
@@ -316,12 +316,12 @@ export async function createExpense(
           action: "CREATE",
           entityName: "BusinessExpense",
           entityId: exp.id,
-          newValues: {
+          newValues: JSON.stringify({
             voucherNumber,
             amount: input.amount,
             paidTo: input.paidTo,
             description: input.description,
-          },
+          }),
         },
       });
 
@@ -365,7 +365,7 @@ export async function cancelExpense(
             action: "CANCEL",
             entityName: "BusinessExpense",
             entityId: id,
-            newValues: { voucherNumber: existing.voucherNumber, reason },
+            newValues: JSON.stringify({ voucherNumber: existing.voucherNumber, reason }),
           },
         });
       }

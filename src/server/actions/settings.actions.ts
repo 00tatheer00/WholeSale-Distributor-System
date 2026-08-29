@@ -143,7 +143,7 @@ export async function updateCompanySettingsAction(data: CompanySettingsInput): P
       entityName: "CompanySettings",
       entityId: company?.id || "SYSTEM",
       oldValues,
-      newValues: parsed.data,
+      newValues: JSON.stringify(parsed.data),
     });
 
     revalidatePath("/settings");
@@ -212,7 +212,7 @@ export async function updateUserProfileAction(data: UserProfileInput): Promise<A
         action: "UPDATE_USER_PROFILE",
         entityName: "User",
         entityId: firstUser.id,
-        newValues: parsed.data,
+        newValues: JSON.stringify(parsed.data),
       });
     }
 

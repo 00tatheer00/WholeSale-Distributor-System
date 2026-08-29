@@ -73,11 +73,11 @@ export async function getInvoices(params: InvoiceQueryParams = {}): Promise<Invo
 
     if (search.trim()) {
       whereClause.OR = [
-        { invoiceNumber: { contains: search.trim(), mode: "insensitive" } },
-        { challanNumber: { contains: search.trim(), mode: "insensitive" } },
-        { customer: { pharmacyName: { contains: search.trim(), mode: "insensitive" } } },
-        { customer: { customerCode: { contains: search.trim(), mode: "insensitive" } } },
-        { sale: { saleNumber: { contains: search.trim(), mode: "insensitive" } } },
+        { invoiceNumber: { contains: search.trim() } },
+        { challanNumber: { contains: search.trim() } },
+        { customer: { pharmacyName: { contains: search.trim() } } },
+        { customer: { customerCode: { contains: search.trim() } } },
+        { sale: { saleNumber: { contains: search.trim() } } },
       ];
     }
 
