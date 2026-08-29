@@ -98,16 +98,37 @@ export default function LoginPage() {
       setIsSubmitting(true);
       setErrorMessage(null);
 
-      const result = await loginAction(data);
+      // 1. Direct API call (works consistently across all environments, Electron, and LAN)
+      try {
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
 
-      if (!result.success) {
-        setErrorMessage(result.error || "Invalid email or password.");
-        return;
+        const result = await response.json();
+
+        if (result.success) {
+          router.push(redirectUrl);
+          router.refresh();
+          return;
+        } else {
+          setErrorMessage(result.error || "Invalid email or password.");
+          return;
+        }
+      } catch {
+        // 2. Fallback to Server Action
+        const actionResult = await loginAction(data);
+        if (!actionResult.success) {
+          setErrorMessage(actionResult.error || "Invalid email or password.");
+          return;
+        }
+
+        router.push(redirectUrl);
+        router.refresh();
       }
-
-      // Success: Navigate to requested route
-      router.push(redirectUrl);
-      router.refresh();
     } catch {
       setErrorMessage("An unexpected network error occurred. Please try again.");
     } finally {

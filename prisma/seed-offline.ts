@@ -33,13 +33,49 @@ async function main() {
 
   console.log("✅ Company configured:", company.name);
 
-  // 2. Hash Default Admin Password
+  // 2. Hash Passwords
   const adminPasswordHash = await bcrypt.hash("admin@123", 10);
+  const admin123Hash = await bcrypt.hash("admin123", 10);
+  const sales123Hash = await bcrypt.hash("sales123", 10);
+  const warehouse123Hash = await bcrypt.hash("warehouse123", 10);
+  const accounts123Hash = await bcrypt.hash("accounts123", 10);
   const managerPasswordHash = await bcrypt.hash("manager@123", 10);
   const cashierPasswordHash = await bcrypt.hash("cashier@123", 10);
 
   // 3. Create Default Users
   const users = [
+    {
+      id: "00000000-0000-0000-0000-000000000001",
+      email: "admin@pharmadist.com",
+      name: "Super Admin",
+      phone: "+93 79 000 1100",
+      role: UserRole.SUPER_ADMIN,
+      passwordHash: admin123Hash,
+    },
+    {
+      id: "00000000-0000-0000-0000-000000000002",
+      email: "sales.manager@pharmadist.com",
+      name: "Sales Manager",
+      phone: "+93 79 000 1200",
+      role: UserRole.SALES_MANAGER,
+      passwordHash: sales123Hash,
+    },
+    {
+      id: "00000000-0000-0000-0000-000000000003",
+      email: "warehouse@pharmadist.com",
+      name: "Warehouse Officer",
+      phone: "+93 79 000 1300",
+      role: UserRole.WAREHOUSE_MANAGER,
+      passwordHash: warehouse123Hash,
+    },
+    {
+      id: "00000000-0000-0000-0000-000000000004",
+      email: "accounts@pharmadist.com",
+      name: "Accounts Officer",
+      phone: "+93 79 000 1400",
+      role: UserRole.ACCOUNTS_OFFICER,
+      passwordHash: accounts123Hash,
+    },
     {
       id: "00000000-0000-0000-0000-000000000010",
       email: "admin@erp.com",
