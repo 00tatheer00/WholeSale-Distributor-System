@@ -131,7 +131,7 @@ function createWindow() {
     show: false,
   });
 
-  mainWindow.loadURL(`http://localhost:${PORT}`);
+  mainWindow.loadURL(`http://127.0.0.1:${PORT}/login`);
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
@@ -199,7 +199,7 @@ function createWindow() {
 app.whenReady().then(async () => {
   try {
     await startNextServer();
-    const ready = await waitForServer(`http://localhost:${PORT}`);
+    const ready = await waitForServer(`http://127.0.0.1:${PORT}/login`);
     if (!ready) {
       console.warn('Server wait timed out, attempting window load anyway...');
     }
