@@ -21,6 +21,7 @@
   "build": {
     "appId": "com.pharmadist.erp",
     "productName": "PharmaDist Wholesale ERP",
+    "asar": false,
     "win": {
       "target": "dir",
       "signAndEditExecutable": false

@@ -1,13 +1,11 @@
-const { app, BrowserWindow, Menu, Tray, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
-const { spawn } = require('child_process');
 const http = require('http');
 
 let mainWindow = null;
-let tray = null;
-let nextServerProcess = null;
+let serverInstance = null;
 const PORT = process.env.PORT || 3000;
 
 // Get Local LAN IP Addresses for Multi-PC / Mobile access
@@ -25,86 +23,54 @@ function getLocalIpAddresses() {
   return addresses.length > 0 ? addresses : ['127.0.0.1'];
 }
 
-// Check if Next.js local server is ready
-function waitForServer(url, timeoutMs = 45000) {
-  return new Promise((resolve, reject) => {
-    const startTime = Date.now();
-    const check = () => {
-      http
-        .get(url, (res) => {
-          if (res.statusCode >= 200 && res.statusCode < 400) {
-            resolve(true);
-          } else {
-            retry();
-          }
-        })
-        .on('error', () => {
-          retry();
-        });
-    };
-
-    const retry = () => {
-      if (Date.now() - startTime > timeoutMs) {
-        reject(new Error('Server start timed out'));
-      } else {
-        setTimeout(check, 1000);
-      }
-    };
-
-    check();
-  });
-}
-
-// Start background Next.js Server on 0.0.0.0:3000
+// Start in-process Next.js Server on 0.0.0.0:3000
 async function startNextServer() {
   const isDev = !app.isPackaged;
   const projectRoot = isDev
     ? path.join(__dirname, '..')
     : path.join(process.resourcesPath, 'app');
 
-  const env = {
-    ...process.env,
-    PORT: PORT.toString(),
-    HOSTNAME: '0.0.0.0', // Listen on all network interfaces for Multi-PC & Mobile LAN access
-    NODE_ENV: isDev ? 'development' : 'production',
-    ELECTRON_RUN_AS_NODE: '1',
-  };
+  const dbPath = path.join(projectRoot, 'prisma', 'wmdms.db');
+  process.env.DATABASE_URL = `file:${dbPath.replace(/\\/g, '/')}`;
+  process.env.PORT = PORT.toString();
+  process.env.HOSTNAME = '0.0.0.0';
+  process.env.NODE_ENV = 'production';
 
   if (isDev) {
     console.log('Running in Development mode with local Next.js dev server...');
-    return;
+    return true;
   }
 
-  // Packaged mode: Use Electron runtime as Node to avoid missing Node.js on client PC
-  const standaloneServer = path.join(projectRoot, '.next', 'standalone', 'server.js');
-  if (fs.existsSync(standaloneServer)) {
-    nextServerProcess = spawn(process.execPath, [standaloneServer], {
-      cwd: path.dirname(standaloneServer),
-      env,
-      stdio: 'ignore',
-    });
-    return;
-  }
+  console.log(`Starting in-process Next.js server from ${projectRoot}...`);
+  const next = require('next');
+  const nextApp = next({
+    dev: false,
+    dir: projectRoot,
+    hostname: '0.0.0.0',
+    port: Number(PORT),
+  });
 
-  // Try programmatic Next.js launch
-  try {
-    const next = require('next');
-    const nextApp = next({ dev: false, dir: projectRoot });
-    const handle = nextApp.getRequestHandler();
-    await nextApp.prepare();
-    const server = http.createServer((req, res) => handle(req, res));
-    server.listen(PORT, '0.0.0.0', () => {
-      console.log(`Next.js server listening on http://0.0.0.0:${PORT}`);
+  const handle = nextApp.getRequestHandler();
+  await nextApp.prepare();
+
+  return new Promise((resolve, reject) => {
+    serverInstance = http.createServer((req, res) => {
+      handle(req, res);
     });
-  } catch (err) {
-    console.warn('Programmatic start failed, spawning next binary with Electron node runtime:', err.message);
-    const nextBin = path.join(projectRoot, 'node_modules', 'next', 'dist', 'bin', 'next');
-    nextServerProcess = spawn(process.execPath, [nextBin, 'start', '-p', PORT.toString(), '-H', '0.0.0.0'], {
-      cwd: projectRoot,
-      env,
-      stdio: 'ignore',
+
+    serverInstance.listen(Number(PORT), '0.0.0.0', (err) => {
+      if (err) {
+        return reject(err);
+      }
+      console.log(`PharmaDist ERP server successfully listening on http://0.0.0.0:${PORT}`);
+      resolve(true);
     });
-  }
+
+    serverInstance.on('error', (err) => {
+      console.error('Server instance error:', err);
+      reject(err);
+    });
+  });
 }
 
 // Create Native Desktop App Window
@@ -196,13 +162,12 @@ function createWindow() {
 app.whenReady().then(async () => {
   try {
     await startNextServer();
-    await waitForServer(`http://localhost:${PORT}`);
     createWindow();
   } catch (err) {
     console.error('Failed to start ERP application:', err);
     dialog.showErrorBox(
       'Startup Error',
-      `Failed to connect to local server.\nError: ${err.message}`
+      `Failed to start local ERP server.\n\nError: ${err.message}`
     );
   }
 
@@ -214,9 +179,9 @@ app.whenReady().then(async () => {
 });
 
 app.on('window-all-closed', () => {
-  if (nextServerProcess) {
+  if (serverInstance) {
     try {
-      nextServerProcess.kill();
+      serverInstance.close();
     } catch {}
   }
   if (process.platform !== 'darwin') {
@@ -225,9 +190,9 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', () => {
-  if (nextServerProcess) {
+  if (serverInstance) {
     try {
-      nextServerProcess.kill();
+      serverInstance.close();
     } catch {}
   }
 });
