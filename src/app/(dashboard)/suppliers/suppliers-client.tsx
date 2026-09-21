@@ -108,8 +108,8 @@ export function SuppliersClient({ initialData, currentParams }: SuppliersClientP
     email: "",
     phone: "",
     address: "",
-    city: "Dhaka",
-    country: "Bangladesh",
+    city: "Karachi",
+    country: "Pakistan",
     drugLicenseNo: "",
     tradeLicenseNo: "",
     taxIdTin: "",
@@ -572,7 +572,7 @@ export function SuppliersClient({ initialData, currentParams }: SuppliersClientP
                     </Label>
                     <Input
                       id="city"
-                      placeholder="e.g., Dhaka"
+                      placeholder="e.g., Karachi"
                       value={formData.city || ""}
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     />
@@ -584,7 +584,7 @@ export function SuppliersClient({ initialData, currentParams }: SuppliersClientP
                     </Label>
                     <Input
                       id="address"
-                      placeholder="e.g., Square Centre, 48 Mohakhali C/A, Dhaka 1212"
+                      placeholder="e.g., Plot 30, Korangi Industrial Area, Karachi"
                       value={formData.address || ""}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     />
@@ -592,11 +592,11 @@ export function SuppliersClient({ initialData, currentParams }: SuppliersClientP
 
                   <div className="space-y-1.5">
                     <Label htmlFor="drugLicenseNo" className="text-xs">
-                      Drug License No (DGDA)
+                      Drug License No (DRAP)
                     </Label>
                     <Input
                       id="drugLicenseNo"
-                      placeholder="e.g., DGDA-MFG-1092"
+                      placeholder="e.g., DRAP-MFG-1092"
                       value={formData.drugLicenseNo || ""}
                       onChange={(e) => setFormData({ ...formData, drugLicenseNo: e.target.value })}
                     />

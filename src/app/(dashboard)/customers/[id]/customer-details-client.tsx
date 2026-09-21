@@ -324,7 +324,7 @@ export function CustomerDetailsClient({ customer }: CustomerDetailsClientProps) 
 
               <div className="space-y-3 text-xs">
                 <div className="flex justify-between py-1.5 border-b border-border/40">
-                  <span className="text-muted-foreground">DGDA Drug License No:</span>
+                  <span className="text-muted-foreground">DRAP Drug License No:</span>
                   <span className="font-mono font-bold text-foreground">{customer.drugLicenseNo}</span>
                 </div>
 

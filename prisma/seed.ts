@@ -36,22 +36,22 @@ async function main() {
   // 2. Seed Default Company & Business Settings
   const company = await prisma.company.create({
     data: {
-      name: "Apex Pharma Distributors Ltd.",
-      tradeLicenseNo: "TRAD-DH-2024-8849",
-      drugLicenseNo: "DL-DH-09182-W",
-      taxIdTin: "8291039182",
-      email: "info@apexpharmadist.com",
-      phone: "+880 1711 000111",
-      address: "Plot 14, Commercial Zone, Tejgaon Industrial Area",
-      city: "Dhaka",
-      country: "Bangladesh",
-      currency: "BDT",
+      name: "PharmaDist Wholesale Medicine Distributors",
+      tradeLicenseNo: "TRAD-KHI-2024-8849",
+      drugLicenseNo: "DRAP-DL-KHI-09182-W",
+      taxIdTin: "NTN-8291039-1",
+      email: "info@pharmadist.pk",
+      phone: "+92 21 34567890",
+      address: "Plot 14, Commercial Zone, Korangi Industrial Area",
+      city: "Karachi",
+      country: "Pakistan",
+      currency: "PKR",
       defaultCreditDays: 30,
       defaultVatPercent: 0.00, // Medicine VAT is often exempt or zero-rated
       enableFefoStrict: true,
       lowStockThreshold: 20,
       nearExpiryDays: 90,
-      invoiceFooterText: "Goods once sold are subject to wholesale returns policy within 7 days. Licensed wholesale drug stockist.",
+      invoiceFooterText: "Goods once sold are subject to wholesale returns policy within 7 days. Licensed wholesale drug stockist per DRAP regulations.",
     },
   });
 

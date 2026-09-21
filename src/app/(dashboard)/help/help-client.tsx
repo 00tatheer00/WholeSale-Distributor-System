@@ -443,11 +443,11 @@ export function HelpClient() {
           },
           {
             title: "4. Register Customer Pharmacies & Credit Limits",
-            description: "Add client pharmacies under 'Customers' and set maximum credit limits in AFN to prevent bad debt exposure.",
+            description: "Add client pharmacies under 'Customers' and set maximum credit limits in PKR to prevent bad debt exposure.",
           },
           {
             title: "5. Book Wholesale Sales & Print Challans",
-            description: "Create sales orders under 'Sales' with automated FEFO batch selection and print DGDA tax invoices and delivery challans.",
+            description: "Create sales orders under 'Sales' with automated FEFO batch selection and print DRAP tax invoices and delivery challans.",
           },
         ],
       },

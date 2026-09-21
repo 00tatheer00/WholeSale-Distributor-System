@@ -95,7 +95,7 @@ export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                 {APP_NAME}
               </span>
               <span className="text-[10px] text-muted-foreground font-medium tracking-wider uppercase">
-                Wholesale Cloud ERP
+                Wholesale Pharma ERP
               </span>
             </div>
           )}

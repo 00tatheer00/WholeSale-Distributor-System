@@ -573,7 +573,7 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
                 <Label className="text-xs font-semibold text-foreground">Email Address</Label>
                 <Input
                   type="email"
-                  placeholder="e.g. tariqul@apexpharma.com"
+                  placeholder="e.g. tariq@pharmadist.pk"
                   value={formData.email || ""}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="h-9 rounded-xl bg-muted/20 text-xs"
@@ -583,7 +583,7 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-foreground">Residential Address</Label>
                 <Input
-                  placeholder="e.g. House 12, Road 4, Dhanmondi, Dhaka"
+                  placeholder="e.g. Suite 402, Trade Centre, Saddar, Karachi"
                   value={formData.address || ""}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="h-9 rounded-xl bg-muted/20 text-xs"

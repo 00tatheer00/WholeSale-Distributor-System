@@ -65,8 +65,8 @@ export function CustomerEditForm({ customer }: CustomerEditFormProps) {
       alternatePhone: customer.alternatePhone || "",
       email: customer.email || "",
       deliveryAddress: customer.deliveryAddress,
-      city: customer.city || "Dhaka",
-      assignedRoute: customer.assignedRoute || "Dhanmondi Route 1",
+      city: customer.city || "Karachi",
+      assignedRoute: customer.assignedRoute || "Clifton / Defence Route 1",
       creditLimit: customer.creditLimit,
       maxDueDays: customer.maxDueDays,
       status: customer.status as any,
@@ -209,7 +209,7 @@ export function CustomerEditForm({ customer }: CustomerEditFormProps) {
               <FileCheck className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="font-semibold text-sm text-foreground">Regulatory & DGDA Licensing</h3>
+              <h3 className="font-semibold text-sm text-foreground">Regulatory & DRAP Licensing</h3>
               <p className="text-xs text-muted-foreground">Drug license number, validity date, and tax identification.</p>
             </div>
           </div>
@@ -218,7 +218,7 @@ export function CustomerEditForm({ customer }: CustomerEditFormProps) {
             {/* Drug License Number */}
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground">
-                Drug License Number (DGDA) <span className="text-rose-500">*</span>
+                Drug License Number (DRAP) <span className="text-rose-500">*</span>
               </Label>
               <Input
                 {...register("drugLicenseNo")}

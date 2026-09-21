@@ -184,9 +184,14 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center text-xs text-muted-foreground"
+                  className="h-32 text-center text-xs text-muted-foreground"
                 >
-                  No matching records found in this view.
+                  <div className="flex flex-col items-center justify-center gap-1.5 py-4">
+                    <p className="font-medium text-foreground/80">No matching records found</p>
+                    <p className="text-[11px] text-muted-foreground max-w-sm">
+                      Try adjusting your search criteria or clearing applied filters to view records.
+                    </p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}
@@ -199,7 +204,9 @@ export function DataTable<TData, TValue>({
         <div className="text-xs text-muted-foreground">
           Showing{" "}
           <span className="font-medium text-foreground">
-            {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}
+            {table.getFilteredRowModel().rows.length === 0
+              ? 0
+              : table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}
           </span>{" "}
           to{" "}
           <span className="font-medium text-foreground">

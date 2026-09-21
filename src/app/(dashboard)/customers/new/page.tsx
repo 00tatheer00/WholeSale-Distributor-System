@@ -57,8 +57,8 @@ export default function NewCustomerPage() {
       alternatePhone: "",
       email: "",
       deliveryAddress: "",
-      city: "Dhaka",
-      assignedRoute: "Dhanmondi Route 1",
+      city: "Karachi",
+      assignedRoute: "Clifton / Defence Route 1",
       creditLimit: 100000,
       maxDueDays: 30,
       openingBalance: 0,
@@ -195,7 +195,7 @@ export default function NewCustomerPage() {
               <FileCheck className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="font-semibold text-sm text-foreground">Regulatory & DGDA Licensing</h3>
+              <h3 className="font-semibold text-sm text-foreground">Regulatory & DRAP Licensing</h3>
               <p className="text-xs text-muted-foreground">Mandatory wholesale medicine regulatory compliance and tax IDs.</p>
             </div>
           </div>
@@ -204,10 +204,10 @@ export default function NewCustomerPage() {
             {/* Drug License Number */}
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground">
-                Drug License Number (DGDA) <span className="text-rose-500">*</span>
+                Drug License Number (DRAP) <span className="text-rose-500">*</span>
               </Label>
               <Input
-                placeholder="e.g. DL-DH-09182-W"
+                placeholder="e.g. DRAP-DL-KHI-09182-W"
                 {...register("drugLicenseNo")}
                 className="h-10 rounded-xl bg-muted/20 text-sm font-mono"
               />
@@ -309,7 +309,7 @@ export default function NewCustomerPage() {
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground">City / Region</Label>
               <Input
-                placeholder="e.g. Dhaka"
+                placeholder="e.g. Karachi"
                 {...register("city")}
                 className="h-10 rounded-xl bg-muted/20 text-sm"
               />
@@ -321,7 +321,7 @@ export default function NewCustomerPage() {
                 Physical Delivery Address <span className="text-rose-500">*</span>
               </Label>
               <Input
-                placeholder="e.g. Plot 32, Road 4, Sector 7, Uttara, Dhaka"
+                placeholder="e.g. Shop 12, Commercial Area, Clifton Block 2, Karachi"
                 {...register("deliveryAddress")}
                 className="h-10 rounded-xl bg-muted/20 text-sm"
               />

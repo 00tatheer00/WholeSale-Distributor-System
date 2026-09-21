@@ -244,6 +244,7 @@ export function PurchaseFormClient({
       paymentReference: paidAmount > 0 ? paymentReference.trim() : undefined,
       items: items.map((item) => ({
         ...item,
+        location: item.location?.trim() || undefined,
         warehouseId: warehouseId || undefined,
       })),
     };

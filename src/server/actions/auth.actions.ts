@@ -150,7 +150,7 @@ export async function forgotPasswordAction(
 ): Promise<AuthActionResult> {
   return {
     success: true,
-    message: "In offline desktop mode, please ask your Administrator to reset your password from Settings > Profile.",
+    message: "In offline desktop and local network mode, please ask your System Administrator to reset your password from Settings > Team & Security.",
   };
 }
 
@@ -162,6 +162,6 @@ export async function resetPasswordAction(
 ): Promise<AuthActionResult> {
   return {
     success: true,
-    message: "Password reset is managed directly through Settings > Profile.",
+    message: "Password reset is managed directly by Administrators through Settings > Team & Security.",
   };
 }

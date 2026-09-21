@@ -85,7 +85,7 @@ export function InvoicesClient({ initialInvoicesData, customers }: InvoicesClien
       {/* 1. Header Section */}
       <PageHeader
         title="Wholesale Tax Invoices & Delivery Challans"
-        description="Formal DGDA-compliant wholesale tax invoices, delivery challans, and customer accounts receivable settlement."
+        description="Formal DRAP-compliant wholesale tax invoices, delivery challans, and customer accounts receivable settlement."
       >
         <Button
           asChild

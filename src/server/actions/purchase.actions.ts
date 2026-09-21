@@ -198,7 +198,7 @@ export async function getPurchaseFormDataAction(): Promise<
         })),
         warehouses: [
           { id: "wh-1", name: "Main Central Warehouse", code: "WH-HQ", isDefault: true },
-          { id: "wh-2", name: "Chittagong Regional Depot", code: "WH-CTG", isDefault: false },
+          { id: "wh-2", name: "Lahore Regional Depot", code: "WH-LHR", isDefault: false },
         ],
       },
     };
