@@ -329,9 +329,9 @@ export function SupplierDetailClient({ supplier }: SupplierDetailClientProps) {
                       <th className="py-2.5 px-3 font-semibold">Transaction Type</th>
                       <th className="py-2.5 px-3 font-semibold">Reference #</th>
                       <th className="py-2.5 px-4 font-semibold">Description</th>
-                      <th className="py-2.5 px-4 text-right font-semibold">Debit (Purchases ৳)</th>
-                      <th className="py-2.5 px-4 text-right font-semibold">Credit (Paid ৳)</th>
-                      <th className="py-2.5 px-4 text-right font-semibold">Running Balance (৳)</th>
+                      <th className="py-2.5 px-4 text-right font-semibold">Debit (Purchases Rs.)</th>
+                      <th className="py-2.5 px-4 text-right font-semibold">Credit (Paid Rs.)</th>
+                      <th className="py-2.5 px-4 text-right font-semibold">Running Balance (Rs.)</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/40">
@@ -496,7 +496,7 @@ export function SupplierDetailClient({ supplier }: SupplierDetailClientProps) {
                       <th className="py-2.5 px-4 font-semibold">Voucher #</th>
                       <th className="py-2.5 px-3 font-semibold">Date</th>
                       <th className="py-2.5 px-3 font-semibold">Method</th>
-                      <th className="py-2.5 px-4 text-right font-semibold">Amount (৳)</th>
+                      <th className="py-2.5 px-4 text-right font-semibold">Amount (Rs.)</th>
                       <th className="py-2.5 px-4 font-semibold">Reference / Instrument</th>
                       <th className="py-2.5 px-4 font-semibold">Notes</th>
                       <th className="py-2.5 px-4 font-semibold">Status</th>
@@ -577,7 +577,7 @@ export function SupplierDetailClient({ supplier }: SupplierDetailClientProps) {
 
               <div className="space-y-1.5">
                 <Label htmlFor="payAmount" className="text-xs font-semibold">
-                  Payment Amount (৳) <span className="text-rose-500">*</span>
+                  Payment Amount (Rs.) <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   id="payAmount"

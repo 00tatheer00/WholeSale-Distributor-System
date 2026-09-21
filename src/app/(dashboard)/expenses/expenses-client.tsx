@@ -662,7 +662,7 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
                 Description / Purpose <span className="text-rose-500">*</span>
               </Label>
               <Textarea
-                placeholder="e.g. Electricity bill payment for Tejgaon main warehouse for August 2026..."
+                placeholder="e.g. Electricity bill payment for central warehouse for August 2026..."
                 value={expenseForm.description}
                 onChange={(e) => setExpenseForm({ ...expenseForm, description: e.target.value })}
                 rows={2}

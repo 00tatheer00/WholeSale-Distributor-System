@@ -28,6 +28,10 @@ import {
   Shield,
   BookOpen,
   HelpCircle,
+  Factory,
+  Warehouse,
+  ArrowLeftRight,
+  PackagePlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAVIGATION_SECTIONS, APP_NAME } from "@/lib/constants";
@@ -55,6 +59,10 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Shield,
   BookOpen,
   HelpCircle,
+  Factory,
+  Warehouse,
+  ArrowLeftRight,
+  PackagePlus,
 };
 
 interface SidebarProps {

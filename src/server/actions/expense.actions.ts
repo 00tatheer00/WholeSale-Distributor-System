@@ -110,7 +110,7 @@ export async function createExpenseAction(
     return {
       success: true,
       data: { voucherNumber: result.data?.voucherNumber },
-      message: `Expense voucher ${result.data?.voucherNumber} for ৳${parsed.data.amount} recorded.`,
+      message: `Expense voucher ${result.data?.voucherNumber} for Rs. ${parsed.data.amount} recorded.`,
     };
   } catch (error: any) {
     console.error("createExpenseAction error:", error);

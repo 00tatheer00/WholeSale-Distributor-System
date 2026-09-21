@@ -6,6 +6,9 @@ import {
   FileSpreadsheet,
   ReceiptText,
   RefreshCw,
+  ArrowLeftRight,
+  Store,
+  Pill,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
@@ -90,62 +93,76 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
         }
       />
 
-      {/* Apple Direct Quick Action Deck (Mobile Responsive) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      {/* Staff Operational Quick Action Deck */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         <Link
-          href="/sales"
-          className="group flex flex-col p-4 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-[#0071E3]/50 hover:scale-[1.01]"
+          href="/sales/new"
+          className="group flex flex-col p-3.5 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-[#0071E3]/50 hover:scale-[1.01]"
         >
           <div className="flex items-center justify-between mb-2">
-            <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-[#0071E3] flex items-center justify-center group-hover:bg-[#0071E3] group-hover:text-white transition-all shadow-sm">
-              <FileSpreadsheet className="h-5 w-5" />
+            <div className="h-9 w-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-[#0071E3] flex items-center justify-center group-hover:bg-[#0071E3] group-hover:text-white transition-all shadow-sm">
+              <FileSpreadsheet className="h-4 w-4" />
             </div>
             <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Sales</span>
           </div>
-          <span className="text-sm font-bold text-foreground group-hover:text-[#0071E3] transition-colors">Book Wholesale Order</span>
-          <span className="text-xs text-muted-foreground mt-0.5">Create invoice & dispatch</span>
+          <span className="text-xs font-bold text-foreground group-hover:text-[#0071E3] transition-colors">+ Book Sale Order</span>
+          <span className="text-[11px] text-muted-foreground mt-0.5">FEFO queue & invoice</span>
         </Link>
 
         <Link
           href="/purchases/new"
-          className="group flex flex-col p-4 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-emerald-500/50 hover:scale-[1.01]"
+          className="group flex flex-col p-3.5 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-emerald-500/50 hover:scale-[1.01]"
         >
           <div className="flex items-center justify-between mb-2">
-            <div className="h-10 w-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm">
-              <ReceiptText className="h-5 w-5" />
+            <div className="h-9 w-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm">
+              <ReceiptText className="h-4 w-4" />
             </div>
             <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Intake</span>
           </div>
-          <span className="text-sm font-bold text-foreground group-hover:text-emerald-600 transition-colors">Direct Purchase Intake</span>
-          <span className="text-xs text-muted-foreground mt-0.5">Batch creation & stock-in</span>
+          <span className="text-xs font-bold text-foreground group-hover:text-emerald-600 transition-colors">+ Purchase Intake</span>
+          <span className="text-[11px] text-muted-foreground mt-0.5">Batch shelf-life & stock</span>
+        </Link>
+
+        <Link
+          href="/inventory/transfers"
+          className="group flex flex-col p-3.5 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-teal-500/50 hover:scale-[1.01]"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="h-9 w-9 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 flex items-center justify-center group-hover:bg-teal-600 group-hover:text-white transition-all shadow-sm">
+              <ArrowLeftRight className="h-4 w-4" />
+            </div>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Transfer</span>
+          </div>
+          <span className="text-xs font-bold text-foreground group-hover:text-teal-600 transition-colors">+ Transfer Stock</span>
+          <span className="text-[11px] text-muted-foreground mt-0.5">Inter-warehouse moves</span>
+        </Link>
+
+        <Link
+          href="/customers"
+          className="group flex flex-col p-3.5 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-amber-500/50 hover:scale-[1.01]"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="h-9 w-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition-all shadow-sm">
+              <Store className="h-4 w-4" />
+            </div>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">AR Dues</span>
+          </div>
+          <span className="text-xs font-bold text-foreground group-hover:text-amber-600 transition-colors">Customer Dues (AR)</span>
+          <span className="text-[11px] text-muted-foreground mt-0.5">Pharmacies & recovery</span>
         </Link>
 
         <Link
           href="/medicines"
-          className="group flex flex-col p-4 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-purple-500/50 hover:scale-[1.01]"
+          className="group flex flex-col p-3.5 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-purple-500/50 hover:scale-[1.01]"
         >
           <div className="flex items-center justify-between mb-2">
-            <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm">
-              <RefreshCw className="h-5 w-5" />
+            <div className="h-9 w-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm">
+              <Pill className="h-4 w-4" />
             </div>
             <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Catalog</span>
           </div>
-          <span className="text-sm font-bold text-foreground group-hover:text-purple-600 transition-colors">Medicine & Batch Stock</span>
-          <span className="text-xs text-muted-foreground mt-0.5">FEFO queue & trade pricing</span>
-        </Link>
-
-        <Link
-          href="/suppliers"
-          className="group flex flex-col p-4 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-amber-500/50 hover:scale-[1.01]"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition-all shadow-sm">
-              <RefreshCw className="h-5 w-5" />
-            </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Vendors</span>
-          </div>
-          <span className="text-sm font-bold text-foreground group-hover:text-amber-600 transition-colors">Supplier AP Ledger</span>
-          <span className="text-xs text-muted-foreground mt-0.5">Payables & settlement</span>
+          <span className="text-xs font-bold text-foreground group-hover:text-purple-600 transition-colors">Medicine Master</span>
+          <span className="text-[11px] text-muted-foreground mt-0.5">Drug catalog & prices</span>
         </Link>
       </div>
 

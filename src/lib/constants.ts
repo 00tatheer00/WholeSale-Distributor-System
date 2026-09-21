@@ -1,7 +1,7 @@
 import { NavigationSection } from "@/types";
 
 export const APP_NAME = "PharmaDist ERP";
-export const APP_DESCRIPTION = "Web-Based Wholesale Medicine Distribution Management System";
+export const APP_DESCRIPTION = "Wholesale Medicine Distribution Management System (Pakistan Edition)";
 export const APP_VERSION = "1.0.0";
 
 /**
@@ -9,60 +9,140 @@ export const APP_VERSION = "1.0.0";
  */
 export const NAVIGATION_SECTIONS: NavigationSection[] = [
   {
-    title: "Core Operations",
+    title: "Overview",
     items: [
       {
         title: "Dashboard",
         href: "/dashboard",
         iconName: "LayoutDashboard",
-        description: "Overview & key distribution metrics",
+        description: "Overview & key distribution KPIs",
       },
+    ],
+  },
+  {
+    title: "Master Data",
+    items: [
       {
-        title: "Medicines & Stock",
+        title: "Medicines",
         href: "/medicines",
         iconName: "Pill",
         description: "Drug catalog, dosage forms, and batch stock",
       },
       {
-        title: "Purchases & Intake",
-        href: "/purchases",
-        iconName: "ReceiptText",
-        description: "Direct purchase intake & batch creation",
+        title: "Categories",
+        href: "/categories",
+        iconName: "Layers",
+        description: "Therapeutic drug categories & classes",
       },
       {
-        title: "Suppliers & Accounts",
+        title: "Manufacturers",
+        href: "/manufacturers",
+        iconName: "Factory",
+        description: "Pharmaceutical manufacturing companies",
+      },
+      {
+        title: "Suppliers & Vendors",
         href: "/suppliers",
         iconName: "Truck",
-        description: "Manufacturers, vendors & AP balance ledger",
+        description: "Wholesale vendors, stockists & AP balance",
       },
       {
-        title: "Wholesale Sales",
-        href: "/sales",
+        title: "Customer Pharmacies",
+        href: "/customers",
+        iconName: "Store",
+        description: "Licensed pharmacies, clinics & credit limits",
+      },
+      {
+        title: "Sales Representatives",
+        href: "/distributors",
+        iconName: "Users2",
+        description: "Medical reps, assigned routes & sales targets",
+      },
+    ],
+  },
+  {
+    title: "Inventory",
+    items: [
+      {
+        title: "Warehouses",
+        href: "/warehouses",
+        iconName: "Warehouse",
+        description: "Storage facilities & physical locations",
+      },
+      {
+        title: "Stock & Batches",
+        href: "/inventory",
+        iconName: "Boxes",
+        description: "Batch FEFO tracking & stock valuation",
+      },
+      {
+        title: "Stock Adjustments",
+        href: "/inventory/adjustments",
+        iconName: "SlidersHorizontal",
+        description: "Reconciliation vouchers & damage write-offs",
+      },
+      {
+        title: "Stock Movements",
+        href: "/inventory/movements",
+        iconName: "History",
+        description: "Immutable physical stock audit ledger",
+      },
+      {
+        title: "Stock Transfers",
+        href: "/inventory/transfers",
+        iconName: "ArrowLeftRight",
+        description: "Transfer batches between warehouses",
+      },
+    ],
+  },
+  {
+    title: "Procurement",
+    items: [
+      {
+        title: "Purchases",
+        href: "/purchases",
+        iconName: "ReceiptText",
+        description: "Purchase orders & intake consignments",
+      },
+      {
+        title: "Purchase Intake",
+        href: "/purchases/new",
+        iconName: "PackagePlus",
+        description: "High-speed batch intake & GRN commit",
+      },
+    ],
+  },
+  {
+    title: "Wholesale Sales",
+    items: [
+      {
+        title: "New Sale Order",
+        href: "/sales/new",
         iconName: "ShoppingCart",
-        description: "Wholesale orders, billing & FEFO stock allocation",
+        description: "Wholesale order booking & FEFO allocation",
+      },
+      {
+        title: "Sales Orders",
+        href: "/sales",
+        iconName: "FileSpreadsheet",
+        description: "Confirmed orders, delivery & credit status",
       },
       {
         title: "Tax Invoices",
         href: "/invoices",
         iconName: "FileSpreadsheet",
-        description: "DGDA-compliant invoices & delivery challans",
-      },
-      {
-        title: "Collections & Receipts",
-        href: "/payments",
-        iconName: "CreditCard",
-        description: "Customer collections & FIFO invoice settlement",
+        description: "DRAP-compliant tax invoices & challans",
       },
     ],
   },
   {
-    title: "Field Force & Financials",
+    title: "Finance & Accounts",
     items: [
       {
-        title: "Field Sales Representatives",
-        href: "/distributors",
-        iconName: "Users2",
-        description: "Medical representatives, route beats & targets",
+        title: "Collections & Receipts",
+        href: "/payments",
+        iconName: "CreditCard",
+        description: "Customer collections & FIFO settlement",
       },
       {
         title: "Operating Expenses",
@@ -74,50 +154,47 @@ export const NAVIGATION_SECTIONS: NavigationSection[] = [
         title: "Profit & Financials",
         href: "/profit",
         iconName: "TrendingUp",
-        description: "Historical batch COGS, gross margins & net profit",
+        description: "Historical batch COGS & net profit margins",
       },
+    ],
+  },
+  {
+    title: "Reports & Analytics",
+    items: [
       {
-        title: "Customer Pharmacies",
-        href: "/customers",
-        iconName: "Store",
-        description: "Licensed pharmacies, clinics & credit limits",
-      },
-      {
-        title: "Warehouse Inventory",
-        href: "/inventory",
-        iconName: "Boxes",
-        description: "Batch FEFO tracking & stock adjustments",
-      },
-      {
-        title: "Reports & Analytics",
+        title: "Reports Hub",
         href: "/reports",
         iconName: "BarChart3",
-        description: "Comprehensive business analytics & export center",
+        description: "Comprehensive business analytics & export",
       },
       {
         title: "System Alerts",
         href: "/notifications",
         iconName: "Bell",
-        description: "FEFO expiry watchdog & inventory depletion alerts",
+        description: "FEFO expiry watchdog & inventory depletion",
       },
+    ],
+  },
+  {
+    title: "Administration",
+    items: [
       {
         title: "System Settings",
         href: "/settings",
         iconName: "Settings",
-        description: "Enterprise profile, users & licensing settings",
+        description: "Company profile, policies & staff roles",
       },
       {
         title: "Security Audit Logs",
         href: "/audit-logs",
         iconName: "Shield",
-        description: "Immutable forensic audit trail of all transactions",
+        description: "Immutable forensic audit trail",
       },
       {
-        title: "System Guide (لارښود)",
+        title: "Operations Manual",
         href: "/help",
         iconName: "BookOpen",
-        badge: "پښتو",
-        description: "Complete operations manual & user guide (Pashto / Urdu / English)",
+        description: "Complete user guide & system manual",
       },
     ],
   },

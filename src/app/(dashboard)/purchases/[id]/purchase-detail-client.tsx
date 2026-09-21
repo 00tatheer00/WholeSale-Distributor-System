@@ -327,12 +327,12 @@ export function PurchaseDetailClient({ purchase }: PurchaseDetailClientProps) {
                   <th className="py-2.5 px-3 font-semibold">Expiry Date</th>
                   <th className="py-2.5 px-3 text-right font-semibold">Received Qty</th>
                   <th className="py-2.5 px-3 text-right font-semibold">Bonus Qty</th>
-                  <th className="py-2.5 px-3 text-right font-semibold">Unit Cost (৳)</th>
-                  <th className="py-2.5 px-3 text-right font-semibold">Trade Price (৳)</th>
-                  <th className="py-2.5 px-3 text-right font-semibold">MRP (৳)</th>
+                  <th className="py-2.5 px-3 text-right font-semibold">Unit Cost (Rs.)</th>
+                  <th className="py-2.5 px-3 text-right font-semibold">Trade Price (Rs.)</th>
+                  <th className="py-2.5 px-3 text-right font-semibold">MRP (Rs.)</th>
                   <th className="py-2.5 px-3 text-right font-semibold">Disc %</th>
                   <th className="py-2.5 px-3 text-right font-semibold">VAT %</th>
-                  <th className="py-2.5 px-4 text-right font-semibold">Line Total (৳)</th>
+                  <th className="py-2.5 px-4 text-right font-semibold">Line Total (Rs.)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40">
@@ -434,7 +434,7 @@ export function PurchaseDetailClient({ purchase }: PurchaseDetailClientProps) {
                     <th className="py-2.5 px-4 font-semibold">Voucher #</th>
                     <th className="py-2.5 px-3 font-semibold">Date</th>
                     <th className="py-2.5 px-3 font-semibold">Method</th>
-                    <th className="py-2.5 px-4 text-right font-semibold">Amount (৳)</th>
+                    <th className="py-2.5 px-4 text-right font-semibold">Amount (Rs.)</th>
                     <th className="py-2.5 px-4 font-semibold">Reference</th>
                     <th className="py-2.5 px-4 font-semibold">Status</th>
                   </tr>

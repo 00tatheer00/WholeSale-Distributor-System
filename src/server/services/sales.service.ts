@@ -547,7 +547,7 @@ export async function createSale(
     if (creditLimit > 0 && projectedDue > creditLimit && !creditOverrideApproved) {
       return {
         success: false,
-        error: `Credit Barrier Exceeded: Order of ৳${grandTotal.toFixed(2)} pushes customer due to ৳${projectedDue.toFixed(2)}, exceeding credit limit of ৳${creditLimit.toFixed(2)}. Requires Sales Manager override.`,
+        error: `Credit Barrier Exceeded: Order of Rs. ${grandTotal.toFixed(2)} pushes customer due to Rs. ${projectedDue.toFixed(2)}, exceeding credit limit of Rs. ${creditLimit.toFixed(2)}. Requires Sales Manager override.`,
       };
     }
 

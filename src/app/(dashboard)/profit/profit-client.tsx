@@ -318,7 +318,7 @@ export function ProfitClient({ initialData }: ProfitClientProps) {
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={11}
                   tickLine={false}
-                  tickFormatter={(val) => `৳${val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}
+                  tickFormatter={(val) => `Rs. ${val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}
                 />
                 <Tooltip
                   formatter={(value: any) => [formatCurrency(Number(value)), ""]}

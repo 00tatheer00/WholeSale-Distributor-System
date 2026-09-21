@@ -14,12 +14,14 @@ import {
 } from "@/server/services/customer.service";
 import { CustomerRecord, CustomerDetailRecord, CustomerLedgerEntry, CustomerFinancialSummary } from "@/types/models";
 import { CustomerStatus } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 
 export interface ActionResult<T = any> {
   success: boolean;
   data?: T;
   error?: string;
   message?: string;
+  canDeactivate?: boolean;
 }
 
 export async function getCustomersAction(
@@ -169,5 +171,94 @@ export async function toggleCustomerStatusAction(
   } catch (error: any) {
     console.error("toggleCustomerStatusAction error:", error);
     return { success: false, error: "Failed to update customer status." };
+  }
+}
+
+export async function deleteCustomerAction(id: string): Promise<ActionResult> {
+  try {
+    const customer = await prisma.customer.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            sales: true,
+            customerPayments: true,
+            invoices: true,
+          },
+        },
+      },
+    });
+
+    if (!customer) {
+      return { success: false, error: "Customer pharmacy not found." };
+    }
+
+    const currentDue = Number(customer.currentDue);
+    if (Math.abs(currentDue) > 0.01) {
+      return {
+        success: false,
+        canDeactivate: true,
+        error: `Cannot delete pharmacy "${customer.pharmacyName}" because they have an active outstanding AR balance of Rs. ${Math.abs(currentDue).toLocaleString()}. Collect or write off outstanding receivables before deleting, or deactivate this pharmacy instead.`,
+      };
+    }
+
+    const { sales, customerPayments, invoices } = customer._count;
+    if (sales > 0 || customerPayments > 0 || invoices > 0) {
+      const details = [
+        sales > 0 ? `${sales} wholesale sale order(s)` : null,
+        customerPayments > 0 ? `${customerPayments} payment collection(s)` : null,
+        invoices > 0 ? `${invoices} tax invoice(s)` : null,
+      ].filter(Boolean).join(", ");
+
+      return {
+        success: false,
+        canDeactivate: true,
+        error: `Cannot permanently delete pharmacy "${customer.pharmacyName}" because historical sales and AR records exist (${details}). Deactivating this pharmacy will prevent new orders while keeping your double-entry accounts fully intact.`,
+      };
+    }
+
+    await prisma.customer.delete({
+      where: { id },
+    });
+
+    revalidatePath("/customers");
+    revalidatePath("/sales");
+
+    return {
+      success: true,
+      message: `Customer pharmacy "${customer.pharmacyName}" deleted successfully.`,
+    };
+  } catch (error: any) {
+    console.error("deleteCustomerAction error:", error);
+    return {
+      success: false,
+      canDeactivate: true,
+      error: error.message || "Failed to delete customer.",
+    };
+  }
+}
+
+export async function deactivateCustomerAction(id: string): Promise<ActionResult> {
+  try {
+    const updated = await prisma.customer.update({
+      where: { id },
+      data: { status: CustomerStatus.INACTIVE },
+      select: { pharmacyName: true },
+    });
+
+    revalidatePath("/customers");
+    revalidatePath(`/customers/${id}`);
+    revalidatePath("/sales");
+
+    return {
+      success: true,
+      message: `Customer pharmacy "${updated.pharmacyName}" deactivated. New sales orders are blocked.`,
+    };
+  } catch (error: any) {
+    console.error("deactivateCustomerAction error:", error);
+    return {
+      success: false,
+      error: error.message || "Failed to deactivate customer.",
+    };
   }
 }

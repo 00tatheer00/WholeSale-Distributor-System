@@ -9,20 +9,18 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Formats a numeric currency amount with standardized Afghanistan Afghani (AFN / ؋) representation.
+ * Formats a numeric currency amount with standardized Pakistani Rupee (PKR / Rs.) representation.
  */
 export function formatCurrency(
   amount: number | string,
-  currency: string = "AFN",
-  locale: string = "en-US"
+  currency: string = "PKR",
+  locale: string = "en-PK"
 ): string {
   const num = typeof amount === "number" ? amount : Number(amount) || 0;
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency: currency,
+  return `Rs. ${num.toLocaleString(locale, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(num);
+  })}`;
 }
 
 /**

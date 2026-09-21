@@ -158,7 +158,7 @@ export function CustomerLedgerClient({
                 <th className="px-4 py-3.5">Particulars / Description</th>
                 <th className="px-4 py-3.5 text-right text-rose-700">Debit (+)</th>
                 <th className="px-4 py-3.5 text-right text-emerald-700">Credit (−)</th>
-                <th className="px-5 py-3.5 text-right">Running Balance (৳)</th>
+                <th className="px-5 py-3.5 text-right">Running Balance (Rs.)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">

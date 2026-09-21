@@ -19,6 +19,8 @@ export interface MedicineRecord {
   darNumber?: string | null;
   categoryId: string;
   categoryName: string;
+  manufacturerId?: string | null;
+  manufacturerName?: string | null;
   supplierId?: string | null;
   supplierName?: string | null;
   unitTradePrice: number;

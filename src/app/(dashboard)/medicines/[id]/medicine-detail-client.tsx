@@ -291,6 +291,10 @@ export function MedicineDetailClient({
                 <span className="text-[11px] text-muted-foreground">Standard Rx Pharmaceutical</span>
               )}
             </div>
+            <div className="text-[11px] text-muted-foreground pt-1 border-t flex justify-between">
+              <span>Manufacturer:</span>
+              <span className="font-medium text-foreground">{medicine.manufacturerName || "Direct / N/A"}</span>
+            </div>
           </CardContent>
         </Card>
 
@@ -555,7 +559,7 @@ export function MedicineDetailClient({
               <div className="text-xs font-bold text-foreground">Acquisition &amp; Pricing Parameters</div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <Label className="text-xs">Purchase Cost (৳) *</Label>
+                  <Label className="text-xs">Purchase Cost (Rs.) *</Label>
                   <Input
                     type="number"
                     step="0.01"
@@ -568,7 +572,7 @@ export function MedicineDetailClient({
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs">Trade Price (৳) *</Label>
+                  <Label className="text-xs">Trade Price (Rs.) *</Label>
                   <Input
                     type="number"
                     step="0.01"
@@ -578,7 +582,7 @@ export function MedicineDetailClient({
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs">MRP (৳) *</Label>
+                  <Label className="text-xs">MRP (Rs.) *</Label>
                   <Input
                     type="number"
                     step="0.01"

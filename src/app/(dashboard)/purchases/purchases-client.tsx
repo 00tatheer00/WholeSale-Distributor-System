@@ -215,7 +215,7 @@ export function PurchasesClient({
               due > 0 ? "text-rose-600 dark:text-rose-400" : "text-muted-foreground"
             }`}
           >
-            {due > 0 ? formatCurrency(due) : "৳0.00"}
+            {due > 0 ? formatCurrency(due) : formatCurrency(0)}
           </div>
         );
       },

@@ -17,6 +17,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Boxes,
+  Trash2,
+  AlertTriangle,
+  Factory,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { DataTable } from "@/components/shared/data-table";
@@ -44,6 +47,8 @@ import {
   createMedicineAction,
   updateMedicineAction,
   toggleMedicineStatusAction,
+  deleteMedicineAction,
+  deactivateMedicineAction,
   getMedicinesAction,
 } from "@/server/actions/medicine.actions";
 import { MedicineInput } from "@/validations/medicine.schema";
@@ -53,6 +58,7 @@ interface MedicineClientProps {
   initialMedicines: MedicineRecord[];
   categories: CategoryRecord[];
   suppliers: { id: string; name: string }[];
+  manufacturers: { id: string; name: string }[];
   totalCount: number;
   totalPages: number;
   initialPage: number;
@@ -62,6 +68,7 @@ export function MedicineClient({
   initialMedicines,
   categories,
   suppliers,
+  manufacturers,
   totalCount: initialTotalCount,
   totalPages: initialTotalPages,
   initialPage,
@@ -87,6 +94,11 @@ export function MedicineClient({
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [feedback, setFeedback] = React.useState<{ type: "success" | "error"; message: string } | null>(null);
 
+  // Safe Deletion State
+  const [deleteTarget, setDeleteTarget] = React.useState<MedicineRecord | null>(null);
+  const [deleteBlockedInfo, setDeleteBlockedInfo] = React.useState<{ canDeactivate: boolean; reason: string } | null>(null);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
   // Form State
   const [formData, setFormData] = React.useState<MedicineInput>({
     brandName: "",
@@ -94,6 +106,7 @@ export function MedicineClient({
     strength: "",
     dosageForm: "TABLET",
     categoryId: categories[0]?.id || "",
+    manufacturerId: manufacturers[0]?.id || "",
     supplierId: suppliers[0]?.id || "",
     unitTradePrice: 0,
     unitMrp: 0,
@@ -172,6 +185,7 @@ export function MedicineClient({
       strength: "",
       dosageForm: "TABLET",
       categoryId: categories[0]?.id || "",
+      manufacturerId: manufacturers[0]?.id || "",
       supplierId: suppliers[0]?.id || "",
       unitTradePrice: 0,
       unitMrp: 0,
@@ -199,6 +213,7 @@ export function MedicineClient({
       strength: med.strength,
       dosageForm: med.dosageForm as any,
       categoryId: med.categoryId,
+      manufacturerId: med.manufacturerId || "",
       supplierId: med.supplierId || "",
       unitTradePrice: med.unitTradePrice,
       unitMrp: med.unitMrp,
@@ -262,6 +277,48 @@ export function MedicineClient({
     const res = await toggleMedicineStatusAction(med.id, nextStatus as any);
     if (res.success) {
       refreshMedicines();
+    }
+  };
+
+  const handleDeleteClick = (med: MedicineRecord) => {
+    setDeleteTarget(med);
+    setDeleteBlockedInfo(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    const res = await deleteMedicineAction(deleteTarget.id);
+    setIsDeleting(false);
+    if (res.success) {
+      setDeleteTarget(null);
+      setFeedback({ type: "success", message: res.message || "Medicine deleted." });
+      refreshMedicines();
+    } else {
+      if (res.canDeactivate) {
+        setDeleteBlockedInfo({
+          canDeactivate: true,
+          reason: res.error || "Cannot delete medicine due to active dependencies.",
+        });
+      } else {
+        setFeedback({ type: "error", message: res.error || "Failed to delete medicine." });
+        setDeleteTarget(null);
+      }
+    }
+  };
+
+  const handleDeactivateInstead = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    const res = await deactivateMedicineAction(deleteTarget.id);
+    setIsDeleting(false);
+    setDeleteTarget(null);
+    setDeleteBlockedInfo(null);
+    if (res.success) {
+      setFeedback({ type: "success", message: res.message || "Medicine deactivated successfully." });
+      refreshMedicines();
+    } else {
+      setFeedback({ type: "error", message: res.error || "Failed to deactivate." });
     }
   };
 
@@ -371,11 +428,11 @@ export function MedicineClient({
       },
     },
     {
-      accessorKey: "supplierName",
+      accessorKey: "manufacturerName",
       header: "Manufacturer",
       cell: ({ row }) => (
-        <span className="text-[11px] text-muted-foreground">
-          {row.original.supplierName}
+        <span className="text-[11px] text-muted-foreground font-medium">
+          {row.original.manufacturerName || "—"}
         </span>
       ),
     },
@@ -428,6 +485,15 @@ export function MedicineClient({
             title={row.original.status === "ACTIVE" ? "Deactivate" : "Activate"}
           >
             <Power className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleDeleteClick(row.original)}
+            className="h-7 w-7 text-rose-500 hover:text-rose-700 hover:bg-rose-50"
+            title="Delete Medicine"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
       ),
@@ -663,13 +729,32 @@ export function MedicineClient({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-xs">Manufacturer / Supplier</Label>
+                <Label className="text-xs">Manufacturer</Label>
+                <Select
+                  value={formData.manufacturerId || ""}
+                  onValueChange={(val) => setFormData({ ...formData, manufacturerId: val })}
+                >
+                  <SelectTrigger className="h-9 text-xs">
+                    <SelectValue placeholder="Select Manufacturer" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {manufacturers.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>
+                        {m.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs">Default Supplier / Vendor</Label>
                 <Select
                   value={formData.supplierId || ""}
                   onValueChange={(val) => setFormData({ ...formData, supplierId: val })}
                 >
                   <SelectTrigger className="h-9 text-xs">
-                    <SelectValue placeholder="Select Manufacturer" />
+                    <SelectValue placeholder="Select Supplier" />
                   </SelectTrigger>
                   <SelectContent>
                     {suppliers.map((s) => (
@@ -680,30 +765,30 @@ export function MedicineClient({
                   </SelectContent>
                 </Select>
               </div>
+            </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-xs">Storage Condition</Label>
-                <Select
-                  value={formData.storageCondition}
-                  onValueChange={(val: any) =>
-                    setFormData({
-                      ...formData,
-                      storageCondition: val,
-                      isColdChain: val === "COLD_CHAIN_2_TO_8_C",
-                      isNarcotic: val === "CONTROLLED_SUBSTANCE_NARCOTIC",
-                    })
-                  }
-                >
-                  <SelectTrigger className="h-9 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ROOM_TEMPERATURE">Room Temperature (&lt;25°C)</SelectItem>
-                    <SelectItem value="COLD_CHAIN_2_TO_8_C">Cold Chain (2°C - 8°C)</SelectItem>
-                    <SelectItem value="CONTROLLED_SUBSTANCE_NARCOTIC">Narcotics Safe (Locked)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Storage Condition</Label>
+              <Select
+                value={formData.storageCondition}
+                onValueChange={(val: any) =>
+                  setFormData({
+                    ...formData,
+                    storageCondition: val,
+                    isColdChain: val === "COLD_CHAIN_2_TO_8_C",
+                    isNarcotic: val === "CONTROLLED_SUBSTANCE_NARCOTIC",
+                  })
+                }
+              >
+                <SelectTrigger className="h-9 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ROOM_TEMPERATURE">Room Temperature (&lt;25°C)</SelectItem>
+                  <SelectItem value="COLD_CHAIN_2_TO_8_C">Cold Chain (2°C - 8°C)</SelectItem>
+                  <SelectItem value="CONTROLLED_SUBSTANCE_NARCOTIC">Narcotics Safe (Locked)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Wholesale Pricing Structure */}
@@ -989,6 +1074,82 @@ export function MedicineClient({
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Safe Deletion & Deactivation Dialog */}
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-rose-700">
+              <AlertTriangle className="h-5 w-5 text-rose-600" />
+              {deleteBlockedInfo ? "Deletion Blocked: Dependencies Detected" : "Confirm Medicine Deletion"}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              {deleteTarget?.brandName} ({deleteTarget?.genericName})
+            </DialogDescription>
+          </DialogHeader>
+
+          {deleteBlockedInfo ? (
+            <div className="space-y-3 py-2">
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-md text-xs text-amber-900 space-y-1">
+                <div className="font-semibold flex items-center gap-1.5 text-amber-800">
+                  <AlertTriangle className="h-4 w-4" />
+                  Preserving Accounting & Ledger Integrity
+                </div>
+                <p className="leading-relaxed">{deleteBlockedInfo.reason}</p>
+              </div>
+              <p className="text-xs text-slate-600">
+                Pharmaceutical regulations and double-entry accounting require keeping transaction audit trails. Deactivating this medicine will immediately hide it from sales order booking, purchase intakes, and catalog selectors without breaking historical vouchers.
+              </p>
+            </div>
+          ) : (
+            <div className="py-3 text-xs text-slate-600 space-y-2">
+              <p>
+                Are you sure you want to permanently delete <strong>{deleteTarget?.brandName}</strong>?
+              </p>
+              <p className="text-slate-500">
+                If this medicine has zero active stock and zero historical transactions, it will be deleted immediately. If transactions are detected, safe deactivation will be offered.
+              </p>
+            </div>
+          )}
+
+          <DialogFooter className="pt-2 flex items-center justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setDeleteTarget(null);
+                setDeleteBlockedInfo(null);
+              }}
+              className="h-9 text-xs"
+            >
+              Cancel
+            </Button>
+            {deleteBlockedInfo ? (
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleDeactivateInstead}
+                disabled={isDeleting}
+                className="h-9 text-xs bg-amber-600 hover:bg-amber-700 text-white font-semibold"
+              >
+                {isDeleting ? "Deactivating..." : "Deactivate Medicine Instead"}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                size="sm"
+                variant="destructive"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="h-9 text-xs font-semibold"
+              >
+                {isDeleting ? "Checking..." : "Confirm Delete"}
+              </Button>
+            )}
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

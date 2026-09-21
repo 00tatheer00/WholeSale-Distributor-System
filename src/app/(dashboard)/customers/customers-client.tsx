@@ -23,11 +23,20 @@ import {
   ChevronLeft,
   ChevronRight,
   TrendingUp,
+  Trash2,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -37,7 +46,11 @@ import {
 } from "@/components/ui/select";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { CustomerRecord, CustomerQueryResult } from "@/types/models";
-import { toggleCustomerStatusAction } from "@/server/actions/customer.actions";
+import {
+  toggleCustomerStatusAction,
+  deleteCustomerAction,
+  deactivateCustomerAction,
+} from "@/server/actions/customer.actions";
 
 interface CustomersClientProps {
   initialData?: CustomerQueryResult;
@@ -52,8 +65,14 @@ export function CustomersClient({ initialData }: CustomersClientProps) {
   const [typeFilter, setTypeFilter] = React.useState(searchParams.get("type") || "ALL");
   const [dueFilter, setDueFilter] = React.useState(searchParams.get("due") || "ALL");
   const [sortBy, setSortBy] = React.useState(searchParams.get("sort") || "name");
-
+  const [cityFilter, setCityFilter] = React.useState(searchParams.get("city") || "Karachi");
+  const [isPending, startTransition] = React.useTransition();
   const [togglingId, setTogglingId] = React.useState<string | null>(null);
+
+  // Safe Deletion State
+  const [deleteTarget, setDeleteTarget] = React.useState<CustomerRecord | null>(null);
+  const [deleteBlockedInfo, setDeleteBlockedInfo] = React.useState<{ canDeactivate: boolean; reason: string } | null>(null);
+  const [isDeleting, setIsDeleting] = React.useState(false);
   const [feedback, setFeedback] = React.useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const data = initialData || {
@@ -90,9 +109,9 @@ export function CustomersClient({ initialData }: CustomersClientProps) {
   };
 
   const handleToggleStatus = async (customer: CustomerRecord) => {
+    setTogglingId(customer.id);
+    const newStatus = customer.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
     try {
-      setTogglingId(customer.id);
-      const newStatus = customer.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
       const res = await toggleCustomerStatusAction(customer.id, newStatus as any);
       if (res.success) {
         setFeedback({
@@ -108,6 +127,48 @@ export function CustomersClient({ initialData }: CustomersClientProps) {
     } finally {
       setTogglingId(null);
       setTimeout(() => setFeedback(null), 4000);
+    }
+  };
+
+  const handleDeleteClick = (customer: CustomerRecord) => {
+    setDeleteTarget(customer);
+    setDeleteBlockedInfo(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    const res = await deleteCustomerAction(deleteTarget.id);
+    setIsDeleting(false);
+    if (res.success) {
+      setDeleteTarget(null);
+      setFeedback({ type: "success", message: res.message || "Customer pharmacy deleted." });
+      router.refresh();
+    } else {
+      if (res.canDeactivate) {
+        setDeleteBlockedInfo({
+          canDeactivate: true,
+          reason: res.error || "Cannot delete customer pharmacy due to active accounting records.",
+        });
+      } else {
+        setFeedback({ type: "error", message: res.error || "Failed to delete customer." });
+        setDeleteTarget(null);
+      }
+    }
+  };
+
+  const handleDeactivateInstead = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    const res = await deactivateCustomerAction(deleteTarget.id);
+    setIsDeleting(false);
+    setDeleteTarget(null);
+    setDeleteBlockedInfo(null);
+    if (res.success) {
+      setFeedback({ type: "success", message: res.message || "Customer pharmacy deactivated successfully." });
+      router.refresh();
+    } else {
+      setFeedback({ type: "error", message: res.error || "Failed to deactivate customer." });
     }
   };
 
@@ -298,7 +359,7 @@ export function CustomersClient({ initialData }: CustomersClientProps) {
               <SelectContent>
                 <SelectItem value="ALL">All Accounts</SelectItem>
                 <SelectItem value="HAS_DUE">Has Due (&gt;0)</SelectItem>
-                <SelectItem value="NO_DUE">No Due (৳0)</SelectItem>
+                <SelectItem value="NO_DUE">No Due (Rs. 0)</SelectItem>
               </SelectContent>
             </Select>
 
@@ -428,7 +489,7 @@ export function CustomersClient({ initialData }: CustomersClientProps) {
                           </div>
                           <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
                             <MapPin className="h-3 w-3 shrink-0" />
-                            <span className="truncate max-w-[140px]">{c.city || "Dhaka"}</span>
+                            <span className="truncate max-w-[140px]">{c.city || "Karachi"}</span>
                           </div>
                         </div>
                       </td>
@@ -526,9 +587,19 @@ export function CustomersClient({ initialData }: CustomersClientProps) {
                           >
                             <Power
                               className={`h-3.5 w-3.5 ${
-                                c.status === "ACTIVE" ? "text-rose-500" : "text-emerald-500"
+                                c.status === "ACTIVE" ? "text-amber-500" : "text-emerald-500"
                               }`}
                             />
+                          </Button>
+
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteClick(c)}
+                            title="Delete Customer"
+                            className="h-8 w-8 p-0 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </div>
                       </td>
@@ -579,6 +650,82 @@ export function CustomersClient({ initialData }: CustomersClientProps) {
           </div>
         )}
       </div>
+
+      {/* Safe Deletion & Deactivation Dialog */}
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-rose-700">
+              <AlertTriangle className="h-5 w-5 text-rose-600" />
+              {deleteBlockedInfo ? "Deletion Blocked: Dependencies Detected" : "Confirm Pharmacy Deletion"}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              {deleteTarget?.tradeName} {deleteTarget?.customerCode ? `(${deleteTarget.customerCode})` : ""}
+            </DialogDescription>
+          </DialogHeader>
+
+          {deleteBlockedInfo ? (
+            <div className="space-y-3 py-2">
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-md text-xs text-amber-900 space-y-1">
+                <div className="font-semibold flex items-center gap-1.5 text-amber-800">
+                  <AlertTriangle className="h-4 w-4" />
+                  Preserving Accounts Receivable & Sales Ledger Integrity
+                </div>
+                <p className="leading-relaxed">{deleteBlockedInfo.reason}</p>
+              </div>
+              <p className="text-xs text-slate-600">
+                Accounting standards and wholesale drug distribution compliance require preserving customer ledgers and tax invoices. Deactivating this customer pharmacy will prevent new sales dispatches while keeping all historical invoices and ledgers intact.
+              </p>
+            </div>
+          ) : (
+            <div className="py-3 text-xs text-slate-600 space-y-2">
+              <p>
+                Are you sure you want to permanently delete pharmacy <strong>{deleteTarget?.tradeName}</strong>?
+              </p>
+              <p className="text-slate-500">
+                If this customer has zero receivables and zero historical sales or invoices, it will be deleted immediately.
+              </p>
+            </div>
+          )}
+
+          <DialogFooter className="pt-2 flex items-center justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setDeleteTarget(null);
+                setDeleteBlockedInfo(null);
+              }}
+              className="h-9 text-xs"
+            >
+              Cancel
+            </Button>
+            {deleteBlockedInfo ? (
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleDeactivateInstead}
+                disabled={isDeleting}
+                className="h-9 text-xs bg-amber-600 hover:bg-amber-700 text-white font-semibold"
+              >
+                {isDeleting ? "Deactivating..." : "Deactivate Pharmacy Instead"}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                size="sm"
+                variant="destructive"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="h-9 text-xs font-semibold"
+              >
+                {isDeleting ? "Checking..." : "Confirm Delete"}
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

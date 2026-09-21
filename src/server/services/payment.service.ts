@@ -211,8 +211,8 @@ export async function getPaymentById(id: string): Promise<PaymentDetailRecord | 
       previousBalance,
       newBalance: currentDue,
       companyName: company?.name || "Apex Pharma Distributors Ltd.",
-      companyAddress: company?.address || "Tejgaon Industrial Area, Dhaka",
-      companyPhone: company?.phone || "+880 1711 000111",
+      companyAddress: company?.address || "Korangi Industrial Area, Karachi",
+      companyPhone: company?.phone || "+92 21 35000111",
       allocatedInvoices,
     };
   } catch (error) {

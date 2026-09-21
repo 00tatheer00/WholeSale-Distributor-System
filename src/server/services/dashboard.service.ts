@@ -296,7 +296,7 @@ function getOfflineFallbackData(
         id: "alt-2",
         type: "HIGH_CUSTOMER_DUE",
         title: "Credit Hold Barrier: Evergreen Drug Corner",
-        description: "Customer is 38 days overdue (limit 30 days) with ৳142,000 due. Automatic dispatch locked.",
+        description: "Customer is 38 days overdue (limit 30 days) with Rs. 142,000 due. Automatic dispatch locked.",
         severity: "critical",
         link: "/customers",
       },
@@ -515,7 +515,7 @@ export async function getDashboardMetrics(
           id: `due-${c.id}`,
           type: "HIGH_CUSTOMER_DUE",
           title: `Credit Hold: ${c.pharmacyName}`,
-          description: `Outstanding balance of ৳${Number(c.currentDue).toLocaleString()} is overdue. Dispatch locked.`,
+          description: `Outstanding balance of Rs. ${Number(c.currentDue).toLocaleString()} is overdue. Dispatch locked.`,
           severity: "critical",
           link: "/customers",
         });

@@ -29,6 +29,7 @@ export const medicineSchema = z.object({
   strength: z.string().min(1, "Dosage strength is required (e.g. 500mg, 10ml)"),
   dosageForm: dosageFormEnum.default("TABLET"),
   categoryId: z.string().min(1, "Please select a medicine category"),
+  manufacturerId: z.string().optional().nullable(),
   supplierId: z.string().optional().nullable(),
   unitTradePrice: z.coerce.number().min(0.01, "Trade price must be greater than 0"),
   unitMrp: z.coerce.number().min(0.01, "MRP must be greater than 0"),

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getMedicineByIdAction } from "@/server/actions/medicine.actions";
 import { getBatchesByMedicineIdAction } from "@/server/actions/batch.actions";
 import { getSuppliersAction } from "@/server/actions/supplier.actions";
+import { getWarehousesAction } from "@/server/actions/warehouse.actions";
 import { MedicineDetailClient } from "./medicine-detail-client";
 
 interface MedicineDetailPageProps {
@@ -12,10 +13,11 @@ interface MedicineDetailPageProps {
 export default async function MedicineDetailPage({ params }: MedicineDetailPageProps) {
   const { id } = await params;
 
-  const [medicineRes, batchesRes, suppliersRes] = await Promise.all([
+  const [medicineRes, batchesRes, suppliersRes, warehousesRes] = await Promise.all([
     getMedicineByIdAction(id),
     getBatchesByMedicineIdAction(id),
     getSuppliersAction(),
+    getWarehousesAction(),
   ]);
 
   if (!medicineRes.success || !medicineRes.data) {
@@ -25,11 +27,10 @@ export default async function MedicineDetailPage({ params }: MedicineDetailPageP
   const medicine = medicineRes.data;
   const batches = batchesRes.data || [];
   const suppliers = suppliersRes.data?.suppliers || [];
-  const warehouses = [
-    { id: "wh-001", name: "Tejgaon Central Warehouse (Air-Conditioned)" },
-    { id: "wh-002", name: "Mirpur Transit Distribution Hub" },
-    { id: "wh-003", name: "Cold-Room Vaccine Depository (2-8°C)" },
-  ];
+  const warehouses = (warehousesRes.data || []).map((w: any) => ({
+    id: w.id,
+    name: `${w.name}${w.isDefault ? " (Default)" : ""}`,
+  }));
 
   return (
     <MedicineDetailClient

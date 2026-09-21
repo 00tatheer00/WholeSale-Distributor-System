@@ -322,7 +322,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
 
     if (isCreditExceeded && !creditOverrideApproved) {
       setServerError(
-        `Credit limit exceeded (৳${projectedDue.toFixed(2)} > ৳${customerCreditLimit.toFixed(2)}). Please check manager override approval to proceed.`
+        `Credit limit exceeded (Rs. ${projectedDue.toFixed(2)} > Rs. ${customerCreditLimit.toFixed(2)}). Please check manager override approval to proceed.`
       );
       return;
     }
@@ -717,7 +717,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                       : "bg-muted/20 border-border text-muted-foreground hover:bg-muted/40"
                   }`}
                 >
-                  Credit Sale (৳0)
+                  Credit Sale (Rs. 0)
                 </button>
                 <button
                   type="button"
@@ -913,7 +913,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                   <span>Customer Credit Limit Barrier Exceeded</span>
                 </div>
                 <p className="text-amber-800 text-[11px]">
-                  Projected balance ৳{projectedDue.toFixed(2)} exceeds limit of ৳{customerCreditLimit.toFixed(2)}.
+                  Projected balance Rs. {projectedDue.toFixed(2)} exceeds limit of Rs. {customerCreditLimit.toFixed(2)}.
                 </p>
 
                 <div className="flex items-center gap-2 pt-1">

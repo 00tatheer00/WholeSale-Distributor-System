@@ -852,6 +852,6 @@ export const MOCK_AUDIT_LOGS = [
     entityId: "pay-01",
     userName: "Shahidul Alam (Accounts)",
     timestamp: "2026-08-16T14:10:00Z",
-    details: "Received ৳18,032 cash payment for Popular Model Pharmacy against INV-2026-00101.",
+    details: "Received Rs. 18,032 cash payment for Popular Model Pharmacy against INV-2026-00101.",
   },
 ];

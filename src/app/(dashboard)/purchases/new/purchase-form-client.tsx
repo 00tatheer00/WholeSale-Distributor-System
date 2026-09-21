@@ -104,10 +104,12 @@ export function PurchaseFormClient({
       discountPercent: 0,
       taxPercent: 0,
       warehouseId: warehouseId || undefined,
+      location: "",
     },
   ]);
 
   const [isReviewOpen, setIsReviewOpen] = React.useState(false);
+  const [createdPurchaseResult, setCreatedPurchaseResult] = React.useState<any | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
@@ -147,6 +149,7 @@ export function PurchaseFormClient({
       discountPercent: 0,
       taxPercent: 0,
       warehouseId: warehouseId || undefined,
+      location: "",
     };
     setItems([...items, newRow]);
   };
@@ -218,7 +221,7 @@ export function PurchaseFormClient({
     }
 
     if (paidAmount > grandTotal) {
-      setErrorMessage(`Upfront payment (৳${paidAmount.toLocaleString()}) cannot exceed Grand Total (৳${grandTotal.toLocaleString()}).`);
+      setErrorMessage(`Upfront payment (Rs. ${paidAmount.toLocaleString()}) cannot exceed Grand Total (Rs. ${grandTotal.toLocaleString()}).`);
       return;
     }
 
@@ -248,9 +251,9 @@ export function PurchaseFormClient({
     const res = await createPurchaseOrderAction(payload);
     setIsSubmitting(false);
 
-    if (res.success) {
+    if (res.success && res.data) {
       setIsReviewOpen(false);
-      router.push(`/purchases/${res.data.id}`);
+      setCreatedPurchaseResult(res.data);
     } else {
       setErrorMessage(res.error || "Failed to commit purchase consignment.");
       setIsReviewOpen(false);
@@ -427,16 +430,17 @@ export function PurchaseFormClient({
                   <tr>
                     <th className="py-2.5 px-3 font-semibold min-w-[200px]">Medicine <span className="text-rose-500">*</span></th>
                     <th className="py-2.5 px-2 font-semibold min-w-[130px]">Batch # <span className="text-rose-500">*</span></th>
+                    <th className="py-2.5 px-2 font-semibold min-w-[110px]">Location (Rack/Bin)</th>
                     <th className="py-2.5 px-2 font-semibold min-w-[130px]">Mfg Date</th>
                     <th className="py-2.5 px-2 font-semibold min-w-[130px]">Expiry Date <span className="text-rose-500">*</span></th>
                     <th className="py-2.5 px-2 font-semibold min-w-[80px]">Qty <span className="text-rose-500">*</span></th>
                     <th className="py-2.5 px-2 font-semibold min-w-[70px]">Bonus Qty</th>
-                    <th className="py-2.5 px-2 font-semibold min-w-[90px]">Cost (৳) <span className="text-rose-500">*</span></th>
-                    <th className="py-2.5 px-2 font-semibold min-w-[90px]">TP (৳)</th>
-                    <th className="py-2.5 px-2 font-semibold min-w-[90px]">MRP (৳)</th>
+                    <th className="py-2.5 px-2 font-semibold min-w-[90px]">Cost (Rs.) <span className="text-rose-500">*</span></th>
+                    <th className="py-2.5 px-2 font-semibold min-w-[90px]">TP (Rs.)</th>
+                    <th className="py-2.5 px-2 font-semibold min-w-[90px]">MRP (Rs.)</th>
                     <th className="py-2.5 px-2 font-semibold min-w-[70px]">Disc %</th>
                     <th className="py-2.5 px-2 font-semibold min-w-[70px]">VAT %</th>
-                    <th className="py-2.5 px-3 text-right font-semibold min-w-[100px]">Line Total (৳)</th>
+                    <th className="py-2.5 px-3 text-right font-semibold min-w-[100px]">Line Total (Rs.)</th>
                     <th className="py-2.5 px-2 text-center font-semibold w-10"></th>
                   </tr>
                 </thead>
@@ -470,6 +474,16 @@ export function PurchaseFormClient({
                           className="h-8 text-xs font-mono"
                           value={item.batchNumber}
                           onChange={(e) => updateItem(idx, "batchNumber", e.target.value)}
+                        />
+                      </td>
+
+                      {/* Location (Rack/Shelf/Bin) */}
+                      <td className="py-2 px-2">
+                        <Input
+                          placeholder="e.g. R-1, B-4"
+                          className="h-8 text-xs font-mono"
+                          value={item.location || ""}
+                          onChange={(e) => updateItem(idx, "location", e.target.value)}
                         />
                       </td>
 
@@ -631,7 +645,7 @@ export function PurchaseFormClient({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="paidAmount" className="text-xs font-semibold">
-                    Disbursed Payment Amount (৳)
+                    Disbursed Payment Amount (Rs.)
                   </Label>
                   <Input
                     id="paidAmount"
@@ -703,7 +717,7 @@ export function PurchaseFormClient({
             <CardHeader className="p-4 border-b border-border/50 bg-muted/20">
               <CardTitle className="text-sm font-semibold flex items-center justify-between">
                 <span>Invoice Breakdown</span>
-                <Badge variant="outline" className="font-mono text-[10px]">AFN (؋)</Badge>
+                <Badge variant="outline" className="font-mono text-[10px]">Rs.</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 space-y-2.5 text-xs">
@@ -805,21 +819,73 @@ export function PurchaseFormClient({
             </p>
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setIsReviewOpen(false)}>
-              Back to Edit
+          <DialogFooter className="p-4 bg-muted/20 border-t flex items-center justify-between">
+            <Button variant="outline" size="sm" onClick={() => setIsReviewOpen(false)}>
+              Back &amp; Edit
             </Button>
             <Button
-              type="button"
-              disabled={isSubmitting}
+              size="sm"
               onClick={handleFinalSubmit}
-              className="bg-primary hover:bg-primary/90 font-semibold text-primary-foreground gap-1.5"
+              disabled={isSubmitting}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
             >
-              {isSubmitting ? "Committing to Inventory..." : "Confirm & Save Consignment"}
+              {isSubmitting ? "Committing Consignment..." : "Confirm & Commit Stock Intake"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Post-Intake Success Modal */}
+      {createdPurchaseResult && (
+        <Dialog open={!!createdPurchaseResult} onOpenChange={() => {}}>
+          <DialogContent className="sm:max-w-[480px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-emerald-700">
+                <CheckCircle2 className="h-6 w-6 text-emerald-600" />
+                Purchase Consignment Received!
+              </DialogTitle>
+              <DialogDescription className="text-xs text-slate-500">
+                Batch inventory and stock ledger movements have been committed to the warehouse.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="p-4 bg-emerald-50/70 border border-emerald-200/80 rounded-lg space-y-2 text-xs text-slate-800">
+              <div className="flex justify-between">
+                <span className="text-slate-500">Consignment Number:</span>
+                <span className="font-mono font-bold text-emerald-800">{createdPurchaseResult.purchaseNumber}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Total B2B Valuation:</span>
+                <span className="font-bold">{formatCurrency(createdPurchaseResult.grandTotal)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Target Warehouse:</span>
+                <span className="font-medium text-slate-700">
+                  {warehouses.find((w) => w.id === warehouseId)?.name || "Central Warehouse"}
+                </span>
+              </div>
+            </div>
+
+            <DialogFooter className="flex flex-col sm:flex-row gap-2 pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push("/purchases")}
+                className="text-xs h-9"
+              >
+                View Purchases List
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => router.push(`/purchases/${createdPurchaseResult.id}`)}
+                className="text-xs h-9 bg-teal-600 hover:bg-teal-700 text-white font-semibold"
+              >
+                View Receiving Slip & Batches
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

@@ -15,6 +15,7 @@ export const purchaseItemSchema = z.object({
   taxPercent: z.coerce.number().min(0).max(100).default(0),
   warehouseId: z.string().optional().nullable(),
   rackId: z.string().optional().nullable(),
+  location: z.string().optional().nullable(),
 });
 
 export const purchaseOrderSchema = z.object({

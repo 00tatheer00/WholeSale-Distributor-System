@@ -570,9 +570,9 @@ export function CustomerDetailsClient({ customer }: CustomerDetailsClientProps) 
                     <th className="px-4 py-3">Date</th>
                     <th className="px-4 py-3">Type</th>
                     <th className="px-4 py-3">Reference</th>
-                    <th className="px-4 py-3 text-right">Debit (৳)</th>
-                    <th className="px-4 py-3 text-right">Credit (৳)</th>
-                    <th className="px-4 py-3 text-right">Running Balance (৳)</th>
+                    <th className="px-4 py-3 text-right">Debit (Rs.)</th>
+                    <th className="px-4 py-3 text-right">Credit (Rs.)</th>
+                    <th className="px-4 py-3 text-right">Running Balance (Rs.)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">

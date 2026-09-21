@@ -21,6 +21,8 @@ import {
   XCircle,
   MoreVertical,
   Receipt,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { DataTable } from "@/components/shared/data-table";
@@ -56,8 +58,10 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import {
   createSupplierAction,
-  recordSupplierPaymentAction,
   toggleSupplierStatusAction,
+  recordSupplierPaymentAction,
+  deleteSupplierAction,
+  deactivateSupplierAction,
 } from "@/server/actions/supplier.actions";
 import { SupplierRecord } from "@/types/models";
 import { SupplierQueryResult } from "@/server/services/supplier.service";
@@ -91,6 +95,11 @@ export function SuppliersClient({ initialData, currentParams }: SuppliersClientP
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [feedback, setFeedback] = React.useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Safe Deletion State
+  const [deleteTarget, setDeleteTarget] = React.useState<SupplierRecord | null>(null);
+  const [deleteBlockedInfo, setDeleteBlockedInfo] = React.useState<{ canDeactivate: boolean; reason: string } | null>(null);
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   // Form states
   const [formData, setFormData] = React.useState<SupplierInput>({
@@ -159,8 +168,8 @@ export function SuppliersClient({ initialData, currentParams }: SuppliersClientP
         email: "",
         phone: "",
         address: "",
-        city: "Dhaka",
-        country: "Bangladesh",
+        city: "Karachi",
+        country: "Pakistan",
         drugLicenseNo: "",
         tradeLicenseNo: "",
         taxIdTin: "",
@@ -208,6 +217,48 @@ export function SuppliersClient({ initialData, currentParams }: SuppliersClientP
       router.refresh();
     } else {
       setFeedback({ type: "error", message: res.error || "Failed to update status." });
+    }
+  };
+
+  const handleDeleteClick = (supplier: SupplierRecord) => {
+    setDeleteTarget(supplier);
+    setDeleteBlockedInfo(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    const res = await deleteSupplierAction(deleteTarget.id);
+    setIsDeleting(false);
+    if (res.success) {
+      setDeleteTarget(null);
+      setFeedback({ type: "success", message: res.message || "Supplier deleted." });
+      router.refresh();
+    } else {
+      if (res.canDeactivate) {
+        setDeleteBlockedInfo({
+          canDeactivate: true,
+          reason: res.error || "Cannot delete supplier due to active transaction dependencies.",
+        });
+      } else {
+        setFeedback({ type: "error", message: res.error || "Failed to delete supplier." });
+        setDeleteTarget(null);
+      }
+    }
+  };
+
+  const handleDeactivateInstead = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    const res = await deactivateSupplierAction(deleteTarget.id);
+    setIsDeleting(false);
+    setDeleteTarget(null);
+    setDeleteBlockedInfo(null);
+    if (res.success) {
+      setFeedback({ type: "success", message: res.message || "Supplier deactivated successfully." });
+      router.refresh();
+    } else {
+      setFeedback({ type: "error", message: res.error || "Failed to deactivate." });
     }
   };
 
@@ -413,6 +464,14 @@ export function SuppliersClient({ initialData, currentParams }: SuppliersClientP
                     </>
                   )}
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => handleDeleteClick(supplier)}
+                  className="cursor-pointer text-rose-600 focus:text-rose-700"
+                >
+                  <Trash2 className="h-3.5 w-3.5 mr-2" />
+                  Delete Supplier
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -570,7 +629,7 @@ export function SuppliersClient({ initialData, currentParams }: SuppliersClientP
 
                   <div className="space-y-1.5">
                     <Label htmlFor="openingBalance" className="text-xs font-semibold">
-                      Opening Due / Balance (৳)
+                      Opening Due / Balance (Rs.)
                     </Label>
                     <Input
                       id="openingBalance"
@@ -773,7 +832,7 @@ export function SuppliersClient({ initialData, currentParams }: SuppliersClientP
 
                 <div className="space-y-1.5">
                   <Label htmlFor="payAmount" className="text-xs font-semibold">
-                    Payment Amount (৳) <span className="text-rose-500">*</span>
+                    Payment Amount (Rs.) <span className="text-rose-500">*</span>
                   </Label>
                   <Input
                     id="payAmount"
@@ -863,6 +922,82 @@ export function SuppliersClient({ initialData, currentParams }: SuppliersClientP
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Safe Deletion & Deactivation Dialog */}
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-rose-700">
+              <AlertTriangle className="h-5 w-5 text-rose-600" />
+              {deleteBlockedInfo ? "Deletion Blocked: Dependencies Detected" : "Confirm Supplier Deletion"}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              {deleteTarget?.name} {deleteTarget?.code ? `(${deleteTarget.code})` : ""}
+            </DialogDescription>
+          </DialogHeader>
+
+          {deleteBlockedInfo ? (
+            <div className="space-y-3 py-2">
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-md text-xs text-amber-900 space-y-1">
+                <div className="font-semibold flex items-center gap-1.5 text-amber-800">
+                  <AlertTriangle className="h-4 w-4" />
+                  Preserving Accounts Payable & Procurement Integrity
+                </div>
+                <p className="leading-relaxed">{deleteBlockedInfo.reason}</p>
+              </div>
+              <p className="text-xs text-slate-600">
+                Accounting standards require preserving historical purchase vouchers and payment receipts. Deactivating this supplier will prevent new purchase orders while keeping all historical invoices and ledgers intact.
+              </p>
+            </div>
+          ) : (
+            <div className="py-3 text-xs text-slate-600 space-y-2">
+              <p>
+                Are you sure you want to permanently delete supplier <strong>{deleteTarget?.name}</strong>?
+              </p>
+              <p className="text-slate-500">
+                If this supplier has zero balances and zero historical orders or payments, it will be deleted immediately.
+              </p>
+            </div>
+          )}
+
+          <DialogFooter className="pt-2 flex items-center justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setDeleteTarget(null);
+                setDeleteBlockedInfo(null);
+              }}
+              className="h-9 text-xs"
+            >
+              Cancel
+            </Button>
+            {deleteBlockedInfo ? (
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleDeactivateInstead}
+                disabled={isDeleting}
+                className="h-9 text-xs bg-amber-600 hover:bg-amber-700 text-white font-semibold"
+              >
+                {isDeleting ? "Deactivating..." : "Deactivate Vendor Instead"}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                size="sm"
+                variant="destructive"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="h-9 text-xs font-semibold"
+              >
+                {isDeleting ? "Checking..." : "Confirm Delete"}
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

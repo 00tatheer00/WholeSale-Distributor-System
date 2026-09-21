@@ -453,7 +453,7 @@ export async function createAndConfirmPurchase(data: PurchaseOrderInput, userId?
     const paidAmount = Math.max(0, data.paidAmount || 0);
 
     if (paidAmount > grandTotal) {
-      throw new Error(`Upfront payment (৳${paidAmount.toLocaleString()}) cannot exceed the grand total (৳${grandTotal.toLocaleString()}).`);
+      throw new Error(`Upfront payment (Rs. ${paidAmount.toLocaleString()}) cannot exceed the grand total (Rs. ${grandTotal.toLocaleString()}).`);
     }
 
     const dueAmount = grandTotal - paidAmount;
@@ -462,12 +462,14 @@ export async function createAndConfirmPurchase(data: PurchaseOrderInput, userId?
 
     const poNumber = `PO-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`;
 
+    const targetWarehouseId = data.warehouseId || defaultWarehouse.id;
+
     // 4. Create Purchase Record
     const purchase = await tx.purchase.create({
       data: {
         purchaseNumber: poNumber,
         supplierId: data.supplierId,
-        warehouseId: defaultWarehouse.id,
+        warehouseId: targetWarehouseId,
         createdById: defaultUser?.id || "",
         supplierInvoiceNumber: data.supplierInvoiceNo?.trim() || null,
         purchaseDate: new Date(data.purchaseDate),
@@ -491,11 +493,11 @@ export async function createAndConfirmPurchase(data: PurchaseOrderInput, userId?
       const expDate = new Date(vItem.expiryDate);
       const mfgDate = vItem.manufacturingDate ? new Date(vItem.manufacturingDate) : null;
 
-      // Find or create MedicineBatch
+      // Find or create MedicineBatch in target warehouse
       const batch = await tx.medicineBatch.findFirst({
         where: {
           medicineId: vItem.medicineId,
-          warehouseId: defaultWarehouse.id,
+          warehouseId: targetWarehouseId,
           batchNumber: vItem.batchNumber.trim(),
         },
       });
@@ -513,6 +515,7 @@ export async function createAndConfirmPurchase(data: PurchaseOrderInput, userId?
             purchaseCostPrice: vItem.unitCostPrice,
             tradePrice: vItem.unitTradePrice,
             mrp: vItem.unitMrp,
+            location: vItem.location || vItem.rackId || batch.location,
             status: batch.status === "EXHAUSTED" ? "ACTIVE" : batch.status,
           },
         });
@@ -521,8 +524,9 @@ export async function createAndConfirmPurchase(data: PurchaseOrderInput, userId?
         const newBatch = await tx.medicineBatch.create({
           data: {
             medicineId: vItem.medicineId,
-            warehouseId: defaultWarehouse.id,
+            warehouseId: targetWarehouseId,
             rackId: vItem.rackId || null,
+            location: vItem.location || vItem.rackId || null,
             supplierId: data.supplierId,
             batchNumber: vItem.batchNumber.trim(),
             mfgDate,
@@ -565,7 +569,7 @@ export async function createAndConfirmPurchase(data: PurchaseOrderInput, userId?
         data: {
           medicineId: vItem.medicineId,
           batchId,
-          warehouseId: defaultWarehouse.id,
+          warehouseId: targetWarehouseId,
           movementType: "PURCHASE_IN",
           quantityDelta: totalIntakeQty,
           quantityBefore,

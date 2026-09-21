@@ -190,7 +190,7 @@ export async function generateSystemAlerts(): Promise<void> {
           newAlertsToCreate.push({
             type: NotificationType.CUSTOMER_CREDIT_BREACH,
             title,
-            message: `${c.pharmacyName} current due ৳${Number(c.currentDue).toLocaleString()} exceeds credit limit ৳${Number(c.creditLimit).toLocaleString()}.`,
+            message: `${c.pharmacyName} current due Rs. ${Number(c.currentDue).toLocaleString()} exceeds credit limit Rs. ${Number(c.creditLimit).toLocaleString()}.`,
             link: `/reports/customer-dues`,
           });
           existingKeys.add(`${NotificationType.CUSTOMER_CREDIT_BREACH}_${title}`);

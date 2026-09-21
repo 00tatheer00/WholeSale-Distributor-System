@@ -643,7 +643,7 @@ export async function recordSupplierPayment(data: SupplierPaymentInput, userId?:
     if (data.amount > currentDue && currentDue > 0) {
       // Overpayment guard
       throw new Error(
-        `Payment amount (৳${data.amount.toLocaleString()}) exceeds the total outstanding payable (৳${currentDue.toLocaleString()}). Advances are restricted.`
+        `Payment amount (Rs. ${data.amount.toLocaleString()}) exceeds the total outstanding payable (Rs. ${currentDue.toLocaleString()}). Advances are restricted.`
       );
     }
 

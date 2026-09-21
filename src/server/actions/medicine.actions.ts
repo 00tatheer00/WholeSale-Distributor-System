@@ -11,6 +11,7 @@ export type ActionResult<T = unknown> = {
   data?: T;
   error?: string;
   message?: string;
+  canDeactivate?: boolean;
   totalCount?: number;
   totalPages?: number;
   page?: number;
@@ -19,6 +20,7 @@ export type ActionResult<T = unknown> = {
 export interface MedicineFilterParams {
   search?: string;
   categoryId?: string;
+  manufacturerId?: string;
   dosageForm?: string;
   supplierId?: string;
   status?: string;
@@ -54,6 +56,10 @@ export async function getMedicinesAction(
       whereClause.categoryId = params.categoryId;
     }
 
+    if (params?.manufacturerId && params.manufacturerId !== "ALL") {
+      whereClause.manufacturerId = params.manufacturerId;
+    }
+
     if (params?.dosageForm && params.dosageForm !== "ALL") {
       whereClause.dosageForm = params.dosageForm;
     }
@@ -72,6 +78,7 @@ export async function getMedicinesAction(
         where: whereClause,
         include: {
           category: true,
+          manufacturer: true,
           supplier: true,
           batches: {
             select: { quantityOnHand: true },
@@ -96,6 +103,8 @@ export async function getMedicinesAction(
         darNumber: m.darNumber,
         categoryId: m.categoryId,
         categoryName: m.category?.name || "General",
+        manufacturerId: m.manufacturerId || "",
+        manufacturerName: m.manufacturer?.name || "N/A",
         supplierId: m.supplierId || "",
         supplierName: m.supplier?.name || "Direct",
         unitTradePrice: Number(m.defaultTradePrice),
@@ -169,6 +178,7 @@ export async function getMedicineByIdAction(
       where: { id },
       include: {
         category: true,
+        manufacturer: true,
         supplier: true,
         batches: {
           select: { quantityOnHand: true },
@@ -195,6 +205,8 @@ export async function getMedicineByIdAction(
       darNumber: m.darNumber,
       categoryId: m.categoryId,
       categoryName: m.category?.name || "General",
+      manufacturerId: m.manufacturerId || "",
+      manufacturerName: m.manufacturer?.name || "N/A",
       supplierId: m.supplierId || "",
       supplierName: m.supplier?.name || "Direct",
       unitTradePrice: Number(m.defaultTradePrice),
@@ -266,6 +278,7 @@ export async function createMedicineAction(data: MedicineInput): Promise<ActionR
       strength,
       dosageForm,
       categoryId,
+      manufacturerId,
       supplierId,
       unitTradePrice,
       unitMrp,
@@ -294,6 +307,7 @@ export async function createMedicineAction(data: MedicineInput): Promise<ActionR
           strength: strength.trim(),
           dosageForm,
           categoryId,
+          manufacturerId: manufacturerId || undefined,
           supplierId: supplierId || undefined,
           defaultTradePrice: unitTradePrice,
           defaultMrp: unitMrp,
@@ -337,6 +351,7 @@ export async function updateMedicineAction(
       strength,
       dosageForm,
       categoryId,
+      manufacturerId,
       supplierId,
       unitTradePrice,
       unitMrp,
@@ -358,6 +373,7 @@ export async function updateMedicineAction(
           strength: strength.trim(),
           dosageForm,
           categoryId,
+          manufacturerId: manufacturerId || null,
           supplierId: supplierId || null,
           defaultTradePrice: unitTradePrice,
           defaultMrp: unitMrp,
@@ -401,3 +417,112 @@ export async function toggleMedicineStatusAction(
     return { success: true, message: `Medicine status updated to ${status} (simulated)` };
   }
 }
+
+export async function deleteMedicineAction(id: string): Promise<ActionResult> {
+  try {
+    const medicine = await prisma.medicine.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            batches: true,
+            saleItems: true,
+            purchaseItems: true,
+            stockMovements: true,
+            stockTransfers: true,
+          },
+        },
+        batches: {
+          where: { quantityOnHand: { gt: 0 } },
+          select: { id: true, batchNumber: true, quantityOnHand: true },
+        },
+      },
+    });
+
+    if (!medicine) {
+      return { success: false, error: "Medicine record not found." };
+    }
+
+    // Check active stock
+    if (medicine.batches.length > 0) {
+      const activeUnits = medicine.batches.reduce((sum, b) => sum + b.quantityOnHand, 0);
+      return {
+        success: false,
+        canDeactivate: true,
+        error: `Cannot delete "${medicine.brandName}" because it has ${activeUnits} active units in stock across ${medicine.batches.length} batch(es). To retire this medicine without corrupting physical stock, deactivate it instead.`,
+      };
+    }
+
+    // Check historical transaction relations
+    const salesCount = medicine._count.saleItems;
+    const purchasesCount = medicine._count.purchaseItems;
+    const movementsCount = medicine._count.stockMovements;
+    const transfersCount = medicine._count.stockTransfers;
+
+    if (salesCount > 0 || purchasesCount > 0 || movementsCount > 0 || transfersCount > 0) {
+      const details = [
+        salesCount > 0 ? `${salesCount} sales invoices` : null,
+        purchasesCount > 0 ? `${purchasesCount} purchase orders` : null,
+        movementsCount > 0 ? `${movementsCount} stock ledger entries` : null,
+        transfersCount > 0 ? `${transfersCount} warehouse transfers` : null,
+      ].filter(Boolean).join(", ");
+
+      return {
+        success: false,
+        canDeactivate: true,
+        error: `Cannot permanently delete "${medicine.brandName}" because it has historical business transactions (${details}). Deactivating it will prevent future sales and purchases while preserving full audit compliance.`,
+      };
+    }
+
+    // Clean record with zero transactions and zero stock
+    // Remove any 0-stock batches first
+    await prisma.medicineBatch.deleteMany({
+      where: { medicineId: id },
+    });
+
+    await prisma.medicine.delete({
+      where: { id },
+    });
+
+    revalidatePath("/medicines");
+    revalidatePath("/inventory");
+
+    return {
+      success: true,
+      message: `Medicine "${medicine.brandName}" deleted successfully.`,
+    };
+  } catch (error: any) {
+    console.error("deleteMedicineAction error:", error);
+    return {
+      success: false,
+      canDeactivate: true,
+      error: error.message || "Failed to delete medicine.",
+    };
+  }
+}
+
+export async function deactivateMedicineAction(id: string): Promise<ActionResult> {
+  try {
+    const med = await prisma.medicine.update({
+      where: { id },
+      data: { status: "INACTIVE" },
+      select: { brandName: true },
+    });
+
+    revalidatePath("/medicines");
+    revalidatePath(`/medicines/${id}`);
+    revalidatePath("/inventory");
+
+    return {
+      success: true,
+      message: `Medicine "${med.brandName}" deactivated. It is now hidden from new sales and purchase orders.`,
+    };
+  } catch (error: any) {
+    console.error("deactivateMedicineAction error:", error);
+    return {
+      success: false,
+      error: error.message || "Failed to deactivate medicine.",
+    };
+  }
+}
+
