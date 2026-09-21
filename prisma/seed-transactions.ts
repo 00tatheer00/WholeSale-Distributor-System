@@ -393,7 +393,7 @@ async function main() {
         amount: 80000.00,
         paymentDate: new Date(),
         paymentMethod: PaymentMethod.CHEQUE,
-        bankName: "Islami Bank Bangladesh",
+        bankName: "Meezan Bank Limited",
         chequeNumber: "CHQ-88192",
         referenceNumber: "IBBL-CHQ-88192",
         notes: "Advance part payment for weekly order",

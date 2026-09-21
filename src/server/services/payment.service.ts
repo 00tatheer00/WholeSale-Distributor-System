@@ -210,7 +210,7 @@ export async function getPaymentById(id: string): Promise<PaymentDetailRecord | 
       recordedByName: payment.createdBy.name,
       previousBalance,
       newBalance: currentDue,
-      companyName: company?.name || "Apex Pharma Distributors Ltd.",
+      companyName: company?.name || "PharmaDist Wholesale Medicine Distributors",
       companyAddress: company?.address || "Korangi Industrial Area, Karachi",
       companyPhone: company?.phone || "+92 21 35000111",
       allocatedInvoices,

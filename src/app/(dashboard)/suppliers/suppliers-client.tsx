@@ -299,7 +299,7 @@ export function SuppliersClient({ initialData, currentParams }: SuppliersClientP
           )}
           {row.original.city && (
             <div className="text-[10px] text-muted-foreground">
-              {row.original.city}, Bangladesh
+              {row.original.city}, Pakistan
             </div>
           )}
         </div>
@@ -547,7 +547,7 @@ export function SuppliersClient({ initialData, currentParams }: SuppliersClientP
                     <Input
                       id="phone"
                       required
-                      placeholder="e.g., +880 1711 000000"
+                      placeholder="e.g., +92 321 1234567"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     />

@@ -15,7 +15,7 @@ async function main() {
   users.forEach((u) => console.log(`   - [${u.role}] ${u.email} (Status: ${u.status})`));
 
   const companies = await prisma.company.findMany();
-  console.log(`✅ Companies found: ${companies.length} (${companies[0]?.name || 'N/A'}, Currency: ${companies[0]?.currency || 'AFN'})`);
+  console.log(`✅ Companies found: ${companies.length} (${companies[0]?.name || 'N/A'}, Currency: ${companies[0]?.currency || 'PKR'})`);
 
   const medicines = await prisma.medicine.count();
   console.log(`✅ Medicines in DB: ${medicines}`);

@@ -197,7 +197,7 @@ export function PurchasesClient({
     },
     {
       accessorKey: "paidAmount",
-      header: "Paid (AFN)",
+      header: "Paid (Rs.)",
       cell: ({ row }) => (
         <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
           {formatCurrency(row.original.paidAmount)}

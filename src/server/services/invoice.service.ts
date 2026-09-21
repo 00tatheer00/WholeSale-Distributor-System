@@ -219,7 +219,7 @@ export async function getInvoices(params: InvoiceQueryParams = {}): Promise<Invo
 }
 
 /**
- * Fetch full Invoice Detail Document with company footer and DGDA licensing info
+ * Fetch full Invoice Detail Document with company footer and DRAP licensing info
  */
 export async function getInvoiceById(id: string): Promise<InvoiceDetailRecord | null> {
   try {

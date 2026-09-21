@@ -94,7 +94,7 @@ export function InfoGuideModal() {
             title: "۳. د نوي پېرود ثبت او ګودام ته د مال داخلول (Purchases / GRN)",
             description: (
               <span>
-                <strong>&ldquo;Purchases&rdquo; &rarr; &ldquo;New Purchase&rdquo;</strong> ته لاړ شئ. د فابریکې بسته نمبر (Batch)، د ختمېدو نیټه (Expiry)، او د پیرود اصلي بیه (AFN) داخل کړئ ترڅو سټاک ګودام ته اضافه شي.
+                <strong>&ldquo;Purchases&rdquo; &rarr; &ldquo;New Purchase&rdquo;</strong> ته لاړ شئ. د فابریکې بسته نمبر (Batch)، د ختمېدو نیټه (Expiry)، او د پیرود اصلي بیه (PKR) داخل کړئ ترڅو سټاک ګودام ته اضافه شي.
               </span>
             ),
           },
@@ -159,7 +159,7 @@ export function InfoGuideModal() {
         sections: [
           {
             title: "د نوي پېرود داخلولو مرحلې",
-            description: "۱. د عرضه کوونکي کمپنۍ وټاکئ او د فابریکې د بل نمبر ولیکئ. ۲. د درملو نوم، د فابریکې بېچ نمبر، د تولید او انقضاء نیټه او تعداد داخل کړئ. ۳. د پیرود نرخ (AFN) او د پلور نرخ وټاکئ او ثبت یې کړئ.",
+            description: "۱. د عرضه کوونکي کمپنۍ وټاکئ او د فابریکې د بل نمبر ولیکئ. ۲. د درملو نوم، د فابریکې بېچ نمبر، د تولید او انقضاء نیټه او تعداد داخل کړئ. ۳. د پیرود نرخ (PKR) او د پلور نرخ وټاکئ او ثبت یې کړئ.",
             type: "default",
           },
           {
@@ -401,11 +401,11 @@ export function InfoGuideModal() {
           },
           {
             title: "3. Purchase Intake (GRN) Se Stock Warehouse Mein Layein",
-            description: "'Purchases' -> 'New Purchase Intake' par jayein. Factory invoice number, batch number, expiry date aur purchase cost price (AFN) daal kar submit karein.",
+            description: "'Purchases' -> 'New Purchase Intake' par jayein. Factory invoice number, batch number, expiry date aur purchase cost price (PKR) daal kar submit karein.",
           },
           {
             title: "4. Customer Pharmacy / Clinic Register Karein",
-            description: "'Customers' par jaakar pharmacy ka naam, owner phone number aur unki Credit Limit (AFN) set karein taake udhaar limit se zyada na jaye.",
+            description: "'Customers' par jaakar pharmacy ka naam, owner phone number aur unki Credit Limit (PKR) set karein taake udhaar limit se zyada na jaye.",
           },
           {
             title: "5. Wholesale Sales Order Book Karein & Invoice Print Karein",
@@ -450,7 +450,7 @@ export function InfoGuideModal() {
         sections: [
           {
             title: "New Purchase Kaise Dalein?",
-            description: "Supplier select karein, batch number, expiry date aur purchase cost (AFN) daal kar submit karein.",
+            description: "Supplier select karein, batch number, expiry date aur purchase cost (PKR) daal kar submit karein.",
           },
         ],
       },
@@ -509,7 +509,7 @@ export function InfoGuideModal() {
         sections: [
           {
             title: "Credit Limit Protection",
-            description: "Agar kisi pharmacy ki credit limit 100,000 AFN hai aur unka due 100,000 se barh jaye, toh system naya udhaar order lock kar deta hai.",
+            description: "Agar kisi pharmacy ki credit limit 100,000 PKR hai aur unka due 100,000 se barh jaye, toh system naya udhaar order lock kar deta hai.",
             type: "danger",
           },
         ],
@@ -657,7 +657,7 @@ export function InfoGuideModal() {
         sections: [
           {
             title: "1. Register Suppliers (Pharma Manufacturers)",
-            description: "Navigate to 'Suppliers' and add drug manufacturers with licensing, contact info, and payment terms in AFN.",
+            description: "Navigate to 'Suppliers' and add drug manufacturers with licensing, contact info, and payment terms in PKR.",
           },
           {
             title: "2. Build Medicine Catalog & Categories",
@@ -714,7 +714,7 @@ export function InfoGuideModal() {
         sections: [
           {
             title: "Receiving Consignments",
-            description: "Enter manufacturer invoice numbers, itemized batches, expiry dates, and purchase cost in AFN.",
+            description: "Enter manufacturer invoice numbers, itemized batches, expiry dates, and purchase cost in PKR.",
           },
         ],
       },
@@ -974,7 +974,7 @@ export function InfoGuideModal() {
               </DialogTitle>
               <DialogDescription className="text-[11px] sm:text-xs text-muted-foreground line-clamp-1">
                 {lang === "ps"
-                  ? "د افغانستان د سټاکیسټانو او عمده پلورونکو لپاره بشپړ عملي لارښود (AFN / FEFO)"
+                  ? "د سټاکیسټانو او عمده پلورونکو لپاره بشپړ عملي لارښود (PKR / FEFO)"
                   : lang === "ur"
                   ? "Software chalane ka asaan Roman Urdu manual (Client Reference Guide)"
                   : "Comprehensive enterprise operations manual for pharmaceutical wholesale distributors"}
@@ -1022,7 +1022,7 @@ export function InfoGuideModal() {
               variant="outline"
               className="text-[10px] sm:text-xs bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 font-medium"
             >
-              AFN (؋)
+              PKR (Rs.)
             </Badge>
             <Badge
               variant="outline"
@@ -1126,10 +1126,10 @@ export function InfoGuideModal() {
               </p>
               <p className="leading-relaxed">
                 {lang === "ps"
-                  ? "ټول مالي او سوداګریز قوانین د افغانستان د درملو د عمده پلور معیارونو سره سم جوړ شوي دي."
+                  ? "ټول مالي او سوداګریز قوانین د پاکستان د درملو د عمده پلور معیارونو او DRAP سره سم جوړ شوي دي."
                   : lang === "ur"
                   ? "Koi masla ho toh administrator se rabta karein ya Settings me Audit Logs check karein."
-                  : "All accounting rules strictly conform to wholesale pharmaceutical ERP standards and AFN currency."}
+                  : "All accounting rules strictly conform to wholesale pharmaceutical ERP standards, DRAP regulations, and PKR currency."}
               </p>
             </div>
           </div>
@@ -1222,8 +1222,8 @@ export function InfoGuideModal() {
             <span className="h-2 w-2 rounded-full bg-emerald-500 inline-block" />
             <span>
               {lang === "ps"
-                ? "د درملو عمده پلور ERP • افغانستان (AFN / ؋)"
-                : "Wholesale Medicine ERP • Afghanistan (AFN / ؋)"}
+                ? "د درملو عمده پلور ERP • پاکستان (PKR / Rs.)"
+                : "Wholesale Medicine ERP • Pakistan (PKR / Rs.)"}
             </span>
           </div>
           <Button

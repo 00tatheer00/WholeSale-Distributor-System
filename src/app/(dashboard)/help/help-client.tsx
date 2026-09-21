@@ -87,7 +87,7 @@ export function HelpClient() {
           },
           {
             title: "۳. د نوي پېرود ثبت او ګودام ته د مال داخلول (Purchases / GRN)",
-            description: "په Purchases -> New Purchase کې د فابریکې بسته نمبر (Batch)، د ختمېدو نیټه (Expiry) او د پیرود اصلي بیه (AFN) داخل کړئ.",
+            description: "په Purchases -> New Purchase کې د فابریکې بسته نمبر (Batch)، د ختمېدو نیټه (Expiry) او د پیرود اصلي بیه (PKR) داخل کړئ.",
             type: "success",
           },
           {
@@ -400,11 +400,11 @@ export function HelpClient() {
           },
           {
             title: "3. Purchase Intake (GRN) Se Stock Warehouse Mein Layein",
-            description: "'Purchases' -> 'New Purchase Intake' par jayein. Factory invoice number, batch number, expiry date aur purchase cost price (AFN) daal kar submit karein.",
+            description: "'Purchases' -> 'New Purchase Intake' par jayein. Factory invoice number, batch number, expiry date aur purchase cost price (PKR) daal kar submit karein.",
           },
           {
             title: "4. Customer Pharmacy / Clinic Register Karein",
-            description: "'Customers' par jaakar pharmacy ka naam aur unki Credit Limit (AFN) set karein.",
+            description: "'Customers' par jaakar pharmacy ka naam aur unki Credit Limit (PKR) set karein.",
           },
           {
             title: "5. Wholesale Sales Order Book Karein & Invoice Print Karein",
@@ -431,7 +431,7 @@ export function HelpClient() {
         sections: [
           {
             title: "1. Register Suppliers (Pharma Manufacturers)",
-            description: "Navigate to 'Suppliers' and add drug manufacturers with licensing, contact info, and payment terms in AFN.",
+            description: "Navigate to 'Suppliers' and add drug manufacturers with licensing, contact info, and payment terms in PKR.",
           },
           {
             title: "2. Build Medicine Catalog & Categories",
@@ -490,7 +490,7 @@ export function HelpClient() {
             }
             description={
               lang === "ps"
-                ? "د درملو عمده پلور، FEFO ګودام، بلونو او مالي ګټې د مدیریت هراړخیز لارښود (AFN / ؋)"
+                ? "د درملو عمده پلور، FEFO ګودام، بلونو او مالي ګټې د مدیریت هراړخیز لارښود (PKR / Rs.)"
                 : "Wholesale Pharmaceutical Distribution ERP User Guide & Standard Operating Procedures"
             }
             className="pb-0 border-b-0 mb-0"
@@ -549,14 +549,16 @@ export function HelpClient() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
         <Card className="rounded-2xl border-emerald-200/80 dark:border-emerald-900 bg-emerald-50/40 dark:bg-emerald-950/20 shadow-sm">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold shrink-0">
-              ؋
+            <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold shrink-0 text-sm">
+              Rs.
             </div>
             <div>
               <p className="text-[11px] font-semibold text-emerald-800 dark:text-emerald-300">
                 {lang === "ps" ? "مالي اسعار" : "Currency"}
               </p>
-              <p className="text-xs font-bold text-foreground">افغانۍ (AFN / ؋)</p>
+              <p className="text-xs font-bold text-foreground">
+                {lang === "ps" ? "روپۍ (PKR / Rs.)" : "Pakistani Rupee (PKR / Rs.)"}
+              </p>
             </div>
           </CardContent>
         </Card>

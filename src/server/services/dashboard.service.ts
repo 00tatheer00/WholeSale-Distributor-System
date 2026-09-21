@@ -277,9 +277,9 @@ function getOfflineFallbackData(
         totalOutstanding: 262000,
         suppliersWithBalanceCount: 3,
         topSuppliers: [
-          { id: "sup-1", name: "Square Pharmaceuticals PLC", due: 145000, phone: "+880 1713 001122" },
-          { id: "sup-2", name: "Beximco Pharmaceuticals Ltd.", due: 82000, phone: "+880 1714 223344" },
-          { id: "sup-4", name: "Renata Limited", due: 35000, phone: "+880 1912 778899" },
+          { id: "sup-1", name: "Getz Pharma (Pvt) Ltd.", due: 145000, phone: "+92 21 35060744" },
+          { id: "sup-2", name: "Sami Pharmaceuticals (Pvt) Ltd.", due: 82000, phone: "+92 21 35311374" },
+          { id: "sup-4", name: "Hilton Pharma (Pvt) Ltd.", due: 35000, phone: "+92 21 35685020" },
         ],
       },
     },

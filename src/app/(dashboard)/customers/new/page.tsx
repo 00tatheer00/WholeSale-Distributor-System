@@ -272,7 +272,7 @@ export default function NewCustomerPage() {
                 Primary Phone Number <span className="text-rose-500">*</span>
               </Label>
               <Input
-                placeholder="e.g. +880 1711 223344"
+                placeholder="e.g. +92 300 1234567"
                 {...register("phone")}
                 className="h-10 rounded-xl bg-muted/20 text-sm"
               />
@@ -285,7 +285,7 @@ export default function NewCustomerPage() {
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground">Alternate / Landline Phone</Label>
               <Input
-                placeholder="e.g. +880 2 9887766"
+                placeholder="e.g. +92 21 35000111"
                 {...register("alternatePhone")}
                 className="h-10 rounded-xl bg-muted/20 text-sm"
               />
@@ -358,7 +358,7 @@ export default function NewCustomerPage() {
             {/* Credit Limit */}
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground">
-                Credit Limit (AFN / ؋) <span className="text-rose-500">*</span>
+                Credit Limit (PKR / Rs.) <span className="text-rose-500">*</span>
               </Label>
               <Input
                 type="number"
@@ -394,7 +394,7 @@ export default function NewCustomerPage() {
             {/* Opening Balance */}
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground">
-                Opening Balance Due (AFN / ؋)
+                Opening Balance Due (PKR / Rs.)
               </Label>
               <Input
                 type="number"

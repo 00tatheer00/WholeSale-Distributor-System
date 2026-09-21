@@ -128,7 +128,7 @@ export function ProfileEditorForm({
           <Input
             id="phone"
             type="tel"
-            placeholder="+880 1711 000000"
+            placeholder="+92 321 1234567"
             className="pl-9 text-xs"
             disabled={isSubmitting}
             {...register("phone")}

@@ -7,7 +7,7 @@ export const supplierSchema = z.object({
   phone: z.string().min(6, "Valid phone number required"),
   address: z.string().optional().nullable(),
   city: z.string().optional().nullable(),
-  country: z.string().default("Bangladesh"),
+  country: z.string().default("Pakistan"),
   drugLicenseNo: z.string().optional().nullable(),
   tradeLicenseNo: z.string().optional().nullable(),
   taxIdTin: z.string().optional().nullable(),

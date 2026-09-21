@@ -15,4 +15,4 @@
 
 ## 3. Strict Domain Guardrails
 - Wholesale Pharmaceutical Distributor ERP ONLY (Not retail POS).
-- Strictly adhere to FEFO (First-Expire, First-Out) queuing, historical batch COGS preservation, credit limit holds, and Afghanistan currency (AFN / ؋) formatting.
+- Strictly adhere to FEFO (First-Expire, First-Out) queuing, historical batch COGS preservation, credit limit holds, and Pakistan currency (PKR / Rs.) formatting per DRAP wholesale standards.

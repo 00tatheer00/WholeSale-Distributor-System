@@ -510,7 +510,7 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
                   Phone Number <span className="text-rose-500">*</span>
                 </Label>
                 <Input
-                  placeholder="e.g. +880 1711 223344"
+                  placeholder="e.g. +92 300 1234567"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="h-9 rounded-xl bg-muted/20 text-xs font-mono"
@@ -544,7 +544,7 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-foreground">Monthly Sales Target (AFN / ؋)</Label>
+                <Label className="text-xs font-semibold text-foreground">Monthly Sales Target (PKR / Rs.)</Label>
                 <Input
                   type="number"
                   min="0"
