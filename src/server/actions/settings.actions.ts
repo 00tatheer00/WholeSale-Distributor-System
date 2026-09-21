@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
+import fs from "fs";
+import path from "path";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth/session";
 import {
   companySettingsSchema,
   CompanySettingsInput,
@@ -500,3 +503,79 @@ export async function updateUserProfileAction(data: UserProfileInput): Promise<A
     return { success: false, error: error.message || "Failed to update profile." };
   }
 }
+
+export async function createDatabaseSnapshotAction(): Promise<ActionResult<{ filename: string; sizeBytes: number; createdAt: string }>> {
+  try {
+    const user = await getCurrentUser();
+    if (!user || user.profile?.role !== "SUPER_ADMIN") {
+      return { success: false, error: "Only Super Administrators can create database snapshots." };
+    }
+
+    const dbPath = path.join(process.cwd(), "prisma", "wmdms.db");
+    if (!fs.existsSync(dbPath)) {
+      return { success: false, error: "Database file not found." };
+    }
+
+    const backupsDir = path.join(process.cwd(), "prisma", "backups");
+    if (!fs.existsSync(backupsDir)) {
+      fs.mkdirSync(backupsDir, { recursive: true });
+    }
+
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const filename = `wmdms-snapshot-${timestamp}.db`;
+    const targetPath = path.join(backupsDir, filename);
+
+    fs.copyFileSync(dbPath, targetPath);
+    const stats = fs.statSync(targetPath);
+
+    await recordAuditLog({
+      action: "DATABASE_SNAPSHOT_CREATED",
+      entityName: "Database",
+      entityId: filename,
+      newValues: JSON.stringify({ filename, sizeBytes: stats.size }),
+    });
+
+    revalidatePath("/settings");
+    return {
+      success: true,
+      data: {
+        filename,
+        sizeBytes: stats.size,
+        createdAt: new Date().toISOString(),
+      },
+      message: `Snapshot "${filename}" created successfully (${(stats.size / 1024).toFixed(1)} KB).`,
+    };
+  } catch (error: any) {
+    console.error("createDatabaseSnapshotAction error:", error);
+    return { success: false, error: error.message || "Failed to create database snapshot." };
+  }
+}
+
+export async function listDatabaseSnapshotsAction(): Promise<ActionResult<Array<{ filename: string; sizeBytes: number; createdAt: string }>>> {
+  try {
+    const backupsDir = path.join(process.cwd(), "prisma", "backups");
+    if (!fs.existsSync(backupsDir)) {
+      return { success: true, data: [] };
+    }
+
+    const files = fs.readdirSync(backupsDir).filter((f) => f.endsWith(".db"));
+    const snapshots = files.map((filename) => {
+      const fullPath = path.join(backupsDir, filename);
+      const stats = fs.statSync(fullPath);
+      return {
+        filename,
+        sizeBytes: stats.size,
+        createdAt: stats.mtime.toISOString(),
+      };
+    });
+
+    // Sort newest first
+    snapshots.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    return { success: true, data: snapshots };
+  } catch (error: any) {
+    console.error("listDatabaseSnapshotsAction error:", error);
+    return { success: false, error: "Failed to list snapshots." };
+  }
+}
+

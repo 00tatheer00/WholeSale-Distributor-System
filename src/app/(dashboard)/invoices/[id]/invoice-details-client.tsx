@@ -320,7 +320,7 @@ export function InvoiceDetailsClient({ invoice }: InvoiceDetailsClientProps) {
             <div>
               <div className="border-b border-dashed border-border pt-6 mb-1"></div>
               <p className="font-semibold text-foreground">Warehouse / Dispenser</p>
-              <p className="text-[9px]">Apex Pharma Dist.</p>
+              <p className="text-[9px]">{invoice.companyName || "PharmaDist Wholesale"}</p>
             </div>
 
             <div>
@@ -336,11 +336,11 @@ export function InvoiceDetailsClient({ invoice }: InvoiceDetailsClientProps) {
             </div>
           </div>
 
-          {/* DRAP Compliance Notice */}
+          {/* DRAP-Oriented Documentation Notice */}
           <div className="text-[9px] text-muted-foreground border-t border-border/40 pt-2 text-center">
             {invoice.companyInvoiceFooter}
             <br />
-            Subject to Drug Regulatory Authority of Pakistan (DRAP) wholesale regulations. Computer-generated tax document.
+            DRAP-oriented pharmaceutical wholesale documentation. Computer-generated tax document.
           </div>
         </div>
       </div>

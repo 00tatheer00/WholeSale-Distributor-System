@@ -22,6 +22,10 @@ import {
   UserX,
   UserCheck,
   MoreHorizontal,
+  HardDrive,
+  Download,
+  RefreshCw,
+  FileCheck2,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -57,6 +61,8 @@ import {
   updateUserAction,
   resetUserPasswordAction,
   toggleUserStatusAction,
+  createDatabaseSnapshotAction,
+  listDatabaseSnapshotsAction,
 } from "@/server/actions/settings.actions";
 import {
   CompanySettingsInput,
@@ -77,7 +83,7 @@ export function SettingsClient({
   auditLogs,
 }: SettingsClientProps) {
   const [activeTab, setActiveTab] = React.useState<
-    "business" | "invoice" | "tax" | "inventory" | "credit" | "notifications" | "users"
+    "business" | "invoice" | "tax" | "inventory" | "credit" | "notifications" | "users" | "backup"
   >("business");
 
   const [users, setUsers] = React.useState<any[]>(initialUsers);
@@ -254,6 +260,39 @@ export function SettingsClient({
     }
   };
 
+  const [snapshots, setSnapshots] = React.useState<Array<{ filename: string; sizeBytes: number; createdAt: string }>>([]);
+  const [isSnapshotLoading, setIsSnapshotLoading] = React.useState(false);
+  const [isCreatingSnapshot, setIsCreatingSnapshot] = React.useState(false);
+
+  React.useEffect(() => {
+    if (activeTab === "backup") {
+      loadSnapshots();
+    }
+  }, [activeTab]);
+
+  const loadSnapshots = async () => {
+    setIsSnapshotLoading(true);
+    const res = await listDatabaseSnapshotsAction();
+    if (res.success && res.data) {
+      setSnapshots(res.data);
+    }
+    setIsSnapshotLoading(false);
+  };
+
+  const handleCreateSnapshot = async () => {
+    setIsCreatingSnapshot(true);
+    const res = await createDatabaseSnapshotAction();
+    if (res.success) {
+      setFeedback(res.message || "Snapshot created successfully.");
+      setTimeout(() => setFeedback(null), 4000);
+      loadSnapshots();
+    } else {
+      setErrorMessage(res.error || "Failed to create snapshot.");
+      setTimeout(() => setErrorMessage(null), 4000);
+    }
+    setIsCreatingSnapshot(false);
+  };
+
   const navItems = [
     { id: "business", label: "Business Profile", icon: Building2, desc: "Company details & license" },
     { id: "invoice", label: "Invoice & Print", icon: FileText, desc: "Print headers, toggles & layout" },
@@ -262,6 +301,7 @@ export function SettingsClient({
     { id: "credit", label: "Credit & Aging", icon: CreditCard, desc: "Receivable hold barriers" },
     { id: "notifications", label: "Alerts & Notifications", icon: Bell, desc: "Watchdog triggers" },
     { id: "users", label: "Team & Security", icon: Users2, desc: "Staff access & roles" },
+    { id: "backup", label: "Backup & Maintenance", icon: HardDrive, desc: "Database snapshot & restore" },
   ];
 
   return (
@@ -284,7 +324,7 @@ export function SettingsClient({
             </Link>
           </Button>
 
-          {activeTab !== "users" && (
+          {activeTab !== "users" && activeTab !== "backup" && (
             <Button
               onClick={() => handleSaveSettings()}
               disabled={isSaving}
@@ -1147,6 +1187,134 @@ export function SettingsClient({
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {/* TAB 8: BACKUP & DISASTER RECOVERY */}
+          {activeTab === "backup" && (
+            <div className="space-y-6">
+              {/* Primary Backup Action */}
+              <Card className="rounded-2xl border-border/80 shadow-sm overflow-hidden">
+                <CardHeader className="bg-muted/20 pb-4 border-b">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-sm font-bold flex items-center gap-2">
+                        <HardDrive className="h-4 w-4 text-[#0071E3]" />
+                        Offline SQLite Database Backup
+                      </CardTitle>
+                      <CardDescription className="text-xs mt-1">
+                        Download a standalone, portable snapshot of the complete distribution database.
+                      </CardDescription>
+                    </div>
+                    <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px]">
+                      100% Offline Storage
+                    </Badge>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="p-6 space-y-4">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    In the offline desktop edition, all records—including medicines, stock batches, purchase invoices, customer balances, sales ledgers, and forensic audit logs—are securely stored in a single embedded SQLite database file (<code className="font-mono text-foreground font-semibold">prisma/wmdms.db</code>).
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-3 pt-2">
+                    <Button
+                      asChild
+                      className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-4 shadow-sm gap-2"
+                    >
+                      <a href="/api/backup/download" download>
+                        <Download className="h-4 w-4" />
+                        Download Live Database (.db)
+                      </a>
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCreateSnapshot}
+                      disabled={isCreatingSnapshot}
+                      className="rounded-xl text-xs h-9 px-4 gap-2 border-border/80"
+                    >
+                      <FileCheck2 className="h-4 w-4 text-purple-600" />
+                      {isCreatingSnapshot ? "Creating Snapshot..." : "Create Local Snapshot"}
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={loadSnapshots}
+                      disabled={isSnapshotLoading}
+                      className="rounded-xl text-xs h-9 w-9 p-0"
+                      title="Refresh snapshots"
+                    >
+                      <RefreshCw className={`h-3.5 w-3.5 ${isSnapshotLoading ? "animate-spin text-[#0071E3]" : ""}`} />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Local Snapshots Table */}
+              <Card className="rounded-2xl border-border/80 shadow-sm overflow-hidden">
+                <CardHeader className="bg-muted/20 pb-3 border-b">
+                  <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    Local Database Snapshots ({snapshots.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {snapshots.length === 0 ? (
+                    <div className="p-6 text-center text-xs text-muted-foreground">
+                      No local snapshots created yet. Click &ldquo;Create Local Snapshot&rdquo; to store a backup in <code className="font-mono font-semibold text-foreground">prisma/backups/</code>.
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs text-left">
+                        <thead className="bg-muted/30 text-muted-foreground font-medium border-b">
+                          <tr>
+                            <th className="px-4 py-2.5">Snapshot Filename</th>
+                            <th className="px-4 py-2.5">Size</th>
+                            <th className="px-4 py-2.5">Date Created</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/60 font-mono text-[11px]">
+                          {snapshots.map((s) => (
+                            <tr key={s.filename} className="hover:bg-muted/30">
+                              <td className="px-4 py-2.5 font-semibold text-foreground">{s.filename}</td>
+                              <td className="px-4 py-2.5 text-muted-foreground">{(s.sizeBytes / 1024).toFixed(1)} KB</td>
+                              <td className="px-4 py-2.5 text-muted-foreground">{new Date(s.createdAt).toLocaleString()}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Disaster Recovery Runbook Guide */}
+              <Card className="rounded-2xl border-amber-200 bg-amber-50/40 dark:bg-amber-950/20 shadow-sm">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-bold flex items-center gap-2 text-amber-900 dark:text-amber-200">
+                    <Shield className="h-4 w-4 text-amber-700" />
+                    Disaster Recovery & Database Restore Instructions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-xs text-amber-900/90 dark:text-amber-200/90 leading-relaxed">
+                  <p>
+                    Because SQLite operates as an in-process, zero-install file database, restoring from a backup requires replacing the active database file when the server is stopped.
+                  </p>
+                  <ol className="list-decimal list-inside space-y-1.5 font-medium pl-1">
+                    <li><strong className="text-foreground">Stop the ERP application:</strong> Close the Electron desktop window or terminate the local terminal process.</li>
+                    <li><strong className="text-foreground">Locate your application directory:</strong> Navigate to the <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 py-0.5 rounded">prisma/</code> folder.</li>
+                    <li><strong className="text-foreground">Preserve safety copy:</strong> Rename the current file from <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 py-0.5 rounded">wmdms.db</code> to <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 py-0.5 rounded">wmdms.db.old</code>.</li>
+                    <li><strong className="text-foreground">Restore backup file:</strong> Copy your downloaded backup file into the <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 py-0.5 rounded">prisma/</code> folder and rename it to <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1 py-0.5 rounded">wmdms.db</code>.</li>
+                    <li><strong className="text-foreground">Restart PharmaDist:</strong> Launch the application. All 28 data tables and historical accounting ledgers will be active immediately.</li>
+                  </ol>
+                  <div className="p-2.5 rounded-xl bg-amber-100/70 dark:bg-amber-900/40 text-[11px] font-semibold text-amber-950 dark:text-amber-100 flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
+                    <span>Never hot-swap or overwrite <code className="font-mono">wmdms.db</code> while the software is running, as active write-ahead locks could corrupt open transactions.</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
         </div>
       </div>
