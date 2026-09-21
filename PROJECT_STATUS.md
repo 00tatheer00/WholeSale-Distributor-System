@@ -3,8 +3,8 @@
 **Project**: Wholesale Medicine Distribution Management System (WMDMS)  
 **Repository**: [https://github.com/00tatheer00/WholeSale-Distributor-System.git](https://github.com/00tatheer00/WholeSale-Distributor-System.git)  
 **Branch**: `main`  
-**Current State**: **Phase 16 Complete — 100% Offline Desktop Edition (.exe) & SQLite Conversion Ready**  
-**Last Updated**: 2026-08-29  
+**Current State**: **Phase 20 Complete — Reports, Settings, User Administration & Forensic Audit Trail UX Ready**  
+**Last Updated**: 2026-09-21  
 
 ---
 
@@ -32,6 +32,7 @@
 | **Phase 17**| Senior Developer Technical & Functional Audit | ✅ Completed | Full 23-part technical and functional discovery audit report created at `docs/CURRENT_AUDIT_REPORT.md` covering stack, architecture, 28 database models, routes, buttons, business logic, and client requirements matrix. |
 | **Phase 18**| ERP UX Foundation, Pakistan Regional Localization & Core Operations | ✅ Completed | Complete Pakistan localization (`PKR`, `Rs.`, DRAP, Raast/JazzCash/EasyPaisa, zero legacy symbols), Decoupled `Manufacturer` Master (`/manufacturers`), Warehouse CRUD (`/warehouses`), Inter-Warehouse Stock Transfers (`/inventory/transfers`), Safe Deletion & Deactivation Guards across Medicines, Suppliers, Customers & Warehouses with accounting dependency preservation, open-ended "Rack/Shelf/Bin" purchase intake, and Dashboard quick action deck. |
 | **Phase 19**| Sales & Finance Workflow UX (Sales, Invoicing, Challans, Collections, Ledger 360 & Profit) | ✅ Completed | Guided Wholesale Sales booking with live credit checks and FEFO batch chips; Sales listing with Sales Rep filter and Date presets; Sale Details 360 with Documents deck; DRAP-compliant single-page A4 Tax Invoice & Delivery Challan; Customer Collections with pre-confirmation review dialog and instant Money Receipt print modal; Customer AR 360 with quick actions; Supplier AP 360 with "Amount We Owe Supplier" clarity; Sales Representative cockpit with target performance and recovery metrics; Safe Operating Expense Edit workflow with atomic transaction; Executive Profit & Financial Intelligence cockpit with helper questions and "This Year" preset. Verified with 0 TypeScript errors and 52/52 Next.js production routes. |
+| **Phase 20**| Reports, Settings, User Administration & Forensic Audit Trail UX | ✅ Completed | Comprehensive Reports Hub reorganization into 4 business categories with plain-language purpose cards; Native Excel (`.xls` SpreadsheetML) & CSV export across all 9 sub-reports; Active date range feedback banners; Complete Company & System settings persistence across 15 fields in SQLite; 7-tab Settings UX with real-time feedback; Staff / User Management CRUD with bcrypt password hashing, roles, and safe deactivation guards; Forensic Audit Logs with human-readable descriptions, before/after diffs, and export. Verified with 0 TypeScript errors and full production build. |
 
 ---
 
@@ -55,7 +56,7 @@
 ---
 
 ## 3. Next Planned Phase
-- **Phase 20 — Advanced Inventory Barcoding, Batch Recalls & Regulatory DRAP Reporting**:
+- **Phase 21 — Advanced Inventory Barcoding, Batch Recalls & Regulatory DRAP Reporting**:
   - Barcode label printing for warehouse medicine bins and batch carton packs.
   - Quarantine and Batch Recall rapid-freeze workflow with customer dispatch audit trail.
   - Regulatory DRAP Form 7 and Form 8 export generation for wholesale inspection audits.
