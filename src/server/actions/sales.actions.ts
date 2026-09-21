@@ -53,9 +53,19 @@ export async function getSaleByIdAction(
   }
 }
 
+export interface CreateSaleResult {
+  saleId: string;
+  saleNumber: string;
+  invoiceId: string;
+  invoiceNumber: string;
+  grandTotal: number;
+  paidAmount: number;
+  dueAmount: number;
+}
+
 export async function createSaleOrderAction(
   data: SaleOrderInput
-): Promise<ActionResult<{ saleId: string; invoiceNumber: string }>> {
+): Promise<ActionResult<CreateSaleResult>> {
   try {
     const parsed = saleOrderSchema.safeParse(data);
     if (!parsed.success) {

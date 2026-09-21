@@ -126,22 +126,32 @@ export function CustomerDetailsClient({ customer }: CustomerDetailsClientProps) 
               <p className="text-xs text-muted-foreground mt-1">
                 Proprietor: <strong>{customer.proprietorName || "N/A"}</strong> • Route:{" "}
                 <strong>{customer.assignedRoute || "Unassigned"}</strong> • City:{" "}
-                <strong>{customer.city || "Dhaka"}</strong>
+                <strong>{customer.city || "Karachi"}</strong>
               </p>
             </div>
           </div>
 
-          {/* Quick Action Placeholders */}
-          <div className="flex items-center gap-2">
+          {/* Quick Action Buttons */}
+          <div className="flex items-center gap-2 flex-wrap">
             <Button
-              variant="outline"
-              size="sm"
-              disabled
-              title="Sales Order booking is scheduled in Phase 9"
-              className="rounded-xl text-xs h-9 opacity-75"
+              asChild
+              className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 shadow-sm"
             >
-              <ShoppingCart className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-              Book Sale (Phase 9)
+              <Link href={`/sales/new?customer=${customer.id}`}>
+                <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
+                Book Wholesale Order
+              </Link>
+            </Button>
+
+            <Button
+              asChild
+              variant="outline"
+              className="rounded-xl text-xs h-9 border-emerald-300 text-emerald-800 bg-emerald-50/50 hover:bg-emerald-100/60"
+            >
+              <Link href={`/payments?customer=${customer.id}&action=new`}>
+                <Receipt className="h-3.5 w-3.5 mr-1.5 text-emerald-700" />
+                Record Collection
+              </Link>
             </Button>
           </div>
         </div>

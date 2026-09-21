@@ -17,6 +17,9 @@ import {
   AlertTriangle,
   Receipt,
   Sparkles,
+  Printer,
+  ArrowRight,
+  CheckCircle2,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +27,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -34,6 +45,7 @@ import {
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { createSaleOrderAction } from "@/server/actions/sales.actions";
 import { SaleOrderInput, SaleItemInput } from "@/validations/sales.schema";
+
 
 interface BatchOption {
   id: string;
@@ -114,8 +126,21 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
   const [creditOverrideApproved, setCreditOverrideApproved] = React.useState<boolean>(false);
   const [creditOverrideReason, setCreditOverrideReason] = React.useState<string>("");
 
+  // Review and Success modal states
+  const [isReviewOpen, setIsReviewOpen] = React.useState(false);
+  const [saleSuccessData, setSaleSuccessData] = React.useState<{
+    saleId: string;
+    saleNumber: string;
+    invoiceId?: string;
+    invoiceNumber?: string;
+    grandTotal: number;
+    paidAmount: number;
+    dueAmount: number;
+  } | null>(null);
+
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [serverError, setServerError] = React.useState<string | null>(null);
+
 
   // Line items state
   const [items, setItems] = React.useState<
@@ -290,8 +315,8 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
   const projectedDue = currentCustomerDue + dueAmount;
   const isCreditExceeded = customerCreditLimit > 0 && projectedDue > customerCreditLimit;
 
-  // Submit Handler
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Open Review Summary Modal
+  const handleOpenReview = (e: React.FormEvent) => {
     e.preventDefault();
     setServerError(null);
 
@@ -300,8 +325,13 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
       return;
     }
 
+    if (selectedCustomer?.status === "INACTIVE") {
+      setServerError(`Customer pharmacy "${selectedCustomer.tradeName}" is inactive. Orders cannot be dispatched.`);
+      return;
+    }
+
     if (items.some((it) => !it.medicineId || !it.batchId)) {
-      setServerError("Please ensure all items have a valid medicine and batch selected.");
+      setServerError("Please ensure all items have a valid medicine and FEFO batch selected.");
       return;
     }
 
@@ -322,13 +352,19 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
 
     if (isCreditExceeded && !creditOverrideApproved) {
       setServerError(
-        `Credit limit exceeded (Rs. ${projectedDue.toFixed(2)} > Rs. ${customerCreditLimit.toFixed(2)}). Please check manager override approval to proceed.`
+        `Credit barrier hold: Order pushes customer balance to Rs. ${projectedDue.toFixed(2)}, exceeding credit limit of Rs. ${customerCreditLimit.toFixed(2)}. Please check manager override approval to proceed.`
       );
       return;
     }
 
+    setIsReviewOpen(true);
+  };
+
+  // Final Action: Confirm and create order
+  const handleConfirmSale = async () => {
     try {
       setIsSubmitting(true);
+      setServerError(null);
 
       const payload: SaleOrderInput = {
         customerId: selectedCustomerId,
@@ -362,16 +398,57 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
       const res = await createSaleOrderAction(payload);
 
       if (res.success && res.data) {
-        router.push(`/sales/${res.data.saleId}`);
+        setIsReviewOpen(false);
+        setSaleSuccessData({
+          saleId: res.data.saleId,
+          saleNumber: res.data.saleNumber || "SO-CONFIRMED",
+          invoiceId: res.data.invoiceId || res.data.saleId,
+          invoiceNumber: res.data.invoiceNumber || "INV-CONFIRMED",
+          grandTotal,
+          paidAmount,
+          dueAmount,
+        });
       } else {
         setServerError(res.error || "Failed to create wholesale order.");
+        setIsReviewOpen(false);
       }
     } catch (err: any) {
       setServerError("Unexpected error occurred while creating order.");
+      setIsReviewOpen(false);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const handleBookAnotherSale = () => {
+    setSaleSuccessData(null);
+    setSelectedCustomerId("");
+    setSelectedDistributorId("");
+    setItems([
+      {
+        medicineId: "",
+        batchId: "",
+        quantity: 10,
+        bonusQuantity: 0,
+        unitTradePrice: 0,
+        unitCostPrice: 0,
+        unitMrp: 0,
+        discountPercent: 0,
+        vatPercent: 0,
+        availableStock: 0,
+        batches: [],
+      },
+    ]);
+    setSpecialDiscountPercent(0);
+    setDeliveryCharge(0);
+    setNotes("");
+    setPaymentType("CREDIT");
+    setPaidAmount(0);
+    setCreditOverrideApproved(false);
+    setCreditOverrideReason("");
+    setServerError(null);
+  };
+
 
   return (
     <div className="space-y-6 max-w-[1300px] mx-auto pb-20">
@@ -401,7 +478,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleOpenReview} className="space-y-6">
         {/* 2. Customer Selection & Credit Verification Card */}
         <div className="bg-card border border-border/80 rounded-2xl p-6 shadow-sm space-y-4">
           <div className="flex items-center gap-2 pb-3 border-b border-border/60">
@@ -409,8 +486,8 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
               <Store className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="font-semibold text-sm text-foreground">Customer Pharmacy & Route</h3>
-              <p className="text-xs text-muted-foreground">Select licensed retail pharmacy or hospital buyer.</p>
+              <h3 className="font-semibold text-sm text-foreground">Step 1 — Customer Pharmacy & Step 2 — Sales Representative</h3>
+              <p className="text-xs text-muted-foreground">Select licensed retail pharmacy or institutional buyer and responsible representative.</p>
             </div>
           </div>
 
@@ -441,18 +518,18 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
               </Select>
             </div>
 
-            {/* Salesman / Distributor */}
+            {/* Sales Representative */}
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-foreground">Assigned Field Salesman</Label>
+              <Label className="text-xs font-semibold text-foreground">Sales Representative</Label>
               <Select
                 value={selectedDistributorId}
                 onValueChange={(val) => setSelectedDistributorId(val)}
               >
                 <SelectTrigger className="h-10 rounded-xl text-sm bg-muted/20">
-                  <SelectValue placeholder="Direct / Cashier HQ" />
+                  <SelectValue placeholder="Direct Order / HQ Cashier" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Direct / Cashier HQ</SelectItem>
+                  <SelectItem value="">Direct Order / HQ Cashier</SelectItem>
                   {distributors.map((d) => (
                     <SelectItem key={d.id} value={d.id}>
                       {d.name} ({d.assignedTerritory})
@@ -465,36 +542,62 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
 
           {/* Customer Live Credit & Compliance Snapshot */}
           {selectedCustomer && (
-            <div className="p-4 rounded-xl bg-muted/30 border border-border/60 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-              <div>
-                <span className="text-muted-foreground">DGDA Drug License:</span>
-                <div className="font-mono font-bold text-foreground mt-0.5">
-                  {selectedCustomer.drugLicenseNo}
+            <div className="space-y-3">
+              {selectedCustomer.status === "BLOCKED_OVERDUE" && (
+                <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-950 space-y-1">
+                  <div className="flex items-center gap-2 font-bold text-xs text-amber-900">
+                    <AlertTriangle className="h-4 w-4 text-amber-700 shrink-0" />
+                    Account On Hold: Overdue Invoices Detected
+                  </div>
+                  <p className="text-[11px] text-amber-800 leading-relaxed">
+                    Customer pharmacy &ldquo;{selectedCustomer.tradeName}&rdquo; has invoices past credit aging limit (Current due: {formatCurrency(selectedCustomer.currentDue)}). Wholesale shipments are locked. To dispatch this consignment, Sales Manager override approval is required at bottom.
+                  </p>
                 </div>
-              </div>
+              )}
 
-              <div>
-                <span className="text-muted-foreground">Credit Limit:</span>
-                <div className="font-mono font-bold text-foreground mt-0.5">
-                  {formatCurrency(selectedCustomer.creditLimit)}
+              {selectedCustomer.status === "INACTIVE" && (
+                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-300 text-rose-950 space-y-1">
+                  <div className="flex items-center gap-2 font-bold text-xs text-rose-900">
+                    <AlertCircle className="h-4 w-4 text-rose-700 shrink-0" />
+                    Customer Inactive / Regulatory Hold
+                  </div>
+                  <p className="text-[11px] text-rose-800 leading-relaxed">
+                    Customer pharmacy &ldquo;{selectedCustomer.tradeName}&rdquo; is deactivated or drug license has lapsed. Inactive accounts cannot be issued wholesale invoices.
+                  </p>
                 </div>
-              </div>
+              )}
 
-              <div>
-                <span className="text-muted-foreground">Current Outstanding Due:</span>
-                <div className="font-mono font-bold text-amber-700 mt-0.5">
-                  {formatCurrency(selectedCustomer.currentDue)}
+              <div className="p-4 rounded-xl bg-muted/30 border border-border/60 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                <div>
+                  <span className="text-muted-foreground">DRAP Drug License:</span>
+                  <div className="font-mono font-bold text-foreground mt-0.5">
+                    {selectedCustomer.drugLicenseNo || "Valid on File"}
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <span className="text-muted-foreground">Available Credit Room:</span>
-                <div
-                  className={`font-mono font-bold mt-0.5 ${
-                    selectedCustomer.availableCredit > 0 ? "text-emerald-700" : "text-rose-600"
-                  }`}
-                >
-                  {formatCurrency(selectedCustomer.availableCredit)}
+                <div>
+                  <span className="text-muted-foreground">Credit Limit:</span>
+                  <div className="font-mono font-bold text-foreground mt-0.5">
+                    {formatCurrency(selectedCustomer.creditLimit)}
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-muted-foreground">Current Outstanding (AR):</span>
+                  <div className="font-mono font-bold text-amber-700 mt-0.5">
+                    {formatCurrency(selectedCustomer.currentDue)}
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-muted-foreground">Available Credit Room:</span>
+                  <div
+                    className={`font-mono font-bold mt-0.5 ${
+                      selectedCustomer.availableCredit > 0 ? "text-emerald-700" : "text-rose-600"
+                    }`}
+                  >
+                    {formatCurrency(selectedCustomer.availableCredit)}
+                  </div>
                 </div>
               </div>
             </div>
@@ -748,7 +851,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                 <div className="space-y-3 pt-2">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <Label className="text-xs font-semibold text-foreground">Amount Paid (AFN / ؋)</Label>
+                      <Label className="text-xs font-semibold text-foreground">Amount Paid (PKR / Rs.)</Label>
                       <Input
                         type="number"
                         min="0"
@@ -772,7 +875,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                           <SelectItem value="CASH">Cash Deposit</SelectItem>
                           <SelectItem value="BANK_TRANSFER">Bank Online Transfer</SelectItem>
                           <SelectItem value="CHEQUE">Cheque / Demand Draft</SelectItem>
-                          <SelectItem value="MFS_BKASH_NAGAD">Hawala / Digital Wallet</SelectItem>
+                          <SelectItem value="MFS_BKASH_NAGAD">Raast / JazzCash / EasyPaisa</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -782,16 +885,16 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                   {paymentMethod !== "CASH" && (
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1">
-                        <Label className="text-xs font-semibold text-foreground">Bank Name / Wallet</Label>
+                        <Label className="text-xs font-semibold text-foreground">Bank Name / Digital Rail</Label>
                         <Input
-                          placeholder="e.g. Kabul Bank / Da Afghanistan Bank"
+                          placeholder="e.g. Habib Bank (HBL) / Meezan Bank"
                           value={paymentBank}
                           onChange={(e) => setPaymentBank(e.target.value)}
                           className="h-9 rounded-xl bg-muted/20 text-xs"
                         />
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs font-semibold text-foreground">Cheque / Trx ID</Label>
+                        <Label className="text-xs font-semibold text-foreground">Cheque # / Trx ID</Label>
                         <Input
                           placeholder="e.g. CHQ-99124 / Trx-881"
                           value={paymentChequeNumber || paymentReference}
@@ -822,7 +925,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs font-semibold text-foreground">Delivery Charge (AFN / ؋)</Label>
+                  <Label className="text-xs font-semibold text-foreground">Delivery Charge (PKR / Rs.)</Label>
                   <Input
                     type="number"
                     min="0"
@@ -860,7 +963,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                 </div>
 
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">VAT / Medicine Tax:</span>
+                  <span className="text-muted-foreground">Sales Tax (VAT / Drug Act):</span>
                   <span className="font-mono text-foreground">+{formatCurrency(lineTaxes)}</span>
                 </div>
 
@@ -879,7 +982,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                 </div>
 
                 <div className="flex justify-between text-emerald-700 pt-1">
-                  <span>Amount Paid:</span>
+                  <span>Amount Paid Now:</span>
                   <span className="font-mono font-bold">−{formatCurrency(paidAmount)}</span>
                 </div>
 
@@ -958,17 +1061,215 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
             disabled={isSubmitting}
             className="bg-[#0071E3] hover:bg-[#0077ED] text-white shadow-sm rounded-xl font-medium px-6 h-11 transition-all active:scale-95"
           >
-            {isSubmitting ? (
-              "Processing Order & Invoice..."
-            ) : (
-              <>
-                <Check className="h-4 w-4 mr-2" />
-                Issue Wholesale Tax Invoice & Dispatch
-              </>
-            )}
+            <ArrowRight className="h-4 w-4 mr-2" />
+            Review Order & Confirm Sale
           </Button>
         </div>
       </form>
+
+      {/* Step 7: Pre-Submission Review Summary Dialog */}
+      <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
+        <DialogContent className="max-w-xl rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base font-bold text-foreground">
+              <Receipt className="h-5 w-5 text-[#0071E3]" />
+              Confirm Wholesale Order & Tax Invoice
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Please review order details and credit allocation before final confirmation.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2 text-xs">
+            {/* Customer & Rep Recap */}
+            <div className="p-3.5 rounded-xl bg-muted/30 border border-border/60 grid grid-cols-2 gap-3">
+              <div>
+                <span className="text-[10px] text-muted-foreground uppercase font-bold">Customer Pharmacy</span>
+                <div className="font-bold text-sm text-foreground mt-0.5">{selectedCustomer?.tradeName}</div>
+                <div className="text-muted-foreground">{selectedCustomer?.deliveryAddress || "Karachi, Pakistan"}</div>
+              </div>
+              <div>
+                <span className="text-[10px] text-muted-foreground uppercase font-bold">Sales Representative</span>
+                <div className="font-semibold text-foreground mt-0.5">
+                  {distributors.find((d) => d.id === selectedDistributorId)?.name || "Direct Order / HQ Cashier"}
+                </div>
+                <div className="text-muted-foreground">Order Date: {orderDate}</div>
+              </div>
+            </div>
+
+            {/* Line items summary */}
+            <div className="p-3 rounded-xl bg-muted/20 border border-border/60 space-y-1.5">
+              <div className="flex justify-between font-semibold text-foreground pb-1 border-b border-border/40">
+                <span>Items Ordered ({items.length} product lines)</span>
+                <span>Total Units: {items.reduce((s, it) => s + (it.quantity || 0) + (it.bonusQuantity || 0), 0)}</span>
+              </div>
+              <div className="max-h-36 overflow-y-auto space-y-1 pr-1 font-mono text-[11px]">
+                {items.map((it, idx) => {
+                  const m = medicines.find((x) => x.id === it.medicineId);
+                  const b = it.batches.find((x) => x.id === it.batchId);
+                  return (
+                    <div key={idx} className="flex justify-between text-muted-foreground">
+                      <span className="truncate max-w-[280px]">
+                        {m?.brandName || `Item #${idx + 1}`} ({b?.batchNumber || "FEFO"})
+                      </span>
+                      <span>
+                        {it.quantity} {it.bonusQuantity > 0 ? `(+${it.bonusQuantity} free)` : ""} @ Rs. {it.unitTradePrice}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Financial Totals */}
+            <div className="p-3.5 rounded-xl bg-sky-50/50 border border-sky-100 space-y-1.5 font-mono">
+              <div className="flex justify-between text-muted-foreground">
+                <span>Subtotal:</span>
+                <span>{formatCurrency(subtotal)}</span>
+              </div>
+              {totalDiscount > 0 && (
+                <div className="flex justify-between text-rose-600">
+                  <span>Discounts Applied:</span>
+                  <span>−{formatCurrency(totalDiscount)}</span>
+                </div>
+              )}
+              {lineTaxes > 0 && (
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Sales Tax (VAT):</span>
+                  <span>+{formatCurrency(lineTaxes)}</span>
+                </div>
+              )}
+              {deliveryCharge > 0 && (
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Delivery Charge:</span>
+                  <span>+{formatCurrency(deliveryCharge)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-bold text-sm text-[#0071E3] pt-1 border-t border-sky-200">
+                <span>Invoice Grand Total:</span>
+                <span>{formatCurrency(grandTotal)}</span>
+              </div>
+              <div className="flex justify-between text-emerald-700">
+                <span>Immediate Payment:</span>
+                <span>−{formatCurrency(paidAmount)}</span>
+              </div>
+              <div className="flex justify-between font-bold text-amber-800">
+                <span>Remaining Credit Balance Added:</span>
+                <span>{formatCurrency(dueAmount)}</span>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsReviewOpen(false)}
+              disabled={isSubmitting}
+              className="rounded-xl text-xs"
+            >
+              Back to Edit
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmSale}
+              disabled={isSubmitting}
+              className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs font-semibold px-5 shadow-sm"
+            >
+              {isSubmitting ? (
+                "Authorizing & Booking..."
+              ) : (
+                <>
+                  <Check className="h-4 w-4 mr-1.5" />
+                  Confirm Sale & Issue Invoice
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Step 8: Post-Sale Success Modal */}
+      <Dialog open={!!saleSuccessData} onOpenChange={() => {}}>
+        <DialogContent className="max-w-md rounded-2xl p-6 text-center space-y-4">
+          <div className="mx-auto h-14 w-14 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+            <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+          </div>
+
+          <div>
+            <h3 className="text-lg font-bold text-foreground">Sale Completed Successfully!</h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              Stock has been depleted according to strict FEFO and accounts receivable recorded.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-muted/20 border border-border/60 text-xs font-mono text-left space-y-2">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground font-sans">Sale Order:</span>
+              <span className="font-bold text-foreground">{saleSuccessData?.saleNumber}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground font-sans">Tax Invoice #:</span>
+              <span className="font-bold text-[#0071E3]">{saleSuccessData?.invoiceNumber}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground font-sans">Total Billed:</span>
+              <span className="font-bold text-foreground">{formatCurrency(saleSuccessData?.grandTotal || 0)}</span>
+            </div>
+            <div className="flex justify-between text-emerald-700">
+              <span className="font-sans">Amount Paid:</span>
+              <span className="font-bold">{formatCurrency(saleSuccessData?.paidAmount || 0)}</span>
+            </div>
+            <div className="flex justify-between text-amber-700">
+              <span className="font-sans">Accounts Receivable:</span>
+              <span className="font-bold">{formatCurrency(saleSuccessData?.dueAmount || 0)}</span>
+            </div>
+          </div>
+
+          <div className="space-y-2 pt-2">
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                asChild
+                className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-10 shadow-sm"
+              >
+                <Link href={`/invoices/${saleSuccessData?.invoiceId}`}>
+                  <FileText className="h-3.5 w-3.5 mr-1.5" /> View Invoice
+                </Link>
+              </Button>
+
+              <Button
+                asChild
+                variant="outline"
+                className="rounded-xl text-xs h-10 border-border"
+              >
+                <Link href={`/invoices/${saleSuccessData?.invoiceId}`}>
+                  <Printer className="h-3.5 w-3.5 mr-1.5 text-sky-600" /> Print Challan
+                </Link>
+              </Button>
+            </div>
+
+            <div className="flex items-center justify-between gap-2 pt-1">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleBookAnotherSale}
+                className="text-xs text-[#0071E3] hover:underline flex-1"
+              >
+                + Book New Sale
+              </Button>
+
+              <Button
+                asChild
+                variant="ghost"
+                className="text-xs text-muted-foreground hover:underline flex-1"
+              >
+                <Link href="/sales">Back to Sales</Link>
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }

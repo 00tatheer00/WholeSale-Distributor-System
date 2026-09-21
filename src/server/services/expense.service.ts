@@ -377,3 +377,71 @@ export async function cancelExpense(
     return { success: false, error: error.message || "Failed to cancel expense." };
   }
 }
+
+/**
+ * Update an existing operating expense voucher
+ */
+export async function updateExpense(
+  id: string,
+  input: Partial<ExpenseInput>,
+  userId?: string
+): Promise<{ success: boolean; data?: any; error?: string }> {
+  try {
+    const existing = await prisma.businessExpense.findUnique({ where: { id } });
+    if (!existing) {
+      return { success: false, error: "Expense voucher not found." };
+    }
+
+    if (existing.status === ExpenseStatus.REJECTED) {
+      return {
+        success: false,
+        error: "Cancelled expense vouchers cannot be modified.",
+      };
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const exp = await tx.businessExpense.update({
+        where: { id },
+        data: {
+          categoryId: input.categoryId !== undefined ? input.categoryId : existing.categoryId,
+          amount: input.amount !== undefined ? input.amount : existing.amount,
+          expenseDate: input.expenseDate ? new Date(input.expenseDate) : existing.expenseDate,
+          paymentMethod: input.paymentMethod ? (input.paymentMethod as PaymentMethod) : existing.paymentMethod,
+          paidTo: input.paidTo !== undefined ? input.paidTo.trim() : existing.paidTo,
+          description: input.description !== undefined ? input.description.trim() : existing.description,
+          referenceNumber: input.referenceNumber !== undefined ? input.referenceNumber?.trim() || null : existing.referenceNumber,
+          notes: input.notes !== undefined ? input.notes?.trim() || null : existing.notes,
+        },
+      });
+
+      if (userId) {
+        await tx.auditLog.create({
+          data: {
+            userId,
+            action: "UPDATE",
+            entityName: "BusinessExpense",
+            entityId: id,
+            oldValues: JSON.stringify({
+              amount: existing.amount,
+              paidTo: existing.paidTo,
+              description: existing.description,
+            }),
+            newValues: JSON.stringify({
+              amount: exp.amount,
+              paidTo: exp.paidTo,
+              description: exp.description,
+            }),
+          },
+        });
+      }
+
+      return exp;
+    });
+
+    return { success: true, data: updated };
+  } catch (error: any) {
+    console.error("Error updating expense:", error);
+    return { success: false, error: error.message || "Failed to update expense voucher." };
+  }
+}
+

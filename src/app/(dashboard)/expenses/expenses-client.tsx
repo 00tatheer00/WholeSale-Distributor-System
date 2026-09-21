@@ -18,6 +18,7 @@ import {
   ChevronRight,
   Ban,
   Filter,
+  Edit,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -43,11 +44,12 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { ExpenseQueryResult } from "@/server/services/expense.service";
 import {
   createExpenseAction,
+  updateExpenseAction,
   createExpenseCategoryAction,
   toggleExpenseCategoryStatusAction,
   cancelExpenseAction,
 } from "@/server/actions/expense.actions";
-import { ExpenseInput, ExpenseCategoryInput } from "@/validations/expense.schema";
+import { ExpenseInput, UpdateExpenseInput, ExpenseCategoryInput } from "@/validations/expense.schema";
 import { ExpenseCategoryRecord, ExpenseRecord } from "@/types/models";
 
 interface ExpensesClientProps {
@@ -64,6 +66,8 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
   const [selectedPayment, setSelectedPayment] = React.useState(searchParams.get("payment") || "ALL");
 
   const [isAddExpenseOpen, setIsAddExpenseOpen] = React.useState(false);
+  const [isEditExpenseOpen, setIsEditExpenseOpen] = React.useState(false);
+  const [editingExpense, setEditingExpense] = React.useState<ExpenseRecord | null>(null);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = React.useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = React.useState(false);
   const [cancellingExpense, setCancellingExpense] = React.useState<ExpenseRecord | null>(null);
@@ -71,6 +75,20 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [feedback, setFeedback] = React.useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Edit Expense Form State
+  const [editExpenseForm, setEditExpenseForm] = React.useState<UpdateExpenseInput>({
+    id: "",
+    categoryId: categories[0]?.id || "",
+    amount: 0,
+    expenseDate: new Date().toISOString().split("T")[0],
+    paidTo: "",
+    paymentMethod: "CASH",
+    description: "",
+    referenceNumber: "",
+    notes: "",
+  });
+
 
   // Expense Form State
   const [expenseForm, setExpenseForm] = React.useState<ExpenseInput>({
@@ -157,7 +175,49 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
     }
   };
 
+  const handleEditExpenseClick = (exp: ExpenseRecord) => {
+    setEditingExpense(exp);
+    setEditExpenseForm({
+      id: exp.id,
+      categoryId: exp.categoryId || categories[0]?.id || "",
+      amount: exp.amount,
+      expenseDate: exp.expenseDate ? exp.expenseDate.split("T")[0] : new Date().toISOString().split("T")[0],
+      paidTo: exp.paidTo || "",
+      paymentMethod: (exp.paymentMethod as any) || "CASH",
+      description: exp.description || "",
+      referenceNumber: exp.referenceNumber || "",
+      notes: exp.notes || "",
+    });
+    setIsEditExpenseOpen(true);
+  };
+
+  const handleUpdateExpense = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editExpenseForm.id || !editExpenseForm.categoryId || !editExpenseForm.paidTo?.trim() || !editExpenseForm.description?.trim()) {
+      setFeedback({ type: "error", message: "Please fill all required fields." });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const res = await updateExpenseAction(editExpenseForm);
+      if (res.success) {
+        setFeedback({ type: "success", message: res.message || "Operating expense updated successfully." });
+        setIsEditExpenseOpen(false);
+        setEditingExpense(null);
+        router.refresh();
+      } else {
+        setFeedback({ type: "error", message: res.error || "Failed to update expense." });
+      }
+    } catch {
+      setFeedback({ type: "error", message: "Unexpected error occurred." });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleCreateCategory = async (e: React.FormEvent) => {
+
     e.preventDefault();
     if (!categoryForm.name.trim()) {
       setFeedback({ type: "error", message: "Category name is required." });
@@ -417,7 +477,7 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
                 <th className="px-4 py-3.5">Paid To / Payee</th>
                 <th className="px-4 py-3.5">Description</th>
                 <th className="px-4 py-3.5">Method</th>
-                <th className="px-4 py-3.5 text-right">Amount (AFN)</th>
+                <th className="px-4 py-3.5 text-right">Amount (Rs.)</th>
                 <th className="px-4 py-3.5 text-center">Status</th>
                 <th className="px-5 py-3.5 text-right">Action</th>
               </tr>
@@ -493,19 +553,33 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
 
                     {/* Action */}
                     <td className="px-5 py-3.5 text-right">
-                      {e.status === "APPROVED" && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setCancellingExpense(e);
-                            setIsCancelModalOpen(true);
-                          }}
-                          className="h-7 px-2 text-xs text-rose-600 hover:bg-rose-50"
-                        >
-                          <Ban className="h-3 w-3 mr-1" /> Void
-                        </Button>
-                      )}
+                      <div className="flex items-center justify-end gap-1">
+                        {e.status === "APPROVED" && (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditExpenseClick(e)}
+                              className="h-7 px-2 text-xs text-sky-600 hover:text-sky-700 hover:bg-sky-50 rounded-lg"
+                              title="Edit Expense Voucher"
+                            >
+                              <Edit className="h-3 w-3 mr-1" /> Edit
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setCancellingExpense(e);
+                                setIsCancelModalOpen(true);
+                              }}
+                              className="h-7 px-2 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg"
+                              title="Void Expense Voucher"
+                            >
+                              <Ban className="h-3 w-3 mr-1" /> Void
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -554,7 +628,7 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
         )}
       </div>
 
-      {/* 6. Record Expense Modal */}
+      {/* 6A. Record Expense Modal */}
       <Dialog open={isAddExpenseOpen} onOpenChange={setIsAddExpenseOpen}>
         <DialogContent className="max-w-lg rounded-2xl">
           <DialogHeader>
@@ -589,7 +663,7 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
 
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-foreground">
-                  Amount (AFN / ؋) <span className="text-rose-500">*</span>
+                  Amount (PKR / Rs.) <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   type="number"
@@ -609,7 +683,7 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
                   Payee / Vendor Name <span className="text-rose-500">*</span>
                 </Label>
                 <Input
-                  placeholder="e.g. Dhaka Power Distribution (DPDC)"
+                  placeholder="e.g. K-Electric / LESCO / Landlord"
                   value={expenseForm.paidTo}
                   onChange={(e) => setExpenseForm({ ...expenseForm, paidTo: e.target.value })}
                   className="h-9 rounded-xl bg-muted/20 text-xs"
@@ -641,7 +715,7 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
                     <SelectItem value="CASH">Cash Payment</SelectItem>
                     <SelectItem value="BANK_TRANSFER">Bank Online Transfer</SelectItem>
                     <SelectItem value="CHEQUE">Cheque</SelectItem>
-                    <SelectItem value="MFS_BKASH_NAGAD">bKash / Nagad</SelectItem>
+                    <SelectItem value="MFS_BKASH_NAGAD">Raast / JazzCash / EasyPaisa</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -690,6 +764,156 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* 6B. Edit Expense Modal */}
+      <Dialog open={isEditExpenseOpen} onOpenChange={setIsEditExpenseOpen}>
+        <DialogContent className="max-w-lg rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base font-bold">
+              <Edit className="h-5 w-5 text-sky-600" />
+              Edit Operating Expense Voucher
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleUpdateExpense} className="space-y-4 pt-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">
+                  Expense Category <span className="text-rose-500">*</span>
+                </Label>
+                <Select
+                  value={editExpenseForm.categoryId}
+                  onValueChange={(val) => setEditExpenseForm({ ...editExpenseForm, categoryId: val })}
+                >
+                  <SelectTrigger className="h-9 rounded-xl text-xs bg-muted/20">
+                    <SelectValue placeholder="Select Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">
+                  Amount (PKR / Rs.) <span className="text-rose-500">*</span>
+                </Label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={editExpenseForm.amount}
+                  onChange={(e) =>
+                    setEditExpenseForm({ ...editExpenseForm, amount: parseFloat(e.target.value) || 0 })
+                  }
+                  className="h-9 rounded-xl bg-muted/20 text-xs font-mono font-bold"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">
+                  Payee / Vendor Name <span className="text-rose-500">*</span>
+                </Label>
+                <Input
+                  placeholder="e.g. K-Electric / LESCO / Landlord"
+                  value={editExpenseForm.paidTo}
+                  onChange={(e) => setEditExpenseForm({ ...editExpenseForm, paidTo: e.target.value })}
+                  className="h-9 rounded-xl bg-muted/20 text-xs"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Expense Date</Label>
+                <Input
+                  type="date"
+                  value={editExpenseForm.expenseDate}
+                  onChange={(e) => setEditExpenseForm({ ...editExpenseForm, expenseDate: e.target.value })}
+                  className="h-9 rounded-xl bg-muted/20 text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Payment Method</Label>
+                <Select
+                  value={editExpenseForm.paymentMethod}
+                  onValueChange={(val: any) =>
+                    setEditExpenseForm({ ...editExpenseForm, paymentMethod: val })
+                  }
+                >
+                  <SelectTrigger className="h-9 rounded-xl text-xs bg-muted/20">
+                    <SelectValue placeholder="Select Method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="CASH">Cash Payment</SelectItem>
+                    <SelectItem value="BANK_TRANSFER">Bank Online Transfer</SelectItem>
+                    <SelectItem value="CHEQUE">Cheque</SelectItem>
+                    <SelectItem value="MFS_BKASH_NAGAD">Raast / JazzCash / EasyPaisa</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Cheque / Trx Reference</Label>
+                <Input
+                  placeholder="Optional reference #"
+                  value={editExpenseForm.referenceNumber || ""}
+                  onChange={(e) => setEditExpenseForm({ ...editExpenseForm, referenceNumber: e.target.value })}
+                  className="h-9 rounded-xl bg-muted/20 text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">
+                Description / Purpose <span className="text-rose-500">*</span>
+              </Label>
+              <Textarea
+                rows={2}
+                placeholder="Brief description of the expense..."
+                value={editExpenseForm.description}
+                onChange={(e) => setEditExpenseForm({ ...editExpenseForm, description: e.target.value })}
+                className="rounded-xl bg-muted/20 text-xs resize-none"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">Audit / Modification Notes</Label>
+              <Input
+                placeholder="Reason for modifying this voucher..."
+                value={editExpenseForm.notes || ""}
+                onChange={(e) => setEditExpenseForm({ ...editExpenseForm, notes: e.target.value })}
+                className="h-9 rounded-xl bg-muted/20 text-xs"
+              />
+            </div>
+
+            <DialogFooter className="gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditExpenseOpen(false)}
+                className="rounded-xl text-xs"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-medium"
+              >
+                {isSubmitting ? "Saving Changes..." : "Save Voucher Changes"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
 
       {/* 7. Manage Categories Modal */}
       <Dialog open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen}>

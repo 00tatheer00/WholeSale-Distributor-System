@@ -24,6 +24,12 @@ export const cancelExpenseSchema = z.object({
   reason: z.string().min(3, "Cancellation reason is required"),
 });
 
+export const updateExpenseSchema = expenseSchema.partial().extend({
+  id: z.string().min(1, "Expense ID is required"),
+});
+
 export type ExpenseCategoryInput = z.infer<typeof expenseCategorySchema>;
 export type ExpenseInput = z.infer<typeof expenseSchema>;
+export type UpdateExpenseInput = z.infer<typeof updateExpenseSchema>;
 export type CancelExpenseInput = z.infer<typeof cancelExpenseSchema>;
+

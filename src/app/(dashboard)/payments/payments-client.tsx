@@ -77,9 +77,14 @@ export function PaymentsClient({
   const [receiptModalOpen, setReceiptModalOpen] = React.useState(false);
   const [loadingReceipt, setLoadingReceipt] = React.useState(false);
 
+  const initialCustomerFromUrl = searchParams.get("customer");
+  const matchingCustomer = customers.find((c) => c.id === initialCustomerFromUrl);
+
+  const [confirmCollectionOpen, setConfirmCollectionOpen] = React.useState(false);
+
   const [formData, setFormData] = React.useState<CustomerPaymentInput>({
-    customerId: customers[0]?.id || "",
-    amount: 10000,
+    customerId: matchingCustomer ? matchingCustomer.id : customers[0]?.id || "",
+    amount: matchingCustomer && matchingCustomer.currentDue > 0 ? matchingCustomer.currentDue : 10000,
     paymentMethod: "CASH",
     paymentDate: new Date().toISOString().split("T")[0],
     referenceNo: "",
@@ -89,6 +94,12 @@ export function PaymentsClient({
     distributorId: "",
     notes: "",
   });
+
+  React.useEffect(() => {
+    if (searchParams.get("action") === "new" || searchParams.get("record") === "true") {
+      setIsAddOpen(true);
+    }
+  }, [searchParams]);
 
   const data = initialPaymentsData || {
     payments: [],
@@ -124,41 +135,43 @@ export function PaymentsClient({
     applyFilters({ search: search.trim() || null });
   };
 
-  const handleSubmitPayment = async (e: React.FormEvent) => {
+  const handleReviewPayment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.customerId || !formData.amount || formData.amount <= 0) {
-      setFeedback({ type: "error", message: "Please select customer and enter a valid positive payment amount." });
+      setFeedback({ type: "error", message: "Please select customer pharmacy and enter a valid positive payment amount." });
       return;
     }
+    setConfirmCollectionOpen(true);
+  };
 
+  const handleConfirmCollection = async () => {
     try {
       setIsSubmitting(true);
       const res = await recordCustomerPaymentAction(formData);
 
-      if (res.success) {
+      if (res.success && res.data) {
+        setConfirmCollectionOpen(false);
+        setIsAddOpen(false);
         setFeedback({
           type: "success",
-          message: res.message || "Payment receipt created and allocated successfully.",
+          message: res.message || `Money Receipt ${res.data.receiptNumber} recorded and allocated successfully.`,
         });
-        setIsAddOpen(false);
-        setFormData({
-          customerId: customers[0]?.id || "",
-          amount: 10000,
-          paymentMethod: "CASH",
-          paymentDate: new Date().toISOString().split("T")[0],
-          referenceNo: "",
-          bankName: "",
-          chequeNumber: "",
-          chequeMaturityDate: "",
-          distributorId: "",
-          notes: "",
-        });
+
+        // Automatically fetch and show newly generated Money Receipt
+        const receiptRes = await getPaymentByIdAction(res.data.paymentId);
+        if (receiptRes.success && receiptRes.data) {
+          setSelectedReceipt(receiptRes.data);
+          setReceiptModalOpen(true);
+        }
+
         router.refresh();
       } else {
         setFeedback({ type: "error", message: res.error || "Failed to record payment." });
+        setConfirmCollectionOpen(false);
       }
     } catch {
       setFeedback({ type: "error", message: "Unexpected error while recording payment." });
+      setConfirmCollectionOpen(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -504,7 +517,7 @@ export function PaymentsClient({
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleSubmitPayment} className="space-y-4 pt-2">
+          <form onSubmit={handleReviewPayment} className="space-y-4 pt-2">
             {/* Customer Pharmacy */}
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-foreground">
@@ -560,7 +573,7 @@ export function PaymentsClient({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-foreground">
-                  Payment Amount (AFN / ؋) <span className="text-rose-500">*</span>
+                  Payment Amount (Rs.) <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   type="number"
@@ -584,7 +597,7 @@ export function PaymentsClient({
                     <SelectItem value="CASH">Cash Collection</SelectItem>
                     <SelectItem value="BANK_TRANSFER">Bank Online Transfer</SelectItem>
                     <SelectItem value="CHEQUE">Cheque / Demand Draft</SelectItem>
-                    <SelectItem value="MFS_BKASH_NAGAD">bKash / Nagad / MFS</SelectItem>
+                    <SelectItem value="MFS_BKASH_NAGAD">Raast / JazzCash / EasyPaisa / MFS</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -596,7 +609,7 @@ export function PaymentsClient({
                 <div className="space-y-1.5">
                   <Label className="text-xs font-semibold text-foreground">Bank Name / Wallet</Label>
                   <Input
-                    placeholder="e.g. Dutch-Bangla Bank"
+                    placeholder="e.g. Meezan Bank / HBL / MCB / Allied Bank"
                     value={formData.bankName || ""}
                     onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
                     className="h-9 rounded-xl bg-muted/20 text-xs"
@@ -675,14 +688,74 @@ export function PaymentsClient({
                 Cancel
               </Button>
               <Button
-                type="submit"
-                disabled={isSubmitting}
+                type="button"
+                onClick={handleReviewPayment}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-medium"
               >
-                {isSubmitting ? "Generating Receipt..." : "Record & Allocate Receipt"}
+                Review & Confirm Collection
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Pre-Confirmation Dialog */}
+      <Dialog open={confirmCollectionOpen} onOpenChange={setConfirmCollectionOpen}>
+        <DialogContent className="max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base font-bold text-foreground">
+              <Receipt className="h-5 w-5 text-emerald-600" />
+              Confirm Customer Collection
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3 py-2 text-xs">
+            <div className="p-3.5 rounded-xl bg-muted/40 border border-border/80 space-y-2">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Customer Pharmacy:</span>
+                <span className="font-bold text-foreground">{selectedCustomer?.tradeName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Current Outstanding Balance:</span>
+                <span className="font-mono font-bold text-amber-700">{formatCurrency(currentDue)}</span>
+              </div>
+              <div className="flex justify-between border-t border-border pt-1.5 text-sm">
+                <span className="font-semibold text-emerald-800">Collection Amount:</span>
+                <span className="font-mono font-extrabold text-emerald-700">{formatCurrency(paymentAmount)}</span>
+              </div>
+              <div className="flex justify-between border-t border-dashed border-border pt-1.5">
+                <span className="text-muted-foreground">Remaining Balance:</span>
+                <span className="font-mono font-bold text-foreground">{formatCurrency(remainingDue)}</span>
+              </div>
+              <div className="flex justify-between pt-1">
+                <span className="text-muted-foreground">Payment Method:</span>
+                <span className="font-semibold text-foreground">{formData.paymentMethod.replace("_", " ")}</span>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-muted-foreground">
+              This payment will be allocated to open invoices via FIFO order. An official customer Money Receipt voucher will be generated immediately.
+            </p>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setConfirmCollectionOpen(false)}
+              className="rounded-xl text-xs"
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              disabled={isSubmitting}
+              onClick={handleConfirmCollection}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold"
+            >
+              {isSubmitting ? "Posting Collection..." : "Confirm Collection"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

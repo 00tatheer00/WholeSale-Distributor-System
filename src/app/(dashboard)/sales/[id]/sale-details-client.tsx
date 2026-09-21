@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   Phone,
   ShieldAlert,
+  Truck,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -90,15 +91,28 @@ export function SaleDetailsClient({ sale }: SaleDetailsClientProps) {
 
         <div className="flex items-center gap-2">
           {sale.invoiceNumber && (
-            <Button
-              asChild
-              className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-4 shadow-sm"
-            >
-              <Link href={`/invoices/${sale.invoiceNumber}`}>
-                <FileText className="h-3.5 w-3.5 mr-1.5" />
-                View & Print Tax Invoice
-              </Link>
-            </Button>
+            <>
+              <Button
+                asChild
+                className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-4 shadow-sm"
+              >
+                <Link href={`/invoices/${sale.invoiceNumber}`}>
+                  <FileText className="h-3.5 w-3.5 mr-1.5" />
+                  Wholesale Tax Invoice
+                </Link>
+              </Button>
+
+              <Button
+                asChild
+                variant="outline"
+                className="rounded-xl text-xs h-9 px-3.5 border-emerald-300 text-emerald-800 bg-emerald-50/50 hover:bg-emerald-100/60"
+              >
+                <Link href={`/invoices/${sale.invoiceNumber}?tab=CHALLAN`}>
+                  <Truck className="h-3.5 w-3.5 mr-1.5 text-emerald-700" />
+                  Delivery Challan
+                </Link>
+              </Button>
+            </>
           )}
 
           {sale.status === "CONFIRMED" && (
@@ -200,7 +214,7 @@ export function SaleDetailsClient({ sale }: SaleDetailsClientProps) {
       {/* 3. Top Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-4.5 shadow-sm">
-          <div className="text-xs font-medium text-sky-800">Grand Total (AFN)</div>
+          <div className="text-xs font-medium text-sky-800">Grand Total (Rs.)</div>
           <div className="mt-2 text-2xl font-bold text-sky-950 font-mono">
             {formatCurrency(sale.grandTotal)}
           </div>
@@ -234,10 +248,10 @@ export function SaleDetailsClient({ sale }: SaleDetailsClientProps) {
         </div>
       </div>
 
-      {/* 4. Customer Information Card */}
+      {/* 4. Customer & Sales Representative Information Card */}
       <div className="bg-card border border-border/80 rounded-2xl p-6 shadow-sm">
         <h3 className="font-semibold text-sm text-foreground pb-3 border-b border-border/60 flex items-center gap-2">
-          <Building2 className="h-4 w-4 text-[#0071E3]" /> Customer Pharmacy & Dispatch Information
+          <Building2 className="h-4 w-4 text-[#0071E3]" /> Customer Pharmacy & Sales Representative
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 text-xs">
@@ -254,14 +268,14 @@ export function SaleDetailsClient({ sale }: SaleDetailsClientProps) {
           </div>
 
           <div>
-            <span className="text-muted-foreground">Contact & Drug License:</span>
+            <span className="text-muted-foreground">Contact & Drug Regulatory Lic:</span>
             <div className="font-semibold text-foreground mt-0.5">{sale.customerPhone}</div>
-            <div className="font-mono text-muted-foreground mt-0.5">DGDA: {sale.companyDrugLicense || "Verified"}</div>
+            <div className="font-mono text-muted-foreground mt-0.5">DRAP Lic: {sale.companyDrugLicense || "Verified"}</div>
           </div>
 
           <div>
-            <span className="text-muted-foreground">Assigned Salesman / Route:</span>
-            <div className="font-semibold text-foreground mt-0.5">{sale.salesmanName}</div>
+            <span className="text-muted-foreground">Sales Representative:</span>
+            <div className="font-semibold text-foreground mt-0.5">{sale.salesmanName || "Direct HQ"}</div>
             <div className="text-muted-foreground mt-0.5">Delivery Status: {sale.deliveryStatus}</div>
           </div>
         </div>
@@ -329,7 +343,122 @@ export function SaleDetailsClient({ sale }: SaleDetailsClientProps) {
         </div>
       </div>
 
-      {/* 6. Cancel Dialog */}
+      {/* 6. Pricing Breakdown & Documents Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Pricing & Settlement */}
+        <div className="bg-card border border-border/80 rounded-2xl p-6 shadow-sm space-y-3">
+          <h3 className="font-semibold text-sm text-foreground pb-2 border-b border-border/60 flex items-center gap-2">
+            <CreditCard className="h-4 w-4 text-emerald-600" /> Pricing & Settlement Summary
+          </h3>
+
+          <div className="space-y-2 text-xs font-mono">
+            <div className="flex justify-between text-muted-foreground">
+              <span>Items Subtotal:</span>
+              <span className="font-semibold text-foreground">{formatCurrency(sale.subtotalAmount)}</span>
+            </div>
+
+            {sale.discountAmount > 0 && (
+              <div className="flex justify-between text-rose-600">
+                <span>Wholesale Discounts:</span>
+                <span>−{formatCurrency(sale.discountAmount)}</span>
+              </div>
+            )}
+
+            {sale.taxAmount > 0 && (
+              <div className="flex justify-between text-muted-foreground">
+                <span>Sales Tax / VAT:</span>
+                <span>+{formatCurrency(sale.taxAmount)}</span>
+              </div>
+            )}
+
+            {sale.deliveryCharge > 0 && (
+              <div className="flex justify-between text-muted-foreground">
+                <span>Delivery Freight:</span>
+                <span>+{formatCurrency(sale.deliveryCharge)}</span>
+              </div>
+            )}
+
+            <div className="pt-2 border-t border-border flex justify-between font-bold text-sm text-foreground">
+              <span>Net Grand Total:</span>
+              <span className="text-[#0071E3]">{formatCurrency(sale.grandTotal)}</span>
+            </div>
+
+            <div className="flex justify-between text-emerald-700 font-bold pt-1">
+              <span>Amount Paid:</span>
+              <span>−{formatCurrency(sale.paidAmount)}</span>
+            </div>
+
+            <div className="flex justify-between text-amber-700 font-extrabold text-sm pt-1 border-t border-dashed border-border">
+              <span>Accounts Receivable Due:</span>
+              <span>{formatCurrency(sale.dueAmount)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Official Documents Deck */}
+        <div className="bg-card border border-border/80 rounded-2xl p-6 shadow-sm space-y-3 flex flex-col justify-between">
+          <div>
+            <h3 className="font-semibold text-sm text-foreground pb-2 border-b border-border/60 flex items-center gap-2">
+              <FileText className="h-4 w-4 text-[#0071E3]" /> Official Business Documents
+            </h3>
+            <p className="text-xs text-muted-foreground pt-1">
+              All documents generated automatically in strict compliance with Drug Regulatory Authority of Pakistan (DRAP).
+            </p>
+          </div>
+
+          <div className="space-y-2.5">
+            {sale.invoiceNumber && (
+              <div className="p-3 rounded-xl bg-muted/30 border border-border/60 flex items-center justify-between">
+                <div>
+                  <div className="font-mono font-bold text-xs text-foreground flex items-center gap-1.5">
+                    <FileText className="h-3.5 w-3.5 text-[#0071E3]" />
+                    Wholesale Tax Invoice
+                  </div>
+                  <div className="text-[11px] text-muted-foreground font-mono">{sale.invoiceNumber}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button asChild size="sm" variant="outline" className="h-8 rounded-xl text-xs">
+                    <Link href={`/invoices/${sale.invoiceNumber}`}>
+                      View
+                    </Link>
+                  </Button>
+                  <Button asChild size="sm" className="h-8 rounded-xl text-xs bg-[#0071E3] hover:bg-[#0077ED] text-white">
+                    <Link href={`/invoices/${sale.invoiceNumber}`}>
+                      <Printer className="h-3 w-3 mr-1" /> Print
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {sale.invoiceNumber && (
+              <div className="p-3 rounded-xl bg-muted/30 border border-border/60 flex items-center justify-between">
+                <div>
+                  <div className="font-mono font-bold text-xs text-foreground flex items-center gap-1.5">
+                    <Truck className="h-3.5 w-3.5 text-emerald-600" />
+                    Goods Delivery Challan
+                  </div>
+                  <div className="text-[11px] text-muted-foreground font-mono">Warehouse Dispatch Copy</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button asChild size="sm" variant="outline" className="h-8 rounded-xl text-xs">
+                    <Link href={`/invoices/${sale.invoiceNumber}?tab=CHALLAN`}>
+                      View
+                    </Link>
+                  </Button>
+                  <Button asChild size="sm" className="h-8 rounded-xl text-xs bg-emerald-600 hover:bg-emerald-700 text-white">
+                    <Link href={`/invoices/${sale.invoiceNumber}?tab=CHALLAN`}>
+                      <Printer className="h-3 w-3 mr-1" /> Print
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 7. Cancel Dialog */}
       <Dialog open={cancelModalOpen} onOpenChange={setCancelModalOpen}>
         <DialogContent className="max-w-md rounded-2xl">
           <DialogHeader>

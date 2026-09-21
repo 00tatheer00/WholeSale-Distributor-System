@@ -188,7 +188,7 @@ export function SupplierDetailClient({ supplier }: SupplierDetailClientProps) {
               </div>
               <p className="text-xs text-muted-foreground flex items-center gap-1.5 pt-1">
                 <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                {supplier.address ? `${supplier.address}, ${supplier.city || "Dhaka"}` : "Dhaka, Bangladesh"}
+                {supplier.address ? `${supplier.address}, ${supplier.city || "Karachi"}` : "Karachi, Pakistan"}
               </p>
             </div>
 
@@ -267,7 +267,7 @@ export function SupplierDetailClient({ supplier }: SupplierDetailClientProps) {
                 {formatCurrency(supplier.currentPayable)}
               </p>
               <p className="text-[11px] text-rose-600/80 font-medium">
-                {supplier.currentPayable > 0 ? "Pending Payment Due" : "All Accounts Cleared"}
+                {supplier.currentPayable > 0 ? "Amount We Owe Supplier" : "All Accounts Cleared"}
               </p>
             </div>
             <div className="h-11 w-11 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500">
@@ -606,10 +606,10 @@ export function SupplierDetailClient({ supplier }: SupplierDetailClientProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="BANK_TRANSFER">Bank Transfer / NEFT</SelectItem>
+                      <SelectItem value="BANK_TRANSFER">Bank Transfer (IBFT / Raast)</SelectItem>
                       <SelectItem value="CHEQUE">Bank Cheque</SelectItem>
                       <SelectItem value="CASH">Cash Payment</SelectItem>
-                      <SelectItem value="MFS_BKASH_NAGAD">MFS (bKash/Nagad)</SelectItem>
+                      <SelectItem value="MFS_BKASH_NAGAD">Raast / JazzCash / EasyPaisa / MFS</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

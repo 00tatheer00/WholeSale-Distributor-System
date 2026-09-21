@@ -2,10 +2,12 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Printer,
   ArrowLeft,
   Store,
+  ShoppingCart,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,7 +19,18 @@ interface InvoiceDetailsClientProps {
 }
 
 export function InvoiceDetailsClient({ invoice }: InvoiceDetailsClientProps) {
-  const [activeTab, setActiveTab] = React.useState<"INVOICE" | "CHALLAN">("INVOICE");
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") === "CHALLAN" ? "CHALLAN" : "INVOICE";
+  const [activeTab, setActiveTab] = React.useState<"INVOICE" | "CHALLAN">(initialTab);
+
+  React.useEffect(() => {
+    if (searchParams.get("print") === "true") {
+      const timer = setTimeout(() => {
+        window.print();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
 
   const handlePrint = () => {
     window.print();
@@ -27,16 +40,31 @@ export function InvoiceDetailsClient({ invoice }: InvoiceDetailsClientProps) {
     <div className="space-y-6 max-w-[1000px] mx-auto pb-20 print:p-0 print:m-0 print:max-w-none">
       {/* 1. Print & Navigation Toolbar (Hidden in Print) */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 print:hidden">
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="text-xs text-muted-foreground hover:text-foreground rounded-xl"
-        >
-          <Link href="/invoices">
-            <ArrowLeft className="h-4 w-4 mr-1.5" /> Back to Invoices
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="text-xs text-muted-foreground hover:text-foreground rounded-xl"
+          >
+            <Link href="/invoices">
+              <ArrowLeft className="h-4 w-4 mr-1.5" /> All Invoices
+            </Link>
+          </Button>
+
+          {invoice.saleOrderId && (
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="text-xs rounded-xl h-8"
+            >
+              <Link href={`/sales/${invoice.saleOrderId}`}>
+                <ShoppingCart className="h-3.5 w-3.5 mr-1 text-[#0071E3]" /> View Sale Order
+              </Link>
+            </Button>
+          )}
+        </div>
 
         <div className="flex items-center gap-3">
           {/* Document Switcher */}
@@ -308,11 +336,11 @@ export function InvoiceDetailsClient({ invoice }: InvoiceDetailsClientProps) {
             </div>
           </div>
 
-          {/* DGDA Compliance Notice */}
+          {/* DRAP Compliance Notice */}
           <div className="text-[9px] text-muted-foreground border-t border-border/40 pt-2 text-center">
             {invoice.companyInvoiceFooter}
             <br />
-            Subject to DGDA wholesale regulations. Computer-generated tax document.
+            Subject to Drug Regulatory Authority of Pakistan (DRAP) wholesale regulations. Computer-generated tax document.
           </div>
         </div>
       </div>

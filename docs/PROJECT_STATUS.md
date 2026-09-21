@@ -31,6 +31,7 @@
 | **Phase 16**| 100% Offline Desktop Edition (.exe) & Multi-PC LAN | ✅ Completed | SQLite zero-install database conversion (`wmdms.db`), local bcrypt session authentication, Electron Desktop wrapper with auto-server & LAN IP discovery, offline seed script (`prisma/seed-offline.ts`), client delivery runbook (`docs/OFFLINE_DESKTOP_GUIDE.md`). |
 | **Phase 17**| Senior Developer Technical & Functional Audit | ✅ Completed | Full 23-part technical and functional discovery audit report created at `docs/CURRENT_AUDIT_REPORT.md` covering stack, architecture, 28 database models, routes, buttons, business logic, and client requirements matrix. |
 | **Phase 18**| ERP UX Foundation, Pakistan Regional Localization & Core Operations | ✅ Completed | Complete Pakistan localization (`PKR`, `Rs.`, DRAP, Raast/JazzCash/EasyPaisa, zero legacy symbols), Decoupled `Manufacturer` Master (`/manufacturers`), Warehouse CRUD (`/warehouses`), Inter-Warehouse Stock Transfers (`/inventory/transfers`), Safe Deletion & Deactivation Guards across Medicines, Suppliers, Customers & Warehouses with accounting dependency preservation, open-ended "Rack/Shelf/Bin" purchase intake, and Dashboard quick action deck. |
+| **Phase 19**| Sales & Finance Workflow UX (Sales, Invoicing, Challans, Collections, Ledger 360 & Profit) | ✅ Completed | Guided Wholesale Sales booking with live credit checks and FEFO batch chips; Sales listing with Sales Rep filter and Date presets; Sale Details 360 with Documents deck; DRAP-compliant single-page A4 Tax Invoice & Delivery Challan; Customer Collections with pre-confirmation review dialog and instant Money Receipt print modal; Customer AR 360 with quick actions; Supplier AP 360 with "Amount We Owe Supplier" clarity; Sales Representative cockpit with target performance and recovery metrics; Safe Operating Expense Edit workflow with atomic transaction; Executive Profit & Financial Intelligence cockpit with helper questions and "This Year" preset. Verified with 0 TypeScript errors and 52/52 Next.js production routes. |
 
 ---
 
@@ -54,8 +55,8 @@
 ---
 
 ## 3. Next Planned Phase
-- **Phase 19 — Guided Sales Dispatch & Invoice Workflow**:
-  - Enhance `/sales/new` with visual customer credit gauge, live over-limit warnings, and one-click credit approval workflow.
-  - Fast-dispatch delivery challan with batch-picking location guidance ("Rack/Shelf/Bin" shown directly on pick lists).
-  - Print-ready wholesale invoice layout with DRAP registration, NTN, and dual-language receipt footers.
+- **Phase 20 — Advanced Inventory Barcoding, Batch Recalls & Regulatory DRAP Reporting**:
+  - Barcode label printing for warehouse medicine bins and batch carton packs.
+  - Quarantine and Batch Recall rapid-freeze workflow with customer dispatch audit trail.
+  - Regulatory DRAP Form 7 and Form 8 export generation for wholesale inspection audits.
 

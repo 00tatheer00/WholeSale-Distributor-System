@@ -4,9 +4,11 @@ import { revalidatePath } from "next/cache";
 import {
   expenseCategorySchema,
   expenseSchema,
+  updateExpenseSchema,
   cancelExpenseSchema,
   ExpenseCategoryInput,
   ExpenseInput,
+  UpdateExpenseInput,
   CancelExpenseInput,
 } from "@/validations/expense.schema";
 import {
@@ -15,10 +17,12 @@ import {
   toggleExpenseCategoryStatus,
   getExpenses,
   createExpense,
+  updateExpense,
   cancelExpense,
   ExpenseQueryParams,
   ExpenseQueryResult,
 } from "@/server/services/expense.service";
+
 import { ExpenseCategoryRecord, ExpenseRecord } from "@/types/models";
 
 export interface ActionResult<T = any> {
@@ -141,3 +145,29 @@ export async function cancelExpenseAction(
     return { success: false, error: "Failed to cancel expense." };
   }
 }
+
+export async function updateExpenseAction(
+  data: UpdateExpenseInput
+): Promise<ActionResult> {
+  try {
+    const parsed = updateExpenseSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.errors[0]?.message || "Invalid update data" };
+    }
+
+    const { id, ...fields } = parsed.data;
+    const result = await updateExpense(id, fields);
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
+
+    revalidatePath("/expenses");
+    revalidatePath("/profit");
+    revalidatePath("/dashboard");
+    return { success: true, message: "Expense voucher updated successfully." };
+  } catch (error: any) {
+    console.error("updateExpenseAction error:", error);
+    return { success: false, error: "Failed to update expense." };
+  }
+}
+

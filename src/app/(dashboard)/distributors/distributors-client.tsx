@@ -71,7 +71,7 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
     phone: "",
     email: "",
     address: "",
-    assignedTerritory: "Dhanmondi & Green Road",
+    assignedTerritory: "Clifton & Saddar, Karachi",
     assignedRoute: "Morning Beat 1",
     monthlySalesTarget: 500000,
     commissionRatePercent: 2.5,
@@ -129,7 +129,7 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
           phone: "",
           email: "",
           address: "",
-          assignedTerritory: "Dhanmondi & Green Road",
+          assignedTerritory: "Clifton & Saddar, Karachi",
           assignedRoute: "Morning Beat 1",
           monthlySalesTarget: 500000,
           commissionRatePercent: 2.5,
@@ -169,8 +169,8 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
     <div className="space-y-6 max-w-[1400px] mx-auto pb-16">
       {/* 1. Header Section */}
       <PageHeader
-        title="Distributors & Field Sales Representatives"
-        description="Medical representatives (MR), assigned routes, field booking performance, collection recovery, and net contribution."
+        title="Sales Representatives & Field Officers"
+        description="Medical sales representatives (MSR), assigned pharmacy beats, booking performance, customer collection recovery, and commission tracking."
       >
         <Button
           onClick={() => setIsAddOpen(true)}

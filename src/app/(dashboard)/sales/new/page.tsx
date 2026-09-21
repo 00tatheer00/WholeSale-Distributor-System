@@ -24,7 +24,7 @@ export default async function NewSalePage() {
       drugLicenseExpiry: c.drugLicenseExpiry?.toISOString().split("T")[0] || "",
       phone: c.phone,
       deliveryAddress: c.address,
-      city: c.city || "Dhaka",
+      city: c.city || "Karachi",
       creditLimit: Number(c.creditLimit),
       currentDue: Number(c.currentDue),
       availableCredit: Math.max(0, Number(c.creditLimit) - Number(c.currentDue)),

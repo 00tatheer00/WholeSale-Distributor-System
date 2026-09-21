@@ -47,6 +47,11 @@ export function resolveProfitDateRange(
       start.setHours(0, 0, 0, 0);
       end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
       break;
+    case "this_year":
+      start = new Date(now.getFullYear(), 0, 1);
+      start.setHours(0, 0, 0, 0);
+      end = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+      break;
     case "custom":
       if (customStart && customEnd) {
         start = new Date(customStart);

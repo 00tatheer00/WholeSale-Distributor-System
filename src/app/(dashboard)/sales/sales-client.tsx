@@ -22,6 +22,8 @@ import {
   Printer,
   Ban,
   Phone,
+  Truck,
+  UserCheck,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -46,19 +48,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { SaleQueryResult, SaleSummaryItem } from "@/server/services/sales.service";
 import { cancelSaleAction } from "@/server/actions/sales.actions";
-import { CustomerRecord } from "@/types/models";
+import { CustomerRecord, DistributorRecord } from "@/types/models";
 
 interface SalesClientProps {
   initialSalesData?: SaleQueryResult;
   customers: CustomerRecord[];
+  distributors?: DistributorRecord[];
 }
 
-export function SalesClient({ initialSalesData, customers }: SalesClientProps) {
+export function SalesClient({ initialSalesData, customers, distributors = [] }: SalesClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [search, setSearch] = React.useState(searchParams.get("search") || "");
   const [customerFilter, setCustomerFilter] = React.useState(searchParams.get("customer") || "ALL");
+  const [salesRepFilter, setSalesRepFilter] = React.useState(searchParams.get("salesRep") || "ALL");
   const [statusFilter, setStatusFilter] = React.useState(searchParams.get("status") || "ALL");
   const [paymentFilter, setPaymentFilter] = React.useState(searchParams.get("payment") || "ALL");
   const [deliveryFilter, setDeliveryFilter] = React.useState(searchParams.get("delivery") || "ALL");
@@ -94,6 +98,33 @@ export function SalesClient({ initialSalesData, customers }: SalesClientProps) {
       current.delete("page");
     }
     router.push(`/sales?${current.toString()}`);
+  };
+
+  const currentStart = searchParams.get("start") || "";
+  const currentEnd = searchParams.get("end") || "";
+
+  const applyDatePreset = (preset: "ALL" | "TODAY" | "WEEK" | "MONTH") => {
+    const now = new Date();
+    if (preset === "ALL") {
+      applyFilters({ start: null, end: null });
+    } else if (preset === "TODAY") {
+      const todayStr = now.toISOString().split("T")[0];
+      applyFilters({ start: todayStr, end: todayStr });
+    } else if (preset === "WEEK") {
+      const day = now.getDay();
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+      const startOfWeek = new Date(now.setDate(diff));
+      applyFilters({
+        start: startOfWeek.toISOString().split("T")[0],
+        end: new Date().toISOString().split("T")[0],
+      });
+    } else if (preset === "MONTH") {
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      applyFilters({
+        start: startOfMonth.toISOString().split("T")[0],
+        end: new Date().toISOString().split("T")[0],
+      });
+    }
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -285,6 +316,27 @@ export function SalesClient({ initialSalesData, customers }: SalesClientProps) {
               </SelectContent>
             </Select>
 
+            {/* Sales Representative Filter */}
+            <Select
+              value={salesRepFilter}
+              onValueChange={(val) => {
+                setSalesRepFilter(val);
+                applyFilters({ salesRep: val });
+              }}
+            >
+              <SelectTrigger className="h-10 text-xs rounded-xl w-[170px] bg-background">
+                <SelectValue placeholder="Sales Representative" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Representatives</SelectItem>
+                {distributors.map((d) => (
+                  <SelectItem key={d.id} value={d.id}>
+                    {d.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             {/* Payment Status Filter */}
             <Select
               value={paymentFilter}
@@ -323,6 +375,54 @@ export function SalesClient({ initialSalesData, customers }: SalesClientProps) {
             </Select>
           </div>
         </div>
+
+        {/* Date Filter Quick Presets */}
+        <div className="flex flex-wrap items-center justify-between pt-2 border-t border-border/60 text-xs gap-2">
+          <div className="flex items-center gap-1.5 text-muted-foreground">
+            <Calendar className="h-3.5 w-3.5 text-[#0071E3]" />
+            <span className="font-medium">Filter Period:</span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => applyDatePreset("ALL")}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                  !currentStart && !currentEnd
+                    ? "bg-[#0071E3] text-white"
+                    : "bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                All Orders
+              </button>
+              <button
+                type="button"
+                onClick={() => applyDatePreset("TODAY")}
+                className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
+              >
+                Today
+              </button>
+              <button
+                type="button"
+                onClick={() => applyDatePreset("WEEK")}
+                className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
+              >
+                This Week
+              </button>
+              <button
+                type="button"
+                onClick={() => applyDatePreset("MONTH")}
+                className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
+              >
+                This Month
+              </button>
+            </div>
+          </div>
+
+          {(currentStart || currentEnd) && (
+            <div className="text-[11px] font-mono text-[#0071E3] bg-sky-50 px-2.5 py-0.5 rounded-md border border-sky-200">
+              Active: {currentStart ? formatDate(currentStart) : "Beginning"} – {currentEnd ? formatDate(currentEnd) : "Present"}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 4. Sales Orders Table */}
@@ -333,6 +433,7 @@ export function SalesClient({ initialSalesData, customers }: SalesClientProps) {
               <tr>
                 <th className="px-5 py-3.5">Order & Invoice #</th>
                 <th className="px-4 py-3.5">Customer Pharmacy</th>
+                <th className="px-4 py-3.5">Sales Representative</th>
                 <th className="px-4 py-3.5">Date</th>
                 <th className="px-4 py-3.5">Items</th>
                 <th className="px-4 py-3.5 text-right">Grand Total</th>
@@ -345,7 +446,7 @@ export function SalesClient({ initialSalesData, customers }: SalesClientProps) {
             <tbody className="divide-y divide-border/60">
               {data.sales.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-5 py-12 text-center text-muted-foreground">
+                  <td colSpan={10} className="px-5 py-12 text-center text-muted-foreground">
                     <ShoppingCart className="h-8 w-8 mx-auto mb-2 text-muted-foreground/40" />
                     <p className="font-medium text-foreground">No sales orders found</p>
                     <p className="text-xs mt-1">Book a new wholesale order or adjust search parameters.</p>
@@ -396,6 +497,15 @@ export function SalesClient({ initialSalesData, customers }: SalesClientProps) {
                           {s.customerPhone}
                         </div>
                       </div>
+                    </td>
+
+                    {/* Sales Representative */}
+                    <td className="px-4 py-4">
+                      <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                        <UserCheck className="h-3.5 w-3.5 text-[#0071E3] shrink-0" />
+                        <span>{s.salesmanName || "Direct HQ"}</span>
+                      </div>
+                      <div className="text-[10px] text-muted-foreground pl-5">Field Sales Rep</div>
                     </td>
 
                     {/* Date */}
@@ -463,12 +573,13 @@ export function SalesClient({ initialSalesData, customers }: SalesClientProps) {
 
                     {/* Actions */}
                     <td className="px-5 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
+                      <div className="flex items-center justify-end gap-1">
                         <Button
                           asChild
                           variant="ghost"
                           size="sm"
-                          className="h-8 px-2.5 text-xs text-[#0071E3] hover:bg-sky-50 rounded-lg"
+                          className="h-8 px-2 text-xs text-[#0071E3] hover:bg-sky-50 rounded-lg"
+                          title="View Complete Order"
                         >
                           <Link href={`/sales/${s.id}`}>
                             <Eye className="h-3.5 w-3.5 mr-1" /> View
@@ -476,16 +587,31 @@ export function SalesClient({ initialSalesData, customers }: SalesClientProps) {
                         </Button>
 
                         {s.invoiceNumber && (
-                          <Button
-                            asChild
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground rounded-lg"
-                          >
-                            <Link href={`/invoices/${s.invoiceNumber}`}>
-                              <FileText className="h-3.5 w-3.5" />
-                            </Link>
-                          </Button>
+                          <>
+                            <Button
+                              asChild
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground rounded-lg"
+                              title="Tax Invoice"
+                            >
+                              <Link href={`/invoices/${s.invoiceNumber}`}>
+                                <FileText className="h-3.5 w-3.5 mr-1" /> Inv
+                              </Link>
+                            </Button>
+
+                            <Button
+                              asChild
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 px-2 text-xs text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg"
+                              title="Goods Delivery Challan"
+                            >
+                              <Link href={`/invoices/${s.invoiceNumber}?tab=CHALLAN`}>
+                                <Truck className="h-3.5 w-3.5 mr-1" /> Challan
+                              </Link>
+                            </Button>
+                          </>
                         )}
 
                         {s.status === "CONFIRMED" && (

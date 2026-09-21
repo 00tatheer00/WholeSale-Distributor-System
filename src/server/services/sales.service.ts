@@ -13,6 +13,7 @@ import { MOCK_INVOICES } from "../actions/mock-data";
 export interface SaleQueryParams {
   search?: string;
   customerId?: string;
+  distributorId?: string;
   statusFilter?: "ALL" | "CONFIRMED" | "CANCELLED" | "DRAFT";
   paymentStatusFilter?: "ALL" | "PAID" | "PARTIALLY_PAID" | "UNPAID";
   deliveryStatusFilter?: "ALL" | "PENDING" | "DISPATCHED" | "DELIVERED" | "RETURNED";
@@ -108,6 +109,7 @@ export async function getSales(params: SaleQueryParams = {}): Promise<SaleQueryR
   const {
     search = "",
     customerId,
+    distributorId,
     statusFilter = "ALL",
     paymentStatusFilter = "ALL",
     deliveryStatusFilter = "ALL",
@@ -131,8 +133,12 @@ export async function getSales(params: SaleQueryParams = {}): Promise<SaleQueryR
       ];
     }
 
-    if (customerId) {
+    if (customerId && customerId !== "ALL") {
       whereClause.customerId = customerId;
+    }
+
+    if (distributorId && distributorId !== "ALL") {
+      whereClause.distributorId = distributorId;
     }
 
     if (statusFilter !== "ALL") {

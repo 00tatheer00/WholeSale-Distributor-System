@@ -99,6 +99,7 @@ export function ProfitClient({ initialData }: ProfitClientProps) {
     { label: "This Week", value: "this_week" },
     { label: "This Month", value: "this_month" },
     { label: "Last Month", value: "last_month" },
+    { label: "This Year", value: "this_year" },
     { label: "Custom Range", value: "custom" },
   ];
 
@@ -131,11 +132,11 @@ export function ProfitClient({ initialData }: ProfitClientProps) {
         <div className="flex items-center gap-2">
           <Calendar className="h-3.5 w-3.5 text-[#0071E3]" />
           <span>
-            Accounting Period:{" "}
+            Showing financial results:{" "}
             <strong className="text-foreground font-mono">
               {formatDate(data.startDate)}
             </strong>{" "}
-            to{" "}
+            –{" "}
             <strong className="text-foreground font-mono">
               {formatDate(data.endDate)}
             </strong>
@@ -151,8 +152,11 @@ export function ProfitClient({ initialData }: ProfitClientProps) {
         {/* Card 1: Gross Sales Revenue */}
         <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-sky-800">Gross Revenue</span>
-            <div className="h-6 w-6 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-700">
+            <div>
+              <span className="text-[11px] font-semibold text-sky-800">Gross Sales</span>
+              <div className="text-[9px] text-sky-600 font-medium">How much did we sell?</div>
+            </div>
+            <div className="h-6 w-6 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-700 shrink-0">
               <TrendingUp className="h-3.5 w-3.5" />
             </div>
           </div>
@@ -165,8 +169,11 @@ export function ProfitClient({ initialData }: ProfitClientProps) {
         {/* Card 2: Historical COGS */}
         <div className="bg-rose-50/70 border border-rose-100/80 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-rose-800">Historical COGS</span>
-            <div className="h-6 w-6 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-700">
+            <div>
+              <span className="text-[11px] font-semibold text-rose-800">Historical COGS</span>
+              <div className="text-[9px] text-rose-600 font-medium">What did stock cost us?</div>
+            </div>
+            <div className="h-6 w-6 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-700 shrink-0">
               <Package className="h-3.5 w-3.5" />
             </div>
           </div>
@@ -183,8 +190,11 @@ export function ProfitClient({ initialData }: ProfitClientProps) {
         {/* Card 3: Gross Profit Realized */}
         <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-emerald-800">Gross Profit</span>
-            <div className="h-6 w-6 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-700">
+            <div>
+              <span className="text-[11px] font-semibold text-emerald-800">Gross Profit</span>
+              <div className="text-[9px] text-emerald-600 font-medium">Before operating costs</div>
+            </div>
+            <div className="h-6 w-6 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-700 shrink-0">
               <ArrowUpRight className="h-3.5 w-3.5" />
             </div>
           </div>
@@ -197,22 +207,28 @@ export function ProfitClient({ initialData }: ProfitClientProps) {
         {/* Card 4: Gross Margin % */}
         <div className="bg-indigo-50/70 border border-indigo-100/80 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-indigo-800">Gross Margin</span>
-            <div className="h-6 w-6 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-700">
+            <div>
+              <span className="text-[11px] font-semibold text-indigo-800">Gross Margin</span>
+              <div className="text-[9px] text-indigo-600 font-medium">Trading markup %</div>
+            </div>
+            <div className="h-6 w-6 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-700 shrink-0">
               <BarChart3 className="h-3.5 w-3.5" />
             </div>
           </div>
           <div className="mt-2 text-xl font-bold text-indigo-950 font-mono">
             {data.grossMarginPercent.toFixed(1)}%
           </div>
-          <div className="text-[10px] text-indigo-600 mt-1">Wholesale trading markup</div>
+          <div className="text-[10px] text-indigo-600 mt-1">Wholesale trading margin</div>
         </div>
 
         {/* Card 5: Operating Expenses */}
         <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-amber-800">Total Expenses</span>
-            <div className="h-6 w-6 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-700">
+            <div>
+              <span className="text-[11px] font-semibold text-amber-800">Total Expenses</span>
+              <div className="text-[9px] text-amber-600 font-medium">What did we spend?</div>
+            </div>
+            <div className="h-6 w-6 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-700 shrink-0">
               <Receipt className="h-3.5 w-3.5" />
             </div>
           </div>
@@ -225,8 +241,11 @@ export function ProfitClient({ initialData }: ProfitClientProps) {
         {/* Card 6: Net Profit Realized */}
         <div className="bg-purple-50/70 border border-purple-100/80 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-purple-800">Net Profit</span>
-            <div className="h-6 w-6 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-700">
+            <div>
+              <span className="text-[11px] font-semibold text-purple-800">Net Profit</span>
+              <div className="text-[9px] text-purple-600 font-medium">After all expenses</div>
+            </div>
+            <div className="h-6 w-6 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-700 shrink-0">
               <Award className="h-3.5 w-3.5" />
             </div>
           </div>
