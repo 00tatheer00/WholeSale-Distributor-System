@@ -30,6 +30,7 @@
 | **Phase 15**| Afghanistan Client Localization & Pashto Operations Manual | ✅ Completed | Comprehensive Pashto System Guide & Operations Manual (`docs/SYSTEM_GUIDE_PASHTO.md`), Interactive Pashto/Urdu/English UI Guide Modal (`InfoGuideModal`), Dedicated `/help` Hub route, and Sidebar navigation. |
 | **Phase 16**| 100% Offline Desktop Edition (.exe) & Multi-PC LAN | ✅ Completed | SQLite zero-install database conversion (`wmdms.db`), local bcrypt session authentication, Electron Desktop wrapper with auto-server & LAN IP discovery, offline seed script (`prisma/seed-offline.ts`), client delivery runbook (`docs/OFFLINE_DESKTOP_GUIDE.md`). |
 | **Phase 17**| Senior Developer Technical & Functional Audit | ✅ Completed | Full 23-part technical and functional discovery audit report created at `docs/CURRENT_AUDIT_REPORT.md` covering stack, architecture, 28 database models, routes, buttons, business logic, and client requirements matrix. |
+| **Phase 18**| ERP UX Foundation, Pakistan Regional Localization & Core Operations | ✅ Completed | Complete Pakistan localization (`PKR`, `Rs.`, DRAP, Raast/JazzCash/EasyPaisa, zero legacy symbols), Decoupled `Manufacturer` Master (`/manufacturers`), Warehouse CRUD (`/warehouses`), Inter-Warehouse Stock Transfers (`/inventory/transfers`), Safe Deletion & Deactivation Guards across Medicines, Suppliers, Customers & Warehouses with accounting dependency preservation, open-ended "Rack/Shelf/Bin" purchase intake, and Dashboard quick action deck. |
 
 ---
 
@@ -37,14 +38,24 @@
 
 - **Framework**: Next.js 15 (App Router, Server Components & Server Actions)
 - **Desktop Runtime**: Electron 34 with background Next.js server & LAN broadcast
-- **Language**: TypeScript 5 (Strict mode, 0 errors on `npm run typecheck`)
+- **Language**: TypeScript 5 (Strict mode, 0 errors on `npx tsc --noEmit`)
 - **Database ORM**: Prisma 6 with embedded SQLite & Atomic Transactions
 - **Authentication**: Local bcrypt password encryption (Offline sessions)
 - **UI Components**: Tailwind CSS, Radix UI primitives, Lucide React, TanStack Table v8, Recharts
+- **Regional Localization**: Pakistan Standard (`PKR`, `Rs.`, DRAP compliance, Raast, JazzCash, EasyPaisa, Bank Transfer, Cheque, Cash)
 - **Verification Status**:
-  - `npm run typecheck` $\rightarrow$ **0 Errors**
-  - `npm run build` $\rightarrow$ **48/48 Routes compiled and optimized successfully**
+  - `npx tsc --noEmit` $\rightarrow$ **0 Errors**
+  - `npm run build` $\rightarrow$ **52/52 Routes compiled and optimized successfully**
 - **Desktop & Multi-PC LAN Support**:
   - Main PC runs `.exe` standalone application with embedded database.
   - Other PCs and Mobile devices on the same Wi-Fi connect via browser (`http://[Server-IP]:3000`) without any client-side installation.
   - Complete Client Delivery Guide created in `docs/OFFLINE_DESKTOP_GUIDE.md`.
+
+---
+
+## 3. Next Planned Phase
+- **Phase 19 — Guided Sales Dispatch & Invoice Workflow**:
+  - Enhance `/sales/new` with visual customer credit gauge, live over-limit warnings, and one-click credit approval workflow.
+  - Fast-dispatch delivery challan with batch-picking location guidance ("Rack/Shelf/Bin" shown directly on pick lists).
+  - Print-ready wholesale invoice layout with DRAP registration, NTN, and dual-language receipt footers.
+
