@@ -29,6 +29,7 @@
 | **Phase 14**| Client Feature Delivery & Financial Intelligence Polish | ✅ Completed | 5 Standard Expense Categories (`EXP-RENT`, `EXP-DAILY`, `EXP-SALESMAN`, `EXP-VISITOR`, `EXP-DOC-MKT`), Without-Expense Profit (Gross) vs Net Profit visual clarity, Salesman Recovery/Receipt report with Day & Month filters and summary KPIs, Post-discount profit integrity, Opening Stock immutable ledger tracking (`MANUAL_IN`), and Production verification (`47/47 routes verified`). |
 | **Phase 15**| Afghanistan Client Localization & Pashto Operations Manual | ✅ Completed | Comprehensive Pashto System Guide & Operations Manual (`docs/SYSTEM_GUIDE_PASHTO.md`), Interactive Pashto/Urdu/English UI Guide Modal (`InfoGuideModal`), Dedicated `/help` Hub route, and Sidebar navigation. |
 | **Phase 16**| 100% Offline Desktop Edition (.exe) & Multi-PC LAN | ✅ Completed | SQLite zero-install database conversion (`wmdms.db`), local bcrypt session authentication, Electron Desktop wrapper with auto-server & LAN IP discovery, offline seed script (`prisma/seed-offline.ts`), client delivery runbook (`docs/OFFLINE_DESKTOP_GUIDE.md`). |
+| **Phase 17**| Senior Developer Technical & Functional Audit | ✅ Completed | Full 23-part technical and functional discovery audit report created at `docs/CURRENT_AUDIT_REPORT.md` covering stack, architecture, 28 database models, routes, buttons, business logic, and client requirements matrix. |
 
 ---
 
