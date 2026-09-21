@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Package,
   ArrowUpRight,
+  FileSpreadsheet,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -27,7 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { exportToCSV } from "@/lib/export-utils";
+import { exportToCSV, exportToExcel } from "@/lib/export-utils";
 
 interface InventoryReportClientProps {
   reportData?: any;
@@ -46,13 +47,15 @@ export function InventoryReportClient({
   const [search, setSearch] = React.useState(searchParams.get("search") || "");
   const [selectedCategory, setSelectedCategory] = React.useState(searchParams.get("category") || "ALL");
   const [selectedSupplier, setSelectedSupplier] = React.useState(searchParams.get("supplier") || "ALL");
+  const [selectedStockLevel, setSelectedStockLevel] = React.useState(searchParams.get("stockLevel") || "ALL");
 
   const data = reportData || {
     totalUnits: 0,
-    totalBatches: 0,
-    totalCostValuation: 0,
-    totalSellingValuation: 0,
-    potentialGrossProfit: 0,
+    totalCostValue: 0,
+    totalPotentialRevenue: 0,
+    totalPotentialProfit: 0,
+    overallMarginPercent: 0,
+    itemCount: 0,
     items: [],
   };
 
@@ -68,22 +71,22 @@ export function InventoryReportClient({
     router.push(`/reports/inventory?${current.toString()}`);
   };
 
-  const handleExportCSV = () => {
-    const headers = [
-      "Medicine Brand",
-      "Generic Name",
-      "Category",
-      "Manufacturer",
-      "Batch Number",
-      "Expiry Date",
-      "Units on Hand",
-      "Unit Cost (AFN)",
-      "Trade Price (AFN)",
-      "Cost Valuation (AFN)",
-      "Potential Selling Revenue (AFN)",
-    ];
+  const exportHeaders = [
+    "Medicine Brand",
+    "Generic Name",
+    "Category",
+    "Manufacturer",
+    "Batch Number",
+    "Expiry Date",
+    "Units on Hand",
+    "Unit Cost (PKR)",
+    "Trade Price (PKR)",
+    "Cost Valuation (PKR)",
+    "Potential Selling Revenue (PKR)",
+  ];
 
-    const rows = data.items.map((it: any) => [
+  const getExportRows = () =>
+    data.items.map((it: any) => [
       it.brandName,
       it.genericName,
       it.categoryName,
@@ -97,7 +100,12 @@ export function InventoryReportClient({
       it.potentialRevenue,
     ]);
 
-    exportToCSV("Warehouse_Inventory_Valuation_Report", headers, rows);
+  const handleExportCSV = () => {
+    exportToCSV("Warehouse_Inventory_Valuation_Report", exportHeaders, getExportRows());
+  };
+
+  const handleExportExcel = () => {
+    exportToExcel("Warehouse_Inventory_Valuation_Report", exportHeaders, getExportRows(), "Inventory Valuation");
   };
 
   return (
@@ -127,9 +135,18 @@ export function InventoryReportClient({
 
           <Button
             onClick={handleExportCSV}
+            variant="outline"
+            size="sm"
+            className="rounded-xl text-xs h-9 border-border/80"
+          >
+            <Download className="h-4 w-4 mr-1.5" /> Export CSV
+          </Button>
+
+          <Button
+            onClick={handleExportExcel}
             className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-3.5 shadow-sm"
           >
-            <Download className="h-4 w-4 mr-1.5" /> Export Filtered CSV
+            <FileSpreadsheet className="h-4 w-4 mr-1.5" /> Export Excel (.xls)
           </Button>
         </div>
       </div>

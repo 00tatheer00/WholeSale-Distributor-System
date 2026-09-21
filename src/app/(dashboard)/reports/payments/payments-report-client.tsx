@@ -13,13 +13,15 @@ import {
   Receipt,
   Truck,
   Store,
+  FileSpreadsheet,
+  Calendar,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { exportToCSV } from "@/lib/export-utils";
+import { exportToCSV, exportToExcel } from "@/lib/export-utils";
 
 interface PaymentsReportClientProps {
   reportData?: any;
@@ -38,12 +40,16 @@ export function PaymentsReportClient({ reportData }: PaymentsReportClientProps) 
     preset: "this_month",
     totalCollected: 0,
     totalDisbursed: 0,
+    totalCustomerCollected: 0,
+    customerPaymentCount: 0,
+    totalSupplierDisbursed: 0,
+    supplierPaymentCount: 0,
     netCashFlow: 0,
     collectedToday: 0,
     receiptsTodayCount: 0,
     collectedThisMonth: 0,
     receiptsThisMonthCount: 0,
-    collectorBreakdown: [],
+    distributorStats: [],
     availableDistributors: [],
     customerPayments: [],
     supplierPayments: [],
@@ -68,39 +74,6 @@ export function PaymentsReportClient({ reportData }: PaymentsReportClientProps) 
     router.push(`/reports/payments?${params.toString()}`);
   };
 
-  const handleExportCSV = () => {
-    if (activeTab === "CUSTOMERS") {
-      const headers = ["Receipt #", "Customer Pharmacy", "Sales Representative / Collector", "Date", "Method", "Amount"];
-      const rows = filteredCustomerPayments.map((p: any) => [
-        p.receiptNumber,
-        p.customerName,
-        p.collectorName,
-        p.paymentDate,
-        p.paymentMethod,
-        p.amount,
-      ]);
-      exportToCSV(`Customer_Collections_Report_${data.startDate}_to_${data.endDate}`, headers, rows);
-    } else {
-      const headers = ["Voucher #", "Manufacturer Supplier", "Date", "Method", "Amount"];
-      const rows = filteredSupplierPayments.map((p: any) => [
-        p.voucherNumber,
-        p.supplierName,
-        p.paymentDate,
-        p.paymentMethod,
-        p.amount,
-      ]);
-      exportToCSV(`Supplier_Disbursements_Report_${data.startDate}_to_${data.endDate}`, headers, rows);
-    }
-  };
-
-  const presets = [
-    { label: "Today", value: "today" },
-    { label: "Yesterday", value: "yesterday" },
-    { label: "This Week", value: "this_week" },
-    { label: "This Month", value: "this_month" },
-    { label: "Last Month", value: "last_month" },
-  ];
-
   const filteredCustomerPayments = (data.customerPayments || []).filter((p: any) => {
     if (!search.trim()) return true;
     const q = search.toLowerCase();
@@ -122,9 +95,67 @@ export function PaymentsReportClient({ reportData }: PaymentsReportClientProps) 
     );
   });
 
+  const handleExportCSV = () => {
+    if (activeTab === "CUSTOMERS") {
+      const headers = ["Receipt #", "Customer Pharmacy", "Sales Representative / Collector", "Date", "Method", "Amount (PKR)"];
+      const rows = filteredCustomerPayments.map((p: any) => [
+        p.receiptNumber,
+        p.customerName,
+        p.collectorName,
+        p.paymentDate,
+        p.paymentMethod,
+        p.amount,
+      ]);
+      exportToCSV(`Customer_Collections_Report_${data.startDate}_to_${data.endDate}`, headers, rows);
+    } else {
+      const headers = ["Voucher #", "Manufacturer Supplier", "Date", "Method", "Amount (PKR)"];
+      const rows = filteredSupplierPayments.map((p: any) => [
+        p.voucherNumber,
+        p.supplierName,
+        p.paymentDate,
+        p.paymentMethod,
+        p.amount,
+      ]);
+      exportToCSV(`Supplier_Disbursements_Report_${data.startDate}_to_${data.endDate}`, headers, rows);
+    }
+  };
+
+  const handleExportExcel = () => {
+    if (activeTab === "CUSTOMERS") {
+      const headers = ["Receipt #", "Customer Pharmacy", "Sales Representative / Collector", "Date", "Method", "Amount (PKR)"];
+      const rows = filteredCustomerPayments.map((p: any) => [
+        p.receiptNumber,
+        p.customerName,
+        p.collectorName,
+        p.paymentDate,
+        p.paymentMethod,
+        p.amount,
+      ]);
+      exportToExcel(`Customer_Collections_Report_${data.startDate}_to_${data.endDate}`, headers, rows, "Customer Collections");
+    } else {
+      const headers = ["Voucher #", "Manufacturer Supplier", "Date", "Method", "Amount (PKR)"];
+      const rows = filteredSupplierPayments.map((p: any) => [
+        p.voucherNumber,
+        p.supplierName,
+        p.paymentDate,
+        p.paymentMethod,
+        p.amount,
+      ]);
+      exportToExcel(`Supplier_Disbursements_Report_${data.startDate}_to_${data.endDate}`, headers, rows, "Supplier Disbursements");
+    }
+  };
+
+  const presets = [
+    { label: "Today", value: "today" },
+    { label: "Yesterday", value: "yesterday" },
+    { label: "This Week", value: "this_week" },
+    { label: "This Month", value: "this_month" },
+    { label: "Last Month", value: "last_month" },
+  ];
+
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto pb-20">
-      {/* 1. Header */}
+      {/* 1. Top Navigation */}
       <div className="flex items-center justify-between">
         <Button
           asChild
@@ -149,9 +180,18 @@ export function PaymentsReportClient({ reportData }: PaymentsReportClientProps) 
 
           <Button
             onClick={handleExportCSV}
+            variant="outline"
+            size="sm"
+            className="rounded-xl text-xs h-9 border-border/80"
+          >
+            <Download className="h-4 w-4 mr-1.5" /> Export CSV
+          </Button>
+
+          <Button
+            onClick={handleExportExcel}
             className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-3.5 shadow-sm"
           >
-            <Download className="h-4 w-4 mr-1.5" /> Export Filtered CSV
+            <FileSpreadsheet className="h-4 w-4 mr-1.5" /> Export Excel (.xls)
           </Button>
         </div>
       </div>
@@ -176,6 +216,21 @@ export function PaymentsReportClient({ reportData }: PaymentsReportClientProps) 
           ))}
         </div>
       </PageHeader>
+
+      {/* Active Period Banner */}
+      <div className="px-4 py-2.5 rounded-xl bg-muted/30 border border-border/70 flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-[#0071E3]" />
+          <span>
+            Showing payment flows from{" "}
+            <strong className="text-foreground">{formatDate(data.startDate)}</strong> to{" "}
+            <strong className="text-foreground">{formatDate(data.endDate)}</strong>
+          </span>
+        </div>
+        <Badge variant="outline" className="font-mono text-[11px]">
+          Net Flow: {formatCurrency(data.netCashFlow)}
+        </Badge>
+      </div>
 
       {/* 2. Top 4 Pastel KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

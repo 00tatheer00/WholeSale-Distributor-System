@@ -13,13 +13,15 @@ import {
   Award,
   Package,
   ArrowUpRight,
+  FileSpreadsheet,
+  Calendar,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { exportToCSV } from "@/lib/export-utils";
+import { exportToCSV, exportToExcel } from "@/lib/export-utils";
 
 interface MedicinesReportClientProps {
   reportData?: any;
@@ -29,18 +31,21 @@ export function MedicinesReportClient({ reportData }: MedicinesReportClientProps
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const currentPreset = reportData?.preset || "this_month";
+  const currentPreset = searchParams.get("preset") || "this_month";
   const [search, setSearch] = React.useState("");
 
   const data = reportData || {
     startDate: new Date().toISOString().split("T")[0],
     endDate: new Date().toISOString().split("T")[0],
-    preset: "this_month",
-    top10Selling: [],
-    allItems: [],
+    totalUnitsSold: 0,
+    totalRevenue: 0,
+    totalCogs: 0,
+    grossProfit: 0,
+    overallMarginPercent: 0,
+    items: [],
   };
 
-  const filteredItems = data.allItems.filter((it: any) => {
+  const filteredItems = data.items.filter((it: any) => {
     if (search.trim()) {
       const q = search.toLowerCase();
       return (
@@ -56,19 +61,19 @@ export function MedicinesReportClient({ reportData }: MedicinesReportClientProps
     router.push(`/reports/medicines?preset=${preset}`);
   };
 
-  const handleExportCSV = () => {
-    const headers = [
-      "Medicine Brand",
-      "Generic Name",
-      "Therapeutic Category",
-      "Quantity Sold (Units)",
-      "Sales Revenue (AFN)",
-      "Historical COGS (AFN)",
-      "Gross Profit (AFN)",
-      "Gross Margin %",
-    ];
+  const exportHeaders = [
+    "Medicine Brand",
+    "Generic Name",
+    "Therapeutic Category",
+    "Quantity Sold (Units)",
+    "Sales Revenue (PKR)",
+    "Historical COGS (PKR)",
+    "Gross Profit (PKR)",
+    "Gross Margin %",
+  ];
 
-    const rows = filteredItems.map((it: any) => [
+  const getExportRows = () =>
+    filteredItems.map((it: any) => [
       it.brandName,
       it.genericName,
       it.categoryName,
@@ -79,7 +84,12 @@ export function MedicinesReportClient({ reportData }: MedicinesReportClientProps
       `${it.marginPercent.toFixed(1)}%`,
     ]);
 
-    exportToCSV(`Medicine_Performance_Report_${data.startDate}_to_${data.endDate}`, headers, rows);
+  const handleExportCSV = () => {
+    exportToCSV(`Medicine_Performance_Report_${data.startDate}_to_${data.endDate}`, exportHeaders, getExportRows());
+  };
+
+  const handleExportExcel = () => {
+    exportToExcel(`Medicine_Performance_Report_${data.startDate}_to_${data.endDate}`, exportHeaders, getExportRows(), "Medicine Performance");
   };
 
   const presets = [
@@ -117,18 +127,27 @@ export function MedicinesReportClient({ reportData }: MedicinesReportClientProps
 
           <Button
             onClick={handleExportCSV}
+            variant="outline"
+            size="sm"
+            className="rounded-xl text-xs h-9 border-border/80"
+          >
+            <Download className="h-4 w-4 mr-1.5" /> Export CSV
+          </Button>
+
+          <Button
+            onClick={handleExportExcel}
             className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-3.5 shadow-sm"
           >
-            <Download className="h-4 w-4 mr-1.5" /> Export Filtered CSV
+            <FileSpreadsheet className="h-4 w-4 mr-1.5" /> Export Excel (.xls)
           </Button>
         </div>
       </div>
 
       <PageHeader
-        title="Fast-Moving Medicines & Product Profitability"
-        description="Top-selling pharmaceutical products ranked by volume, revenue generation, and gross profit margins."
+        title="Drug Sales Movement & Matrix Intelligence"
+        description="Rankings of fast vs slow-moving medicines, gross margins, and volume contribution."
       >
-        <div className="flex flex-wrap items-center gap-1.5 bg-muted/40 p-1 rounded-2xl border border-border/80">
+        <div className="flex items-center gap-1.5 bg-muted/40 p-1 rounded-2xl border border-border/80">
           {presets.map((p) => (
             <button
               key={p.value}

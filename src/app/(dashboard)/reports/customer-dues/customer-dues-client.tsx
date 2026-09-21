@@ -12,13 +12,14 @@ import {
   Search,
   Eye,
   Phone,
+  FileSpreadsheet,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/lib/utils";
-import { exportToCSV } from "@/lib/export-utils";
+import { exportToCSV, exportToExcel } from "@/lib/export-utils";
 
 interface CustomerDuesClientProps {
   reportData?: any;
@@ -29,41 +30,45 @@ export function CustomerDuesClient({ reportData }: CustomerDuesClientProps) {
   const [filterOverLimit, setFilterOverLimit] = React.useState<boolean | null>(null);
 
   const data = reportData || {
-    totalReceivables: 0,
+    totalCustomers: 0,
+    totalDues: 0,
     totalCreditLimit: 0,
     overLimitCount: 0,
-    totalCustomersWithDue: 0,
-    items: [],
+    customers: [],
   };
 
-  const filteredItems = data.items.filter((c: any) => {
+  const customers = data.customers || data.items || [];
+  const totalDues = data.totalDues ?? data.totalReceivables ?? 0;
+  const totalCustomers = data.totalCustomers ?? data.totalCustomersWithDue ?? 0;
+
+  const filteredItems = customers.filter((c: any) => {
     if (filterOverLimit === true && !c.isOverLimit) return false;
     if (search.trim()) {
       const q = search.toLowerCase();
       return (
         c.pharmacyName.toLowerCase().includes(q) ||
         c.customerCode.toLowerCase().includes(q) ||
-        c.phone.toLowerCase().includes(q) ||
-        c.proprietorName.toLowerCase().includes(q)
+        c.proprietorName.toLowerCase().includes(q) ||
+        (c.phone && c.phone.includes(q))
       );
     }
     return true;
   });
 
-  const handleExportCSV = () => {
-    const headers = [
-      "Customer Code",
-      "Pharmacy Name",
-      "Proprietor",
-      "Phone",
-      "Credit Limit (AFN)",
-      "Current Due (AFN)",
-      "Available Credit (AFN)",
-      "Credit Utilization %",
-      "Over Limit Status",
-    ];
+  const exportHeaders = [
+    "Customer Code",
+    "Pharmacy Name",
+    "Proprietor",
+    "Phone",
+    "Credit Limit (PKR)",
+    "Current Due (PKR)",
+    "Available Credit (PKR)",
+    "Credit Utilization %",
+    "Over Limit Status",
+  ];
 
-    const rows = filteredItems.map((c: any) => [
+  const getExportRows = () =>
+    filteredItems.map((c: any) => [
       c.customerCode,
       c.pharmacyName,
       c.proprietorName,
@@ -75,7 +80,12 @@ export function CustomerDuesClient({ reportData }: CustomerDuesClientProps) {
       c.isOverLimit ? "OVER_LIMIT_HOLD" : "NORMAL",
     ]);
 
-    exportToCSV("Customer_Accounts_Receivable_Dues_Report", headers, rows);
+  const handleExportCSV = () => {
+    exportToCSV("Customer_Accounts_Receivable_Dues_Report", exportHeaders, getExportRows());
+  };
+
+  const handleExportExcel = () => {
+    exportToExcel("Customer_Accounts_Receivable_Dues_Report", exportHeaders, getExportRows(), "Customer AR Dues");
   };
 
   return (
@@ -105,9 +115,18 @@ export function CustomerDuesClient({ reportData }: CustomerDuesClientProps) {
 
           <Button
             onClick={handleExportCSV}
+            variant="outline"
+            size="sm"
+            className="rounded-xl text-xs h-9 border-border/80"
+          >
+            <Download className="h-4 w-4 mr-1.5" /> Export CSV
+          </Button>
+
+          <Button
+            onClick={handleExportExcel}
             className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-3.5 shadow-sm"
           >
-            <Download className="h-4 w-4 mr-1.5" /> Export Filtered CSV
+            <FileSpreadsheet className="h-4 w-4 mr-1.5" /> Export Excel (.xls)
           </Button>
         </div>
       </div>

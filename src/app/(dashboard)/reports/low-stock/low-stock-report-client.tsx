@@ -12,12 +12,13 @@ import {
   Phone,
   Search,
   ShoppingCart,
+  FileSpreadsheet,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { exportToCSV } from "@/lib/export-utils";
+import { exportToCSV, exportToExcel } from "@/lib/export-utils";
 
 interface LowStockReportClientProps {
   reportData?: any;
@@ -35,34 +36,35 @@ export function LowStockReportClient({ reportData }: LowStockReportClientProps) 
   };
 
   const filteredItems = data.items.filter((it: any) => {
-    if (filterType === "OUT" && it.status !== "OUT_OF_STOCK") return false;
-    if (filterType === "LOW" && it.status !== "LOW_STOCK") return false;
+    if (filterType === "OUT" && it.currentStock > 0) return false;
+    if (filterType === "LOW" && it.currentStock === 0) return false;
     if (search.trim()) {
       const q = search.toLowerCase();
       return (
         it.brandName.toLowerCase().includes(q) ||
         it.genericName.toLowerCase().includes(q) ||
+        it.categoryName.toLowerCase().includes(q) ||
         it.supplierName.toLowerCase().includes(q)
       );
     }
     return true;
   });
 
-  const handleExportCSV = () => {
-    const headers = [
-      "Medicine Brand",
-      "Generic Name",
-      "Dosage Form",
-      "Category",
-      "Primary Supplier",
-      "Current Stock",
-      "Minimum Stock Level",
-      "Reorder Level",
-      "Reorder Deficit Quantity",
-      "Status",
-    ];
+  const exportHeaders = [
+    "Medicine Brand",
+    "Generic Name",
+    "Dosage Form",
+    "Category",
+    "Primary Supplier",
+    "Current Stock",
+    "Minimum Stock Level",
+    "Reorder Level",
+    "Reorder Deficit Quantity",
+    "Status",
+  ];
 
-    const rows = filteredItems.map((it: any) => [
+  const getExportRows = () =>
+    filteredItems.map((it: any) => [
       it.brandName,
       it.genericName,
       it.dosageForm,
@@ -75,7 +77,12 @@ export function LowStockReportClient({ reportData }: LowStockReportClientProps) 
       it.status,
     ]);
 
-    exportToCSV("Low_Stock_and_Reorder_Report", headers, rows);
+  const handleExportCSV = () => {
+    exportToCSV("Low_Stock_and_Reorder_Report", exportHeaders, getExportRows());
+  };
+
+  const handleExportExcel = () => {
+    exportToExcel("Low_Stock_and_Reorder_Report", exportHeaders, getExportRows(), "Low Stock Deficit");
   };
 
   return (
@@ -105,9 +112,18 @@ export function LowStockReportClient({ reportData }: LowStockReportClientProps) 
 
           <Button
             onClick={handleExportCSV}
+            variant="outline"
+            size="sm"
+            className="rounded-xl text-xs h-9 border-border/80"
+          >
+            <Download className="h-4 w-4 mr-1.5" /> Export CSV
+          </Button>
+
+          <Button
+            onClick={handleExportExcel}
             className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-3.5 shadow-sm"
           >
-            <Download className="h-4 w-4 mr-1.5" /> Export Filtered CSV
+            <FileSpreadsheet className="h-4 w-4 mr-1.5" /> Export Excel (.xls)
           </Button>
         </div>
       </div>

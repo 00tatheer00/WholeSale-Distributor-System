@@ -12,13 +12,14 @@ import {
   PackageX,
   ShieldAlert,
   Search,
+  FileSpreadsheet,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { exportToCSV } from "@/lib/export-utils";
+import { exportToCSV, exportToExcel } from "@/lib/export-utils";
 
 interface ExpiryReportClientProps {
   reportData?: any;
@@ -34,17 +35,16 @@ export function ExpiryReportClient({ reportData }: ExpiryReportClientProps) {
   const data = reportData || {
     warningDays: 60,
     expiredCount: 0,
-    expiredValue: 0,
     nearExpiryCount: 0,
-    nearExpiryValue: 0,
-    totalAtRiskValue: 0,
+    totalAtRiskUnits: 0,
+    totalAtRiskCost: 0,
+    totalAtRiskSelling: 0,
     items: [],
   };
 
   const filteredItems = data.items.filter((it: any) => {
     if (filterBucket === "EXPIRED" && !it.isExpired) return false;
-    if (filterBucket === "30D" && it.riskBucket !== "CRITICAL_30D") return false;
-    if (filterBucket === "60D" && it.riskBucket !== "WARNING_60D") return false;
+    if (filterBucket === "NEAR_EXPIRY" && it.isExpired) return false;
     if (search.trim()) {
       const q = search.toLowerCase();
       return (
@@ -57,21 +57,21 @@ export function ExpiryReportClient({ reportData }: ExpiryReportClientProps) {
     return true;
   });
 
-  const handleExportCSV = () => {
-    const headers = [
-      "Medicine Brand",
-      "Generic Name",
-      "Manufacturer Supplier",
-      "Batch Number",
-      "Quantity on Hand",
-      "Expiry Date",
-      "Days Remaining",
-      "Unit Cost Price (AFN)",
-      "Inventory Value at Risk (AFN)",
-      "Status",
-    ];
+  const exportHeaders = [
+    "Medicine Brand",
+    "Generic Name",
+    "Manufacturer Supplier",
+    "Batch Number",
+    "Quantity on Hand",
+    "Expiry Date",
+    "Days Remaining",
+    "Unit Cost Price (PKR)",
+    "Inventory Value at Risk (PKR)",
+    "Status",
+  ];
 
-    const rows = filteredItems.map((it: any) => [
+  const getExportRows = () =>
+    filteredItems.map((it: any) => [
       it.brandName,
       it.genericName,
       it.supplierName,
@@ -84,7 +84,12 @@ export function ExpiryReportClient({ reportData }: ExpiryReportClientProps) {
       it.isExpired ? "EXPIRED" : "NEAR_EXPIRY",
     ]);
 
-    exportToCSV(`DGDA_Expiry_Watchdog_Report_${data.warningDays}days`, headers, rows);
+  const handleExportCSV = () => {
+    exportToCSV(`DRAP_Expiry_Watchdog_Report_${data.warningDays}days`, exportHeaders, getExportRows());
+  };
+
+  const handleExportExcel = () => {
+    exportToExcel(`DRAP_Expiry_Watchdog_Report_${data.warningDays}days`, exportHeaders, getExportRows(), "Expiry Watchdog");
   };
 
   const setDays = (days: number) => {
@@ -118,15 +123,24 @@ export function ExpiryReportClient({ reportData }: ExpiryReportClientProps) {
 
           <Button
             onClick={handleExportCSV}
+            variant="outline"
+            size="sm"
+            className="rounded-xl text-xs h-9 border-border/80"
+          >
+            <Download className="h-4 w-4 mr-1.5" /> Export CSV
+          </Button>
+
+          <Button
+            onClick={handleExportExcel}
             className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-3.5 shadow-sm"
           >
-            <Download className="h-4 w-4 mr-1.5" /> Export Filtered CSV
+            <FileSpreadsheet className="h-4 w-4 mr-1.5" /> Export Excel (.xls)
           </Button>
         </div>
       </div>
 
       <PageHeader
-        title="DGDA Expiry Watchdog & Quarantine Intelligence"
+        title="DRAP Expiry Watchdog & Quarantine Intelligence"
         description="Strict FEFO audit identifying expired stocks and batch expirations within customizable warning thresholds."
       >
         <div className="flex items-center gap-1.5 bg-muted/40 p-1 rounded-2xl border border-border/80">

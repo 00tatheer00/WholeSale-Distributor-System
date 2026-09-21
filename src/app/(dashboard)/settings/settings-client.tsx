@@ -13,11 +13,15 @@ import {
   Save,
   CheckCircle2,
   Shield,
-  Upload,
   AlertTriangle,
   Lock,
   Eye,
-  ExternalLink,
+  Plus,
+  Edit2,
+  KeyRound,
+  UserX,
+  UserCheck,
+  MoreHorizontal,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -26,9 +30,40 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { updateCompanySettingsAction } from "@/server/actions/settings.actions";
-import { CompanySettingsInput } from "@/validations/settings.schema";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  updateCompanySettingsAction,
+  createUserAction,
+  updateUserAction,
+  resetUserPasswordAction,
+  toggleUserStatusAction,
+} from "@/server/actions/settings.actions";
+import {
+  CompanySettingsInput,
+  CreateUserInput,
+  UpdateUserInput,
+} from "@/validations/settings.schema";
+import { formatDate } from "@/lib/utils";
 
 interface SettingsClientProps {
   initialCompany: any;
@@ -38,27 +73,31 @@ interface SettingsClientProps {
 
 export function SettingsClient({
   initialCompany,
-  users,
+  users: initialUsers,
   auditLogs,
 }: SettingsClientProps) {
   const [activeTab, setActiveTab] = React.useState<
     "business" | "invoice" | "tax" | "inventory" | "credit" | "notifications" | "users"
   >("business");
 
+  const [users, setUsers] = React.useState<any[]>(initialUsers);
+
   const [settings, setSettings] = React.useState<CompanySettingsInput>({
-    name: initialCompany.name || "Apex Pharma Dist Ltd.",
-    tradeLicenseNo: initialCompany.tradeLicenseNo || "TR-DHK-2026-8891",
-    drugLicenseNo: initialCompany.drugLicenseNo || "DGDA-DL-9842-W",
-    taxIdTin: initialCompany.taxIdTin || "TIN-89342019-2026",
-    email: initialCompany.email || "accounts@apexpharma.af",
-    phone: initialCompany.phone || "+93 70 123 4567",
-    address: initialCompany.address || "District 4, Shar-e-Naw",
-    city: initialCompany.city || "Kabul",
-    country: initialCompany.country || "Afghanistan",
-    currency: initialCompany.currency || "AFN",
+    name: initialCompany.name || "PharmaDist Wholesale Medicine Distribution Ltd.",
+    tradeLicenseNo: initialCompany.tradeLicenseNo || "TR-KHI-2026-8891",
+    drugLicenseNo: initialCompany.drugLicenseNo || "DRAP-DL-9842-W",
+    taxIdTin: initialCompany.taxIdTin || "NTN-89342019-2026",
+    email: initialCompany.email || "info@pharmadist.pk",
+    phone: initialCompany.phone || "+92 21 3589 1234",
+    address: initialCompany.address || "Plot 45, Sector 15, Korangi Industrial Area",
+    city: initialCompany.city || "Karachi",
+    country: initialCompany.country || "Pakistan",
+    currency: initialCompany.currency || "PKR",
     logoUrl: initialCompany.logoUrl || null,
-    invoiceFooterText: initialCompany.invoiceFooterText || "Goods once sold cannot be returned without original cash memo & regulatory compliance verification.",
-    
+    invoiceFooterText:
+      initialCompany.invoiceFooterText ||
+      "Goods once sold cannot be returned without original cash memo & DRAP compliance verification.",
+
     // Invoice settings
     invoicePrefix: initialCompany.invoicePrefix || "INV-",
     showTaxOnInvoice: initialCompany.showTaxOnInvoice ?? true,
@@ -67,9 +106,9 @@ export function SettingsClient({
     showExpiryOnInvoice: initialCompany.showExpiryOnInvoice ?? true,
 
     // Tax & Discount
-    defaultVatPercent: initialCompany.defaultVatPercent || 0,
+    defaultVatPercent: initialCompany.defaultVatPercent ?? 0,
     enableGlobalDiscount: initialCompany.enableGlobalDiscount ?? true,
-    maxDiscountPercent: initialCompany.maxDiscountPercent || 20,
+    maxDiscountPercent: initialCompany.maxDiscountPercent ?? 20,
 
     // Inventory & FEFO
     enableFefoStrict: initialCompany.enableFefoStrict ?? true,
@@ -93,37 +132,144 @@ export function SettingsClient({
 
   const [isSaving, setIsSaving] = React.useState(false);
   const [feedback, setFeedback] = React.useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // User Management Dialog States
+  const [isAddUserOpen, setIsAddUserOpen] = React.useState(false);
+  const [newUser, setNewUser] = React.useState<CreateUserInput>({
+    name: "",
+    email: "",
+    phone: "",
+    role: "INVENTORY_OFFICER",
+    password: "",
+    status: "ACTIVE",
+  });
+
+  const [editingUser, setEditingUser] = React.useState<UpdateUserInput | null>(null);
+  const [isEditUserOpen, setIsEditUserOpen] = React.useState(false);
+
+  const [resetUser, setResetUser] = React.useState<{ id: string; name: string; password: string } | null>(null);
+  const [isResetPasswordOpen, setIsResetPasswordOpen] = React.useState(false);
+
+  const [deactivateUser, setDeactivateUser] = React.useState<{ id: string; name: string; status: string } | null>(null);
+  const [isDeactivateOpen, setIsDeactivateOpen] = React.useState(false);
+
+  const [isUserProcessing, setIsUserProcessing] = React.useState(false);
+
+  const handleSaveSettings = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setIsSaving(true);
     setFeedback(null);
+    setErrorMessage(null);
 
     const res = await updateCompanySettingsAction(settings);
     setIsSaving(false);
 
     if (res.success) {
-      setFeedback(res.message || "Settings updated successfully.");
-      setTimeout(() => setFeedback(null), 3500);
+      setFeedback(res.message || "Settings saved successfully.");
+      setTimeout(() => setFeedback(null), 4000);
+    } else {
+      setErrorMessage(res.error || "Failed to update settings.");
+      setTimeout(() => setErrorMessage(null), 5000);
+    }
+  };
+
+  // User Action Handlers
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsUserProcessing(true);
+    const res = await createUserAction(newUser);
+    setIsUserProcessing(false);
+
+    if (res.success) {
+      setIsAddUserOpen(false);
+      setNewUser({
+        name: "",
+        email: "",
+        phone: "",
+        role: "INVENTORY_OFFICER",
+        password: "",
+        status: "ACTIVE",
+      });
+      setFeedback(res.message || "Staff member enrolled successfully.");
+      setTimeout(() => setFeedback(null), 4000);
+      window.location.reload();
+    } else {
+      alert(res.error || "Failed to create user account.");
+    }
+  };
+
+  const handleUpdateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    setIsUserProcessing(true);
+    const res = await updateUserAction(editingUser);
+    setIsUserProcessing(false);
+
+    if (res.success) {
+      setIsEditUserOpen(false);
+      setEditingUser(null);
+      setFeedback(res.message || "User updated successfully.");
+      setTimeout(() => setFeedback(null), 4000);
+      window.location.reload();
+    } else {
+      alert(res.error || "Failed to update user account.");
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetUser) return;
+    setIsUserProcessing(true);
+    const res = await resetUserPasswordAction({
+      userId: resetUser.id,
+      newPassword: resetUser.password,
+    });
+    setIsUserProcessing(false);
+
+    if (res.success) {
+      setIsResetPasswordOpen(false);
+      setResetUser(null);
+      setFeedback(res.message || "Password reset successfully.");
+      setTimeout(() => setFeedback(null), 4000);
+    } else {
+      alert(res.error || "Failed to reset password.");
+    }
+  };
+
+  const handleToggleUserStatus = async () => {
+    if (!deactivateUser) return;
+    setIsUserProcessing(true);
+    const res = await toggleUserStatusAction(deactivateUser.id, deactivateUser.status);
+    setIsUserProcessing(false);
+
+    if (res.success) {
+      setIsDeactivateOpen(false);
+      setDeactivateUser(null);
+      setFeedback(res.message || "Account status updated.");
+      setTimeout(() => setFeedback(null), 4000);
+      window.location.reload();
+    } else {
+      alert(res.error || "Failed to toggle account status.");
     }
   };
 
   const navItems = [
-    { id: "business", label: "Business Profile", icon: Building2 },
-    { id: "invoice", label: "Invoice & Print", icon: FileText },
-    { id: "tax", label: "Tax & Discount", icon: Percent },
-    { id: "inventory", label: "Inventory & FEFO", icon: Boxes },
-    { id: "credit", label: "Credit & Aging", icon: CreditCard },
-    { id: "notifications", label: "Alerts & Notifications", icon: Bell },
-    { id: "users", label: "Team & Security", icon: Users2 },
+    { id: "business", label: "Business Profile", icon: Building2, desc: "Company details & license" },
+    { id: "invoice", label: "Invoice & Print", icon: FileText, desc: "Print headers, toggles & layout" },
+    { id: "tax", label: "Tax & Discount", icon: Percent, desc: "VAT rates & discount caps" },
+    { id: "inventory", label: "Inventory & FEFO", icon: Boxes, desc: "Expiry safety & reorders" },
+    { id: "credit", label: "Credit & Aging", icon: CreditCard, desc: "Receivable hold barriers" },
+    { id: "notifications", label: "Alerts & Notifications", icon: Bell, desc: "Watchdog triggers" },
+    { id: "users", label: "Team & Security", icon: Users2, desc: "Staff access & roles" },
   ];
 
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto pb-20">
       {/* 1. Header */}
       <PageHeader
-        title="System Administration & Enterprise Settings"
-        description="Configure pharmaceutical distributor parameters, DGDA licensing, FEFO stock rules, customer credit barriers, and security policies."
+        title="System Settings & Administration"
+        description="Configure pharmaceutical distributor business details, DRAP compliance rules, FEFO stock safety, customer credit barriers, and staff permissions."
       >
         <div className="flex items-center gap-2">
           <Button
@@ -134,18 +280,20 @@ export function SettingsClient({
           >
             <Link href="/audit-logs">
               <Shield className="h-4 w-4 mr-1.5 text-purple-600" />
-              Security Audit Log Explorer
+              Forensic Audit Logs
             </Link>
           </Button>
 
-          <Button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-4 shadow-sm"
-          >
-            <Save className="h-4 w-4 mr-1.5" />
-            {isSaving ? "Saving Settings..." : "Save All Changes"}
-          </Button>
+          {activeTab !== "users" && (
+            <Button
+              onClick={() => handleSaveSettings()}
+              disabled={isSaving}
+              className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-4 shadow-sm"
+            >
+              <Save className="h-4 w-4 mr-1.5" />
+              {isSaving ? "Saving Settings..." : "Save Settings"}
+            </Button>
+          )}
         </div>
       </PageHeader>
 
@@ -156,10 +304,17 @@ export function SettingsClient({
         </div>
       )}
 
-      {/* 2. Main Two-Column Layout */}
+      {errorMessage && (
+        <div className="p-3.5 rounded-2xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 flex items-center gap-2 shadow-sm">
+          <AlertTriangle className="h-4 w-4 text-rose-600 shrink-0" />
+          {errorMessage}
+        </div>
+      )}
+
+      {/* 2. Main Layout */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Left: Settings Sidebar Navigation */}
-        <div className="md:col-span-1 space-y-1">
+        {/* Left: Navigation Tabs */}
+        <div className="md:col-span-1 space-y-3">
           <div className="bg-card border border-border/80 rounded-2xl p-2 shadow-sm space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -167,101 +322,117 @@ export function SettingsClient({
               return (
                 <button
                   key={item.id}
+                  type="button"
                   onClick={() => setActiveTab(item.id as any)}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all ${
                     isActive
                       ? "bg-[#0071E3] text-white shadow-sm font-bold"
                       : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
-                  {item.label}
+                  <div className="flex items-center gap-2.5">
+                    <Icon className="h-4 w-4 shrink-0" />
+                    <div>
+                      <span className="text-xs block">{item.label}</span>
+                      <span
+                        className={`text-[10px] block ${
+                          isActive ? "text-white/80" : "text-muted-foreground"
+                        }`}
+                      >
+                        {item.desc}
+                      </span>
+                    </div>
+                  </div>
                 </button>
               );
             })}
           </div>
 
-          <div className="p-4 bg-muted/30 border border-border/60 rounded-2xl text-[11px] text-muted-foreground space-y-1">
-            <p className="font-semibold text-foreground">Security Guardrail</p>
-            <p>All modifications are logged to the immutable audit trail with timestamp and admin actor ID.</p>
+          <div className="p-4 bg-muted/30 border border-border/60 rounded-2xl text-[11px] text-muted-foreground space-y-1.5">
+            <p className="font-semibold text-foreground flex items-center gap-1.5">
+              <Lock className="h-3.5 w-3.5 text-[#0071E3]" /> Audit Trail Active
+            </p>
+            <p>
+              Every configuration change is atomically logged with timestamp, previous values, and
+              administrator credentials.
+            </p>
           </div>
         </div>
 
-        {/* Right: Active Settings Panel */}
+        {/* Right: Active Settings Card */}
         <div className="md:col-span-3">
-          <form onSubmit={handleSave}>
-            {/* Section 1: Business Profile */}
-            {activeTab === "business" && (
-              <Card className="border border-border/80 rounded-2xl shadow-sm">
-                <CardHeader className="border-b bg-muted/20 pb-4">
-                  <CardTitle className="text-sm font-bold flex items-center gap-2">
-                    <Building2 className="h-4 w-4 text-[#0071E3]" />
-                    Distributor Enterprise Profile & Licensing
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Legal company details that appear on all DGDA wholesale tax invoices, delivery challans, and money receipts.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-6 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">Distributor / Business Name</Label>
-                      <Input
-                        value={settings.name}
-                        onChange={(e) => setSettings({ ...settings, name: e.target.value })}
-                        className="rounded-xl text-xs h-9 bg-muted/30"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">DGDA Drug License #</Label>
-                      <Input
-                        value={settings.drugLicenseNo || ""}
-                        onChange={(e) => setSettings({ ...settings, drugLicenseNo: e.target.value })}
-                        className="rounded-xl text-xs h-9 font-mono bg-muted/30"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">City Corporation Trade License #</Label>
-                      <Input
-                        value={settings.tradeLicenseNo || ""}
-                        onChange={(e) => setSettings({ ...settings, tradeLicenseNo: e.target.value })}
-                        className="rounded-xl text-xs h-9 font-mono bg-muted/30"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">Tax ID / TIN Number</Label>
-                      <Input
-                        value={settings.taxIdTin || ""}
-                        onChange={(e) => setSettings({ ...settings, taxIdTin: e.target.value })}
-                        className="rounded-xl text-xs h-9 font-mono bg-muted/30"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">Official Contact Phone</Label>
-                      <Input
-                        value={settings.phone || ""}
-                        onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
-                        className="rounded-xl text-xs h-9 bg-muted/30"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">Billing & Accounts Email</Label>
-                      <Input
-                        type="email"
-                        value={settings.email || ""}
-                        onChange={(e) => setSettings({ ...settings, email: e.target.value })}
-                        className="rounded-xl text-xs h-9 bg-muted/30"
-                      />
-                    </div>
+          {/* Section 1: Business Profile */}
+          {activeTab === "business" && (
+            <Card className="border border-border/80 rounded-2xl shadow-sm">
+              <CardHeader className="border-b bg-muted/20 pb-4">
+                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-[#0071E3]" />
+                  Distributor Enterprise Profile & Licensing
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Legal company details that appear on all DRAP wholesale tax invoices, delivery
+                  challans, and customer money receipts.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Distributor / Company Name</Label>
+                    <Input
+                      value={settings.name}
+                      onChange={(e) => setSettings({ ...settings, name: e.target.value })}
+                      className="rounded-xl text-xs h-9 bg-muted/30"
+                    />
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold">Warehouse / Physical Address</Label>
+                    <Label className="text-xs font-semibold">DRAP Wholesale Drug License #</Label>
+                    <Input
+                      value={settings.drugLicenseNo || ""}
+                      onChange={(e) => setSettings({ ...settings, drugLicenseNo: e.target.value })}
+                      className="rounded-xl text-xs h-9 font-mono bg-muted/30"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Trade License / Incorporation #</Label>
+                    <Input
+                      value={settings.tradeLicenseNo || ""}
+                      onChange={(e) => setSettings({ ...settings, tradeLicenseNo: e.target.value })}
+                      className="rounded-xl text-xs h-9 font-mono bg-muted/30"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">National Tax Number (NTN / STRN)</Label>
+                    <Input
+                      value={settings.taxIdTin || ""}
+                      onChange={(e) => setSettings({ ...settings, taxIdTin: e.target.value })}
+                      className="rounded-xl text-xs h-9 font-mono bg-muted/30"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Official Contact Phone</Label>
+                    <Input
+                      value={settings.phone || ""}
+                      onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
+                      className="rounded-xl text-xs h-9 bg-muted/30"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Billing & Accounts Email</Label>
+                    <Input
+                      type="email"
+                      value={settings.email || ""}
+                      onChange={(e) => setSettings({ ...settings, email: e.target.value })}
+                      className="rounded-xl text-xs h-9 bg-muted/30"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-xs font-semibold">Warehouse / Physical Godown Address</Label>
                     <Input
                       value={settings.address || ""}
                       onChange={(e) => setSettings({ ...settings, address: e.target.value })}
@@ -269,378 +440,1074 @@ export function SettingsClient({
                     />
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">City</Label>
-                      <Input
-                        value={settings.city || ""}
-                        onChange={(e) => setSettings({ ...settings, city: e.target.value })}
-                        className="rounded-xl text-xs h-9 bg-muted/30"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">Country</Label>
-                      <Input
-                        value={settings.country}
-                        onChange={(e) => setSettings({ ...settings, country: e.target.value })}
-                        className="rounded-xl text-xs h-9 bg-muted/30"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">Currency Code</Label>
-                      <Input
-                        value={settings.currency}
-                        onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
-                        className="rounded-xl text-xs h-9 font-mono bg-muted/30"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Section 2: Invoice & Print Configuration */}
-            {activeTab === "invoice" && (
-              <Card className="border border-border/80 rounded-2xl shadow-sm">
-                <CardHeader className="border-b bg-muted/20 pb-4">
-                  <CardTitle className="text-sm font-bold flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-[#0071E3]" />
-                    Wholesale Tax Invoice & Print Formatting
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Configure document prefixing, batch transparency, and terms printed on physical invoices.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-6 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">Invoice Number Prefix</Label>
-                      <Input
-                        value={settings.invoicePrefix}
-                        onChange={(e) => setSettings({ ...settings, invoicePrefix: e.target.value })}
-                        className="rounded-xl text-xs h-9 font-mono bg-muted/30"
-                      />
-                      <p className="text-[11px] text-muted-foreground">e.g. INV-YYYY-XXXXX</p>
-                    </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">City</Label>
+                    <Input
+                      value={settings.city || ""}
+                      onChange={(e) => setSettings({ ...settings, city: e.target.value })}
+                      className="rounded-xl text-xs h-9 bg-muted/30"
+                    />
                   </div>
 
-                  <div className="space-y-3 pt-2">
-                    <Label className="text-xs font-bold text-foreground">Print Line Visibility</Label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={settings.showBatchOnInvoice}
-                          onChange={(e) => setSettings({ ...settings, showBatchOnInvoice: e.target.checked })}
-                          className="rounded text-[#0071E3]"
-                        />
-                        <span className="text-xs font-medium">Show Batch Numbers</span>
-                      </label>
-
-                      <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={settings.showExpiryOnInvoice}
-                          onChange={(e) => setSettings({ ...settings, showExpiryOnInvoice: e.target.checked })}
-                          className="rounded text-[#0071E3]"
-                        />
-                        <span className="text-xs font-medium">Show Batch Expiry Dates</span>
-                      </label>
-
-                      <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={settings.showTaxOnInvoice}
-                          onChange={(e) => setSettings({ ...settings, showTaxOnInvoice: e.target.checked })}
-                          className="rounded text-[#0071E3]"
-                        />
-                        <span className="text-xs font-medium">Show DGDA VAT Breakdown</span>
-                      </label>
-
-                      <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={settings.showDiscountOnInvoice}
-                          onChange={(e) => setSettings({ ...settings, showDiscountOnInvoice: e.target.checked })}
-                          className="rounded text-[#0071E3]"
-                        />
-                        <span className="text-xs font-medium">Show Trade Discounts</span>
-                      </label>
-                    </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Country</Label>
+                    <Input
+                      value={settings.country || "Pakistan"}
+                      onChange={(e) => setSettings({ ...settings, country: e.target.value })}
+                      className="rounded-xl text-xs h-9 bg-muted/30"
+                    />
                   </div>
 
-                  <div className="space-y-1.5 pt-2">
-                    <Label className="text-xs font-semibold">Invoice Terms & Legal Footer</Label>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-xs font-semibold">Tax Invoice Legal Disclaimer Footer</Label>
                     <Textarea
-                      rows={3}
+                      rows={2}
                       value={settings.invoiceFooterText || ""}
                       onChange={(e) => setSettings({ ...settings, invoiceFooterText: e.target.value })}
-                      className="rounded-xl text-xs bg-muted/30"
+                      className="rounded-xl text-xs bg-muted/30 resize-none"
                     />
+                    <p className="text-[11px] text-muted-foreground">
+                      Appears at the bottom of all printed wholesale tax invoices and delivery challans.
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
 
-            {/* Section 3: Tax & Discount */}
-            {activeTab === "tax" && (
-              <Card className="border border-border/80 rounded-2xl shadow-sm">
-                <CardHeader className="border-b bg-muted/20 pb-4">
-                  <CardTitle className="text-sm font-bold flex items-center gap-2">
-                    <Percent className="h-4 w-4 text-emerald-600" />
-                    Tax (VAT) & Trade Discount Controls
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Configure default VAT rates and cashier maximum allowable trade discounts.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-6 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">Default VAT Rate (%)</Label>
-                      <Input
-                        type="number"
-                        min={0}
-                        max={100}
-                        step="0.01"
-                        value={settings.defaultVatPercent}
-                        onChange={(e) => setSettings({ ...settings, defaultVatPercent: parseFloat(e.target.value) || 0 })}
-                        className="rounded-xl text-xs h-9 bg-muted/30"
-                      />
-                      <p className="text-[11px] text-muted-foreground">Historical invoices maintain their transaction-time VAT.</p>
-                    </div>
+                <div className="pt-4 border-t flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={() => handleSaveSettings()}
+                    disabled={isSaving}
+                    className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-4"
+                  >
+                    <Save className="h-4 w-4 mr-1.5" />
+                    {isSaving ? "Saving..." : "Save Business Profile"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">Max Allowable Discount (%)</Label>
-                      <Input
-                        type="number"
-                        min={0}
-                        max={100}
-                        value={settings.maxDiscountPercent}
-                        onChange={(e) => setSettings({ ...settings, maxDiscountPercent: parseFloat(e.target.value) || 0 })}
-                        className="rounded-xl text-xs h-9 bg-muted/30"
-                      />
-                      <p className="text-[11px] text-muted-foreground">Discounts above this threshold require manager approval.</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+          {/* Section 2: Invoice & Print Settings */}
+          {activeTab === "invoice" && (
+            <Card className="border border-border/80 rounded-2xl shadow-sm">
+              <CardHeader className="border-b bg-muted/20 pb-4">
+                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-[#0071E3]" />
+                  Tax Invoice & Delivery Challan Print Preferences
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Customize invoice prefixes and choose which columns appear on printed wholesale documents.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="space-y-1.5 max-w-sm">
+                  <Label className="text-xs font-semibold">Invoice Serial Prefix</Label>
+                  <Input
+                    value={settings.invoicePrefix || "INV-"}
+                    onChange={(e) => setSettings({ ...settings, invoicePrefix: e.target.value })}
+                    className="rounded-xl text-xs h-9 font-mono bg-muted/30"
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    Example format: INV-2026-00001
+                  </p>
+                </div>
 
-            {/* Section 4: Inventory & FEFO */}
-            {activeTab === "inventory" && (
-              <Card className="border border-border/80 rounded-2xl shadow-sm">
-                <CardHeader className="border-b bg-muted/20 pb-4">
-                  <CardTitle className="text-sm font-bold flex items-center gap-2">
-                    <Boxes className="h-4 w-4 text-indigo-600" />
-                    FEFO Allocation & Inventory Protection
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    First-Expire, First-Out rules and safety blocks preventing dispatch of expired stock.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-6 space-y-4">
-                  <div className="p-4 rounded-xl bg-rose-50/70 border border-rose-100 flex items-start gap-3">
-                    <AlertTriangle className="h-5 w-5 text-rose-700 shrink-0 mt-0.5" />
-                    <div className="space-y-0.5">
-                      <p className="text-xs font-bold text-rose-900">DGDA Expired Medicine Block</p>
-                      <p className="text-[11px] text-rose-700 leading-relaxed">
-                        Under national pharmaceutical regulations, batches with expiry date &lt; today are strictly prohibited from sales booking and automated FEFO queues.
-                      </p>
-                    </div>
-                  </div>
+                <div className="pt-2 space-y-3">
+                  <Label className="text-xs font-semibold block">Printed Document Columns</Label>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">Default Low Stock Reorder Threshold (Units)</Label>
-                      <Input
-                        type="number"
-                        min={1}
-                        value={settings.lowStockThreshold}
-                        onChange={(e) => setSettings({ ...settings, lowStockThreshold: parseInt(e.target.value, 10) || 10 })}
-                        className="rounded-xl text-xs h-9 bg-muted/30"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">Near-Expiry Warning Window (Days)</Label>
-                      <Input
-                        type="number"
-                        min={1}
-                        value={settings.nearExpiryDays}
-                        onChange={(e) => setSettings({ ...settings, nearExpiryDays: parseInt(e.target.value, 10) || 90 })}
-                        className="rounded-xl text-xs h-9 bg-muted/30"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Section 5: Credit & Aging */}
-            {activeTab === "credit" && (
-              <Card className="border border-border/80 rounded-2xl shadow-sm">
-                <CardHeader className="border-b bg-muted/20 pb-4">
-                  <CardTitle className="text-sm font-bold flex items-center gap-2">
-                    <CreditCard className="h-4 w-4 text-purple-600" />
-                    Customer Credit Limit & Receivable Barriers
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Control credit exposure, maximum payment terms, and automatic sales order hold policies.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-6 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">Default Customer Credit Terms (Days)</Label>
-                      <Input
-                        type="number"
-                        min={0}
-                        value={settings.defaultCreditDays}
-                        onChange={(e) => setSettings({ ...settings, defaultCreditDays: parseInt(e.target.value, 10) || 30 })}
-                        className="rounded-xl text-xs h-9 bg-muted/30"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold">Credit Warning Threshold (%)</Label>
-                      <Input
-                        type="number"
-                        min={1}
-                        max={100}
-                        value={settings.creditWarningThresholdPercent}
-                        onChange={(e) => setSettings({ ...settings, creditWarningThresholdPercent: parseFloat(e.target.value) || 80 })}
-                        className="rounded-xl text-xs h-9 bg-muted/30"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="pt-2">
-                    <label className="flex items-center gap-2.5 p-3.5 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={settings.enforceCreditLimit}
-                        onChange={(e) => setSettings({ ...settings, enforceCreditLimit: e.target.checked })}
-                        className="rounded text-[#0071E3]"
-                      />
-                      <div>
-                        <span className="text-xs font-bold block">Enforce Strict Credit Limit Hold</span>
-                        <span className="text-[11px] text-muted-foreground">
-                          Automatically hold wholesale order booking when pharmacy current due exceeds authorized credit limit.
-                        </span>
-                      </div>
-                    </label>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Section 6: Notification Toggles */}
-            {activeTab === "notifications" && (
-              <Card className="border border-border/80 rounded-2xl shadow-sm">
-                <CardHeader className="border-b bg-muted/20 pb-4">
-                  <CardTitle className="text-sm font-bold flex items-center gap-2">
-                    <Bell className="h-4 w-4 text-sky-600" />
-                    Internal Watchdog & Notification Preferences
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Toggle real-time alerts generated in the top header and system watchdog center.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-6 space-y-3">
                   <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={settings.notifyLowStock}
-                      onChange={(e) => setSettings({ ...settings, notifyLowStock: e.target.checked })}
+                      checked={settings.showTaxOnInvoice}
+                      onChange={(e) => setSettings({ ...settings, showTaxOnInvoice: e.target.checked })}
                       className="rounded text-[#0071E3]"
                     />
                     <div className="text-xs">
-                      <span className="font-bold block">Low Stock & Reorder Alerts</span>
-                      <span className="text-muted-foreground text-[11px]">Notify when inventory on hand falls below minimum threshold.</span>
+                      <span className="font-bold block">Show Tax / VAT Column on Invoice</span>
+                      <span className="text-muted-foreground text-[11px]">
+                        Displays line-level sales tax rates and amounts.
+                      </span>
                     </div>
                   </label>
 
                   <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={settings.notifyNearExpiry}
-                      onChange={(e) => setSettings({ ...settings, notifyNearExpiry: e.target.checked })}
+                      checked={settings.showDiscountOnInvoice}
+                      onChange={(e) =>
+                        setSettings({ ...settings, showDiscountOnInvoice: e.target.checked })
+                      }
                       className="rounded text-[#0071E3]"
                     />
                     <div className="text-xs">
-                      <span className="font-bold block">Near-Expiry Warning Alerts</span>
-                      <span className="text-muted-foreground text-[11px]">Notify when medicine batches enter the warning window.</span>
+                      <span className="font-bold block">Show Commercial Discount Column</span>
+                      <span className="text-muted-foreground text-[11px]">
+                        Displays percentage and monetary discounts per medicine item.
+                      </span>
                     </div>
                   </label>
 
                   <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={settings.notifyCreditBreach}
-                      onChange={(e) => setSettings({ ...settings, notifyCreditBreach: e.target.checked })}
+                      checked={settings.showBatchOnInvoice}
+                      onChange={(e) =>
+                        setSettings({ ...settings, showBatchOnInvoice: e.target.checked })
+                      }
                       className="rounded text-[#0071E3]"
                     />
                     <div className="text-xs">
-                      <span className="font-bold block">Customer Credit Limit Breach Alerts</span>
-                      <span className="text-muted-foreground text-[11px]">Notify when a customer exceeds their sanctioned credit limit.</span>
+                      <span className="font-bold block">Show Batch Numbers</span>
+                      <span className="text-muted-foreground text-[11px]">
+                        Mandatory for DRAP pharmaceutical traceability on both invoices and delivery challans.
+                      </span>
                     </div>
                   </label>
-                </CardContent>
-              </Card>
-            )}
 
-            {/* Section 7: Users & Security */}
-            {activeTab === "users" && (
-              <Card className="border border-border/80 rounded-2xl shadow-sm">
-                <CardHeader className="border-b bg-muted/20 pb-4">
+                  <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.showExpiryOnInvoice}
+                      onChange={(e) =>
+                        setSettings({ ...settings, showExpiryOnInvoice: e.target.checked })
+                      }
+                      className="rounded text-[#0071E3]"
+                    />
+                    <div className="text-xs">
+                      <span className="font-bold block">Show Batch Expiry Dates</span>
+                      <span className="text-muted-foreground text-[11px]">
+                        Prints batch MM/YY expiry dates beside each dispensed item.
+                      </span>
+                    </div>
+                  </label>
+                </div>
+
+                <div className="pt-4 border-t flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={() => handleSaveSettings()}
+                    disabled={isSaving}
+                    className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-4"
+                  >
+                    <Save className="h-4 w-4 mr-1.5" />
+                    {isSaving ? "Saving..." : "Save Invoice Settings"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Section 3: Tax & Discount */}
+          {activeTab === "tax" && (
+            <Card className="border border-border/80 rounded-2xl shadow-sm">
+              <CardHeader className="border-b bg-muted/20 pb-4">
+                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                  <Percent className="h-4 w-4 text-emerald-600" />
+                  Tax & Commercial Discount Policies
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Configure default sales tax rates and safeguard against unauthorized discounting.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Default VAT / Sales Tax Rate (%)</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={100}
+                      step="0.01"
+                      value={settings.defaultVatPercent}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          defaultVatPercent: parseFloat(e.target.value) || 0,
+                        })
+                      }
+                      className="rounded-xl text-xs h-9 bg-muted/30"
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      Applied automatically to newly booked wholesale order lines.
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Maximum Allowable Order Discount (%)</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={settings.maxDiscountPercent}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          maxDiscountPercent: parseFloat(e.target.value) || 0,
+                        })
+                      }
+                      className="rounded-xl text-xs h-9 bg-muted/30"
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      Discounts exceeding this limit require Sales Manager approval.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.enableGlobalDiscount}
+                      onChange={(e) =>
+                        setSettings({ ...settings, enableGlobalDiscount: e.target.checked })
+                      }
+                      className="rounded text-[#0071E3]"
+                    />
+                    <div className="text-xs">
+                      <span className="font-bold block">Enable Special Order-Level Discounts</span>
+                      <span className="text-muted-foreground text-[11px]">
+                        Allows booking staff to apply overall consignment discounts in addition to line-item discounts.
+                      </span>
+                    </div>
+                  </label>
+                </div>
+
+                <div className="pt-4 border-t flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={() => handleSaveSettings()}
+                    disabled={isSaving}
+                    className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-4"
+                  >
+                    <Save className="h-4 w-4 mr-1.5" />
+                    {isSaving ? "Saving..." : "Save Tax Policies"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Section 4: Inventory & FEFO */}
+          {activeTab === "inventory" && (
+            <Card className="border border-border/80 rounded-2xl shadow-sm">
+              <CardHeader className="border-b bg-muted/20 pb-4">
+                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                  <Boxes className="h-4 w-4 text-indigo-600" />
+                  FEFO Allocation & Inventory Protection
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  First-Expire, First-Out rules and safety blocks preventing dispatch of expired stock.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="p-4 rounded-xl bg-sky-50/70 border border-sky-100 flex items-start gap-3">
+                  <Shield className="h-5 w-5 text-sky-700 shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-bold text-sky-900">DRAP Strict FEFO Allocation Standard</p>
+                    <p className="text-[11px] text-sky-700 leading-relaxed">
+                      Pharmaceutical distribution regulations mandate dispatching stock with the earliest expiry dates first. The system prioritizes earliest batches automatically.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Low Stock Reorder Threshold (Units)</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={settings.lowStockThreshold}
+                      onChange={(e) =>
+                        setSettings({ ...settings, lowStockThreshold: parseInt(e.target.value, 10) || 10 })
+                      }
+                      className="rounded-xl text-xs h-9 bg-muted/30"
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      Triggers low stock reorder alerts when inventory drops below this number.
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Near-Expiry Warning Window (Days)</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={settings.nearExpiryDays}
+                      onChange={(e) =>
+                        setSettings({ ...settings, nearExpiryDays: parseInt(e.target.value, 10) || 90 })
+                      }
+                      className="rounded-xl text-xs h-9 bg-muted/30"
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      Flag batches expiring within this number of days as high risk.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-2 space-y-3">
+                  <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.enableFefoStrict}
+                      onChange={(e) =>
+                        setSettings({ ...settings, enableFefoStrict: e.target.checked })
+                      }
+                      className="rounded text-[#0071E3]"
+                    />
+                    <div className="text-xs">
+                      <span className="font-bold block">Enforce Strict FEFO Allocation</span>
+                      <span className="text-muted-foreground text-[11px]">
+                        Automatically locks order booking to the earliest expiring active batches.
+                      </span>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 p-3.5 rounded-xl border border-rose-200 bg-rose-50/40 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.allowExpiredSales}
+                      onChange={(e) =>
+                        setSettings({ ...settings, allowExpiredSales: e.target.checked })
+                      }
+                      className="rounded text-rose-600"
+                    />
+                    <div className="text-xs">
+                      <span className="font-bold text-rose-900 block flex items-center gap-1.5">
+                        <AlertTriangle className="h-3.5 w-3.5 text-rose-600" />
+                        Allow Sales of Expired Stock (Emergency Testing Only)
+                      </span>
+                      <span className="text-rose-700 text-[11px]">
+                        STRICT SAFETY WARNING: Under DRAP regulations, selling expired medicines is illegal. Keep this unchecked for live wholesale operations.
+                      </span>
+                    </div>
+                  </label>
+                </div>
+
+                <div className="pt-4 border-t flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={() => handleSaveSettings()}
+                    disabled={isSaving}
+                    className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-4"
+                  >
+                    <Save className="h-4 w-4 mr-1.5" />
+                    {isSaving ? "Saving..." : "Save Inventory Policies"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Section 5: Credit & Aging */}
+          {activeTab === "credit" && (
+            <Card className="border border-border/80 rounded-2xl shadow-sm">
+              <CardHeader className="border-b bg-muted/20 pb-4">
+                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                  <CreditCard className="h-4 w-4 text-purple-600" />
+                  Customer Credit Limit & Receivable Guardrails
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Control credit exposure, maximum payment days, and automatic sales order hold policies.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Default Customer Credit Terms (Days)</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={settings.defaultCreditDays}
+                      onChange={(e) =>
+                        setSettings({ ...settings, defaultCreditDays: parseInt(e.target.value, 10) || 30 })
+                      }
+                      className="rounded-xl text-xs h-9 bg-muted/30"
+                    />
+                    <p className="text-[11px] text-muted-foreground">Standard invoice payment grace period.</p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Credit Warning Utilization Threshold (%)</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={100}
+                      value={settings.creditWarningThresholdPercent}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          creditWarningThresholdPercent: parseFloat(e.target.value) || 80,
+                        })
+                      }
+                      className="rounded-xl text-xs h-9 bg-muted/30"
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      Warns staff when customer balances reach this percentage of their sanctioned limit.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-2 space-y-3">
+                  <label className="flex items-center gap-2.5 p-3.5 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.enforceCreditLimit}
+                      onChange={(e) =>
+                        setSettings({ ...settings, enforceCreditLimit: e.target.checked })
+                      }
+                      className="rounded text-[#0071E3]"
+                    />
+                    <div className="text-xs">
+                      <span className="font-bold block">Enforce Strict Credit Limit Hold</span>
+                      <span className="text-muted-foreground text-[11px]">
+                        Automatically blocks checkout when customer outstanding balance exceeds their sanctioned credit limit.
+                      </span>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 p-3.5 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.requireApprovalOnCreditExceed}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          requireApprovalOnCreditExceed: e.target.checked,
+                        })
+                      }
+                      className="rounded text-[#0071E3]"
+                    />
+                    <div className="text-xs">
+                      <span className="font-bold block">Require Manager Override on Overdue Accounts</span>
+                      <span className="text-muted-foreground text-[11px]">
+                        Requires explicit sales manager authorization reason to book orders for blocked pharmacies.
+                      </span>
+                    </div>
+                  </label>
+                </div>
+
+                <div className="pt-4 border-t flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={() => handleSaveSettings()}
+                    disabled={isSaving}
+                    className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-4"
+                  >
+                    <Save className="h-4 w-4 mr-1.5" />
+                    {isSaving ? "Saving..." : "Save Credit Policies"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Section 6: Alerts & Notifications */}
+          {activeTab === "notifications" && (
+            <Card className="border border-border/80 rounded-2xl shadow-sm">
+              <CardHeader className="border-b bg-muted/20 pb-4">
+                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                  <Bell className="h-4 w-4 text-sky-600" />
+                  System Watchdog & Notification Center Preferences
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Toggle real-time alerts generated in the top header bell popover and system watchdog center.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6 space-y-3">
+                <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.notifyLowStock}
+                    onChange={(e) =>
+                      setSettings({ ...settings, notifyLowStock: e.target.checked })
+                    }
+                    className="rounded text-[#0071E3]"
+                  />
+                  <div className="text-xs">
+                    <span className="font-bold block">Low Stock & Reorder Alerts</span>
+                    <span className="text-muted-foreground text-[11px]">
+                      Notify when medicine units on hand drop below minimum threshold.
+                    </span>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.notifyNearExpiry}
+                    onChange={(e) =>
+                      setSettings({ ...settings, notifyNearExpiry: e.target.checked })
+                    }
+                    className="rounded text-[#0071E3]"
+                  />
+                  <div className="text-xs">
+                    <span className="font-bold block">Near-Expiry Watchdog Alerts</span>
+                    <span className="text-muted-foreground text-[11px]">
+                      Notify when active batches enter the near-expiry warning window.
+                    </span>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.notifyExpiredStock}
+                    onChange={(e) =>
+                      setSettings({ ...settings, notifyExpiredStock: e.target.checked })
+                    }
+                    className="rounded text-[#0071E3]"
+                  />
+                  <div className="text-xs">
+                    <span className="font-bold block">Expired Medicine Quarantine Alerts</span>
+                    <span className="text-muted-foreground text-[11px]">
+                      Immediate alerts when any batch passes its expiration date.
+                    </span>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.notifyCreditBreach}
+                    onChange={(e) =>
+                      setSettings({ ...settings, notifyCreditBreach: e.target.checked })
+                    }
+                    className="rounded text-[#0071E3]"
+                  />
+                  <div className="text-xs">
+                    <span className="font-bold block">Customer Credit Limit Breach Alerts</span>
+                    <span className="text-muted-foreground text-[11px]">
+                      Notify when a customer pharmacy balance exceeds authorized credit limit.
+                    </span>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/70 bg-muted/20 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.notifySupplierDues}
+                    onChange={(e) =>
+                      setSettings({ ...settings, notifySupplierDues: e.target.checked })
+                    }
+                    className="rounded text-[#0071E3]"
+                  />
+                  <div className="text-xs">
+                    <span className="font-bold block">Supplier Payment Due Reminders</span>
+                    <span className="text-muted-foreground text-[11px]">
+                      Notify when supplier consignment payment vouchers are approaching due date.
+                    </span>
+                  </div>
+                </label>
+
+                <div className="pt-4 border-t flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={() => handleSaveSettings()}
+                    disabled={isSaving}
+                    className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-4"
+                  >
+                    <Save className="h-4 w-4 mr-1.5" />
+                    {isSaving ? "Saving..." : "Save Notification Preferences"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Section 7: Team / User Management */}
+          {activeTab === "users" && (
+            <Card className="border border-border/80 rounded-2xl shadow-sm">
+              <CardHeader className="border-b bg-muted/20 pb-4 flex flex-row items-center justify-between">
+                <div>
                   <CardTitle className="text-sm font-bold flex items-center gap-2">
                     <Users2 className="h-4 w-4 text-[#0071E3]" />
-                    Authorized Staff Accounts & Role-Based Access Control
+                    Staff Accounts & Access Management
                   </CardTitle>
                   <CardDescription className="text-xs">
-                    Active team members and their designated ERP operational permissions.
+                    Enroll team members, assign operational roles, reset passwords, and manage active status.
                   </CardDescription>
-                </CardHeader>
-                <CardContent className="p-6 space-y-4">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-muted/40 border-b font-semibold text-muted-foreground uppercase tracking-wider">
-                        <tr>
-                          <th className="px-4 py-3">Staff Name</th>
-                          <th className="px-4 py-3">Email Address</th>
-                          <th className="px-4 py-3">Phone</th>
-                          <th className="px-4 py-3 text-center">Assigned Role</th>
-                          <th className="px-4 py-3 text-center">Account Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border/60">
-                        {users.map((u) => (
-                          <tr key={u.id} className="hover:bg-muted/30">
-                            <td className="px-4 py-3 font-semibold text-foreground">{u.name}</td>
-                            <td className="px-4 py-3 text-muted-foreground font-mono">{u.email}</td>
-                            <td className="px-4 py-3 text-muted-foreground font-mono">{u.phone}</td>
-                            <td className="px-4 py-3 text-center">
-                              <Badge variant="outline" className="text-[10px] font-mono">
-                                {u.role}
-                              </Badge>
-                            </td>
-                            <td className="px-4 py-3 text-center">
+                </div>
+
+                <Button
+                  type="button"
+                  onClick={() => setIsAddUserOpen(true)}
+                  className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-3.5 shadow-sm"
+                >
+                  <Plus className="h-4 w-4 mr-1.5" /> Add Staff Member
+                </Button>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-muted/40 border-b font-semibold text-muted-foreground uppercase tracking-wider">
+                      <tr>
+                        <th className="px-4 py-3">Staff Name</th>
+                        <th className="px-4 py-3">Email Address</th>
+                        <th className="px-4 py-3">Phone</th>
+                        <th className="px-4 py-3 text-center">Assigned Role</th>
+                        <th className="px-4 py-3 text-center">Status</th>
+                        <th className="px-4 py-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/60">
+                      {users.map((u) => (
+                        <tr key={u.id} className="hover:bg-muted/30">
+                          <td className="px-4 py-3 font-semibold text-foreground">{u.name}</td>
+                          <td className="px-4 py-3 text-muted-foreground font-mono">{u.email}</td>
+                          <td className="px-4 py-3 text-muted-foreground font-mono">{u.phone}</td>
+                          <td className="px-4 py-3 text-center">
+                            <Badge variant="outline" className="text-[10px] font-mono">
+                              {u.role.replace(/_/g, " ")}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            {u.status === "ACTIVE" ? (
                               <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px]">
+                                Active
+                              </Badge>
+                            ) : (
+                              <Badge className="bg-rose-50 text-rose-700 border-rose-200 text-[10px]">
                                 {u.status}
                               </Badge>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </form>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-44 text-xs">
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setEditingUser({
+                                      id: u.id,
+                                      name: u.name,
+                                      email: u.email,
+                                      phone: u.phone === "N/A" ? "" : u.phone,
+                                      role: u.role,
+                                      status: u.status,
+                                    });
+                                    setIsEditUserOpen(true);
+                                  }}
+                                  className="cursor-pointer gap-2"
+                                >
+                                  <Edit2 className="h-3.5 w-3.5 text-sky-600" />
+                                  Edit Account & Role
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setResetUser({
+                                      id: u.id,
+                                      name: u.name,
+                                      password: "",
+                                    });
+                                    setIsResetPasswordOpen(true);
+                                  }}
+                                  className="cursor-pointer gap-2"
+                                >
+                                  <KeyRound className="h-3.5 w-3.5 text-amber-600" />
+                                  Reset Password
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setDeactivateUser({
+                                      id: u.id,
+                                      name: u.name,
+                                      status: u.status,
+                                    });
+                                    setIsDeactivateOpen(true);
+                                  }}
+                                  className={`cursor-pointer gap-2 ${
+                                    u.status === "ACTIVE"
+                                      ? "text-rose-600 focus:text-rose-600"
+                                      : "text-emerald-600 focus:text-emerald-600"
+                                  }`}
+                                >
+                                  {u.status === "ACTIVE" ? (
+                                    <>
+                                      <UserX className="h-3.5 w-3.5" /> Deactivate Account
+                                    </>
+                                  ) : (
+                                    <>
+                                      <UserCheck className="h-3.5 w-3.5" /> Activate Account
+                                    </>
+                                  )}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
+
+      {/* MODAL 1: ADD STAFF MEMBER */}
+      <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
+        <DialogContent className="max-w-md rounded-2xl">
+          <form onSubmit={handleCreateUser}>
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold flex items-center gap-2">
+                <Users2 className="h-5 w-5 text-[#0071E3]" />
+                Enroll New Staff Member
+              </DialogTitle>
+              <DialogDescription className="text-xs">
+                Create login credentials and designate role-based permissions for distribution operations.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-3.5 py-4">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Full Name *</Label>
+                <Input
+                  required
+                  placeholder="e.g. Tariq Mehmood"
+                  value={newUser.name}
+                  onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                  className="rounded-xl text-xs h-9 bg-muted/30"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Email Address (Login Username) *</Label>
+                <Input
+                  required
+                  type="email"
+                  placeholder="e.g. tariq@pharmadist.pk"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                  className="rounded-xl text-xs h-9 bg-muted/30"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Contact Phone</Label>
+                <Input
+                  placeholder="e.g. +92 300 1234567"
+                  value={newUser.phone || ""}
+                  onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
+                  className="rounded-xl text-xs h-9 bg-muted/30"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Assigned Role *</Label>
+                  <Select
+                    value={newUser.role}
+                    onValueChange={(val: any) => setNewUser({ ...newUser, role: val })}
+                  >
+                    <SelectTrigger className="rounded-xl text-xs h-9 bg-muted/30">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SUPER_ADMIN">Super Administrator</SelectItem>
+                      <SelectItem value="SALES_MANAGER">Sales Manager</SelectItem>
+                      <SelectItem value="SALESMAN">Field Salesman</SelectItem>
+                      <SelectItem value="WAREHOUSE_MANAGER">Warehouse Manager</SelectItem>
+                      <SelectItem value="INVENTORY_OFFICER">Inventory Officer</SelectItem>
+                      <SelectItem value="ACCOUNTS_OFFICER">Accounts Officer</SelectItem>
+                      <SelectItem value="CASHIER">Cashier</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Account Status</Label>
+                  <Select
+                    value={newUser.status}
+                    onValueChange={(val: any) => setNewUser({ ...newUser, status: val })}
+                  >
+                    <SelectTrigger className="rounded-xl text-xs h-9 bg-muted/30">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ACTIVE">Active</SelectItem>
+                      <SelectItem value="INACTIVE">Inactive</SelectItem>
+                      <SelectItem value="SUSPENDED">Suspended</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Initial Login Password *</Label>
+                <Input
+                  required
+                  type="password"
+                  placeholder="Minimum 6 characters"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  className="rounded-xl text-xs h-9 bg-muted/30"
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  Hashed securely with bcrypt before committing to the database.
+                </p>
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 pt-2 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsAddUserOpen(false)}
+                className="rounded-xl text-xs h-9"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isUserProcessing}
+                className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-4"
+              >
+                {isUserProcessing ? "Creating Account..." : "Create Account"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* MODAL 2: EDIT STAFF MEMBER */}
+      <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
+        <DialogContent className="max-w-md rounded-2xl">
+          {editingUser && (
+            <form onSubmit={handleUpdateUser}>
+              <DialogHeader>
+                <DialogTitle className="text-base font-bold flex items-center gap-2">
+                  <Edit2 className="h-5 w-5 text-sky-600" />
+                  Edit Staff Details & Permissions
+                </DialogTitle>
+                <DialogDescription className="text-xs">
+                  Update staff profile information, phone, role classification, and account status.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-3.5 py-4">
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Full Name *</Label>
+                  <Input
+                    required
+                    value={editingUser.name}
+                    onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+                    className="rounded-xl text-xs h-9 bg-muted/30"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Email Address *</Label>
+                  <Input
+                    required
+                    type="email"
+                    value={editingUser.email}
+                    onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
+                    className="rounded-xl text-xs h-9 bg-muted/30"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Phone Number</Label>
+                  <Input
+                    value={editingUser.phone || ""}
+                    onChange={(e) => setEditingUser({ ...editingUser, phone: e.target.value })}
+                    className="rounded-xl text-xs h-9 bg-muted/30"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs font-semibold">Operational Role</Label>
+                    <Select
+                      value={editingUser.role}
+                      onValueChange={(val: any) => setEditingUser({ ...editingUser, role: val })}
+                    >
+                      <SelectTrigger className="rounded-xl text-xs h-9 bg-muted/30">
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="SUPER_ADMIN">Super Administrator</SelectItem>
+                        <SelectItem value="SALES_MANAGER">Sales Manager</SelectItem>
+                        <SelectItem value="SALESMAN">Field Salesman</SelectItem>
+                        <SelectItem value="WAREHOUSE_MANAGER">Warehouse Manager</SelectItem>
+                        <SelectItem value="INVENTORY_OFFICER">Inventory Officer</SelectItem>
+                        <SelectItem value="ACCOUNTS_OFFICER">Accounts Officer</SelectItem>
+                        <SelectItem value="CASHIER">Cashier</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className="text-xs font-semibold">Account Status</Label>
+                    <Select
+                      value={editingUser.status}
+                      onValueChange={(val: any) => setEditingUser({ ...editingUser, status: val })}
+                    >
+                      <SelectTrigger className="rounded-xl text-xs h-9 bg-muted/30">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ACTIVE">Active</SelectItem>
+                        <SelectItem value="INACTIVE">Inactive</SelectItem>
+                        <SelectItem value="SUSPENDED">Suspended</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <DialogFooter className="gap-2 pt-2 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditUserOpen(false)}
+                  className="rounded-xl text-xs h-9"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isUserProcessing}
+                  className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-4"
+                >
+                  {isUserProcessing ? "Saving..." : "Save Changes"}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* MODAL 3: RESET PASSWORD */}
+      <Dialog open={isResetPasswordOpen} onOpenChange={setIsResetPasswordOpen}>
+        <DialogContent className="max-w-sm rounded-2xl">
+          {resetUser && (
+            <form onSubmit={handleResetPassword}>
+              <DialogHeader>
+                <DialogTitle className="text-base font-bold flex items-center gap-2">
+                  <KeyRound className="h-5 w-5 text-amber-600" />
+                  Reset Staff Password
+                </DialogTitle>
+                <DialogDescription className="text-xs">
+                  Set a new password for <span className="font-bold text-foreground">{resetUser.name}</span>.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-3 py-4">
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">New Password (Minimum 6 characters)</Label>
+                  <Input
+                    required
+                    type="password"
+                    placeholder="Enter new secure password"
+                    value={resetUser.password}
+                    onChange={(e) => setResetUser({ ...resetUser, password: e.target.value })}
+                    className="rounded-xl text-xs h-9 bg-muted/30"
+                  />
+                </div>
+              </div>
+
+              <DialogFooter className="gap-2 pt-2 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsResetPasswordOpen(false)}
+                  className="rounded-xl text-xs h-9"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isUserProcessing || resetUser.password.length < 6}
+                  className="bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs h-9 px-4"
+                >
+                  {isUserProcessing ? "Resetting..." : "Reset Password"}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* MODAL 4: DEACTIVATE / ACTIVATE CONFIRMATION */}
+      <Dialog open={isDeactivateOpen} onOpenChange={setIsDeactivateOpen}>
+        <DialogContent className="max-w-md rounded-2xl">
+          {deactivateUser && (
+            <div>
+              <DialogHeader>
+                <DialogTitle className="text-base font-bold flex items-center gap-2">
+                  {deactivateUser.status === "ACTIVE" ? (
+                    <>
+                      <UserX className="h-5 w-5 text-rose-600" />
+                      Confirm Account Deactivation
+                    </>
+                  ) : (
+                    <>
+                      <UserCheck className="h-5 w-5 text-emerald-600" />
+                      Confirm Account Reactivation
+                    </>
+                  )}
+                </DialogTitle>
+                <DialogDescription className="text-xs leading-relaxed pt-1">
+                  {deactivateUser.status === "ACTIVE" ? (
+                    <>
+                      Are you sure you want to deactivate{" "}
+                      <span className="font-bold text-foreground">{deactivateUser.name}</span>?
+                      <br />
+                      <span className="text-rose-700 font-semibold block mt-1.5">
+                        Deactivating immediately revokes login access while preserving all historical sales orders, ledger entries, and audit logs.
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      Reactivate account for{" "}
+                      <span className="font-bold text-foreground">{deactivateUser.name}</span> to restore system login and operations.
+                    </>
+                  )}
+                </DialogDescription>
+              </DialogHeader>
+
+              <DialogFooter className="gap-2 pt-4 border-t mt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsDeactivateOpen(false)}
+                  className="rounded-xl text-xs h-9"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleToggleUserStatus}
+                  disabled={isUserProcessing}
+                  className={`rounded-xl text-xs h-9 px-4 text-white ${
+                    deactivateUser.status === "ACTIVE"
+                      ? "bg-rose-600 hover:bg-rose-700"
+                      : "bg-emerald-600 hover:bg-emerald-700"
+                  }`}
+                >
+                  {isUserProcessing
+                    ? "Updating..."
+                    : deactivateUser.status === "ACTIVE"
+                    ? "Deactivate Account"
+                    : "Activate Account"}
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

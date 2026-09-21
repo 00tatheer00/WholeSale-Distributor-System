@@ -67,9 +67,17 @@ export async function getNotifications(userId?: string): Promise<NotificationSum
  */
 export async function generateSystemAlerts(): Promise<void> {
   try {
+    const company = await prisma.company.findFirst();
+
+    const notifyLowStock = company?.notifyLowStock ?? true;
+    const notifyNearExpiry = company?.notifyNearExpiry ?? true;
+    const notifyExpiredStock = company?.notifyExpiredStock ?? true;
+    const notifyCreditBreach = company?.notifyCreditBreach ?? true;
+    const nearExpiryDays = company?.nearExpiryDays ?? 90;
+
     const now = new Date();
-    const in60Days = new Date();
-    in60Days.setDate(now.getDate() + 60);
+    const expiryHorizon = new Date();
+    expiryHorizon.setDate(now.getDate() + nearExpiryDays);
 
     const oneDayAgo = new Date();
     oneDayAgo.setHours(oneDayAgo.getHours() - 24);
@@ -95,108 +103,119 @@ export async function generateSystemAlerts(): Promise<void> {
     }> = [];
 
     // 1. Check Out of Stock & Low Stock
-    const medicines = await prisma.medicine.findMany({
-      where: { status: "ACTIVE" },
-      include: {
-        batches: {
-          where: { quantityOnHand: { gt: 0 } },
-          select: { quantityOnHand: true },
+    if (notifyLowStock) {
+      const medicines = await prisma.medicine.findMany({
+        where: { status: "ACTIVE" },
+        include: {
+          batches: {
+            where: { quantityOnHand: { gt: 0 } },
+            select: { quantityOnHand: true },
+          },
         },
-      },
-    });
+      });
 
-    medicines.forEach((m) => {
-      const totalStock = m.batches.reduce((sum, b) => sum + b.quantityOnHand, 0);
+      medicines.forEach((m) => {
+        const totalStock = m.batches.reduce((sum, b) => sum + b.quantityOnHand, 0);
+        const threshold = Math.max(m.minReorderLevel, company?.lowStockThreshold ?? 10);
 
-      if (totalStock === 0) {
-        const title = `Out of Stock: ${m.brandName}`;
-        if (!existingKeys.has(`${NotificationType.OUT_OF_STOCK}_${title}`)) {
-          newAlertsToCreate.push({
-            type: NotificationType.OUT_OF_STOCK,
-            title,
-            message: `"${m.brandName}" (${m.genericName}) has 0 units available across all batches.`,
-            link: `/reports/low-stock`,
-          });
-          existingKeys.add(`${NotificationType.OUT_OF_STOCK}_${title}`);
+        if (totalStock === 0) {
+          const title = `Out of Stock: ${m.brandName}`;
+          if (!existingKeys.has(`${NotificationType.OUT_OF_STOCK}_${title}`)) {
+            newAlertsToCreate.push({
+              type: NotificationType.OUT_OF_STOCK,
+              title,
+              message: `"${m.brandName}" (${m.genericName}) has 0 units available across all batches.`,
+              link: `/reports/low-stock`,
+            });
+            existingKeys.add(`${NotificationType.OUT_OF_STOCK}_${title}`);
+          }
+        } else if (totalStock <= threshold) {
+          const title = `Low Stock Warning: ${m.brandName}`;
+          if (!existingKeys.has(`${NotificationType.LOW_STOCK}_${title}`)) {
+            newAlertsToCreate.push({
+              type: NotificationType.LOW_STOCK,
+              title,
+              message: `"${m.brandName}" has only ${totalStock} units left (Reorder threshold: ${threshold}).`,
+              link: `/reports/low-stock`,
+            });
+            existingKeys.add(`${NotificationType.LOW_STOCK}_${title}`);
+          }
         }
-      } else if (totalStock <= m.minReorderLevel) {
-        const title = `Low Stock Warning: ${m.brandName}`;
-        if (!existingKeys.has(`${NotificationType.LOW_STOCK}_${title}`)) {
-          newAlertsToCreate.push({
-            type: NotificationType.LOW_STOCK,
-            title,
-            message: `"${m.brandName}" has only ${totalStock} units left (Min threshold: ${m.minReorderLevel}).`,
-            link: `/reports/low-stock`,
-          });
-          existingKeys.add(`${NotificationType.LOW_STOCK}_${title}`);
-        }
-      }
-    });
+      });
+    }
 
     // 2. Check Expired & Near-Expiry Batches
-    const batches = await prisma.medicineBatch.findMany({
-      where: {
-        quantityOnHand: { gt: 0 },
-        expiryDate: { lte: in60Days },
-      },
-      include: { medicine: true },
-    });
+    if (notifyExpiredStock || notifyNearExpiry) {
+      const batches = await prisma.medicineBatch.findMany({
+        where: {
+          quantityOnHand: { gt: 0 },
+          expiryDate: { lte: expiryHorizon },
+        },
+        include: { medicine: true },
+      });
 
-    batches.forEach((b) => {
-      if (b.expiryDate < now) {
-        const title = `Expired Stock: ${b.medicine.brandName} (Batch ${b.batchNumber})`;
-        if (!existingKeys.has(`${NotificationType.EXPIRED_MEDICINE}_${title}`)) {
-          newAlertsToCreate.push({
-            type: NotificationType.EXPIRED_MEDICINE,
-            title,
-            message: `Batch "${b.batchNumber}" expired on ${b.expiryDate.toISOString().split("T")[0]} with ${b.quantityOnHand} units remaining. Quarantine immediately.`,
-            link: `/reports/expiry`,
-          });
-          existingKeys.add(`${NotificationType.EXPIRED_MEDICINE}_${title}`);
+      batches.forEach((b) => {
+        if (b.expiryDate < now) {
+          if (notifyExpiredStock) {
+            const title = `Expired Stock: ${b.medicine.brandName} (Batch ${b.batchNumber})`;
+            if (!existingKeys.has(`${NotificationType.EXPIRED_MEDICINE}_${title}`)) {
+              newAlertsToCreate.push({
+                type: NotificationType.EXPIRED_MEDICINE,
+                title,
+                message: `Batch "${b.batchNumber}" expired on ${b.expiryDate.toISOString().split("T")[0]} with ${b.quantityOnHand} units remaining. Quarantine immediately.`,
+                link: `/reports/expiry`,
+              });
+              existingKeys.add(`${NotificationType.EXPIRED_MEDICINE}_${title}`);
+            }
+          }
+        } else {
+          if (notifyNearExpiry) {
+            const daysLeft = Math.ceil((b.expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+            const title = `Near Expiry (${daysLeft}d): ${b.medicine.brandName}`;
+            if (!existingKeys.has(`${NotificationType.NEAR_EXPIRY}_${title}`)) {
+              newAlertsToCreate.push({
+                type: NotificationType.NEAR_EXPIRY,
+                title,
+                message: `Batch "${b.batchNumber}" has ${b.quantityOnHand} units expiring in ${daysLeft} days (${b.expiryDate.toISOString().split("T")[0]}).`,
+                link: `/reports/expiry`,
+              });
+              existingKeys.add(`${NotificationType.NEAR_EXPIRY}_${title}`);
+            }
+          }
         }
-      } else {
-        const daysLeft = Math.ceil((b.expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-        const title = `Near Expiry (${daysLeft}d): ${b.medicine.brandName}`;
-        if (!existingKeys.has(`${NotificationType.NEAR_EXPIRY}_${title}`)) {
-          newAlertsToCreate.push({
-            type: NotificationType.NEAR_EXPIRY,
-            title,
-            message: `Batch "${b.batchNumber}" has ${b.quantityOnHand} units expiring in ${daysLeft} days (${b.expiryDate.toISOString().split("T")[0]}).`,
-            link: `/reports/expiry`,
-          });
-          existingKeys.add(`${NotificationType.NEAR_EXPIRY}_${title}`);
-        }
-      }
-    });
+      });
+    }
 
     // 3. Check Customer Credit Limit Breaches
-    const overLimitCustomers = await prisma.customer.findMany({
-      where: {
-        status: "ACTIVE",
-        creditLimit: { gt: 0 },
-      },
-      select: {
-        id: true,
-        pharmacyName: true,
-        currentDue: true,
-        creditLimit: true,
-      },
-    });
+    if (notifyCreditBreach) {
+      const overLimitCustomers = await prisma.customer.findMany({
+        where: {
+          status: "ACTIVE",
+          creditLimit: { gt: 0 },
+        },
+        select: {
+          id: true,
+          pharmacyName: true,
+          currentDue: true,
+          creditLimit: true,
+        },
+      });
 
-    overLimitCustomers.forEach((c) => {
-      if (Number(c.currentDue) > Number(c.creditLimit)) {
-        const title = `Credit Limit Exceeded: ${c.pharmacyName}`;
-        if (!existingKeys.has(`${NotificationType.CUSTOMER_CREDIT_BREACH}_${title}`)) {
-          newAlertsToCreate.push({
-            type: NotificationType.CUSTOMER_CREDIT_BREACH,
-            title,
-            message: `${c.pharmacyName} current due Rs. ${Number(c.currentDue).toLocaleString()} exceeds credit limit Rs. ${Number(c.creditLimit).toLocaleString()}.`,
-            link: `/reports/customer-dues`,
-          });
-          existingKeys.add(`${NotificationType.CUSTOMER_CREDIT_BREACH}_${title}`);
+      overLimitCustomers.forEach((c) => {
+        if (Number(c.currentDue) > Number(c.creditLimit)) {
+          const title = `Credit Limit Exceeded: ${c.pharmacyName}`;
+          if (!existingKeys.has(`${NotificationType.CUSTOMER_CREDIT_BREACH}_${title}`)) {
+            newAlertsToCreate.push({
+              type: NotificationType.CUSTOMER_CREDIT_BREACH,
+              title,
+              message: `${c.pharmacyName} current due Rs. ${Number(c.currentDue).toLocaleString()} exceeds credit limit Rs. ${Number(c.creditLimit).toLocaleString()}.`,
+              link: `/reports/customer-dues`,
+            });
+            existingKeys.add(`${NotificationType.CUSTOMER_CREDIT_BREACH}_${title}`);
+          }
         }
-      }
-    });
+      });
+    }
 
     // 4. Batch Insert New Deduplicated Alerts
     if (newAlertsToCreate.length > 0) {

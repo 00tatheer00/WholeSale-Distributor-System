@@ -12,6 +12,8 @@ import {
   Truck,
   TrendingUp,
   CreditCard,
+  FileSpreadsheet,
+  Calendar,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { exportToCSV } from "@/lib/export-utils";
+import { exportToCSV, exportToExcel } from "@/lib/export-utils";
 
 interface PurchasesReportClientProps {
   reportData?: any;
@@ -42,6 +44,7 @@ export function PurchasesReportClient({
   const currentPreset = reportData?.preset || "this_month";
   const [search, setSearch] = React.useState(searchParams.get("search") || "");
   const [selectedSupplier, setSelectedSupplier] = React.useState(searchParams.get("supplier") || "ALL");
+  const [selectedStatus, setSelectedStatus] = React.useState(searchParams.get("status") || "ALL");
 
   const data = reportData || {
     startDate: new Date().toISOString().split("T")[0],
@@ -66,19 +69,19 @@ export function PurchasesReportClient({
     router.push(`/reports/purchases?${current.toString()}`);
   };
 
-  const handleExportCSV = () => {
-    const headers = [
-      "Purchase Number",
-      "Supplier Invoice #",
-      "Manufacturer Supplier",
-      "Date",
-      "Total Amount (AFN)",
-      "Paid Amount (AFN)",
-      "Due Balance (AFN)",
-      "Status",
-    ];
+  const exportHeaders = [
+    "Purchase Number",
+    "Supplier Invoice #",
+    "Manufacturer Supplier",
+    "Date",
+    "Total Amount (PKR)",
+    "Paid Amount (PKR)",
+    "Due Balance (PKR)",
+    "Status",
+  ];
 
-    const rows = data.purchases.map((p: any) => [
+  const getExportRows = () =>
+    data.purchases.map((p: any) => [
       p.purchaseNumber,
       p.supplierInvoiceNumber,
       p.supplierName,
@@ -89,7 +92,12 @@ export function PurchasesReportClient({
       p.status,
     ]);
 
-    exportToCSV(`Procurement_Report_${data.startDate}_to_${data.endDate}`, headers, rows);
+  const handleExportCSV = () => {
+    exportToCSV(`Procurement_Report_${data.startDate}_to_${data.endDate}`, exportHeaders, getExportRows());
+  };
+
+  const handleExportExcel = () => {
+    exportToExcel(`Procurement_Report_${data.startDate}_to_${data.endDate}`, exportHeaders, getExportRows(), "Procurement Consignments");
   };
 
   const presets = [
@@ -127,9 +135,18 @@ export function PurchasesReportClient({
 
           <Button
             onClick={handleExportCSV}
+            variant="outline"
+            size="sm"
+            className="rounded-xl text-xs h-9 border-border/80"
+          >
+            <Download className="h-4 w-4 mr-1.5" /> Export CSV
+          </Button>
+
+          <Button
+            onClick={handleExportExcel}
             className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-3.5 shadow-sm"
           >
-            <Download className="h-4 w-4 mr-1.5" /> Export Filtered CSV
+            <FileSpreadsheet className="h-4 w-4 mr-1.5" /> Export Excel (.xls)
           </Button>
         </div>
       </div>
@@ -154,6 +171,21 @@ export function PurchasesReportClient({
           ))}
         </div>
       </PageHeader>
+
+      {/* Active Period Banner */}
+      <div className="px-4 py-2.5 rounded-xl bg-muted/30 border border-border/70 flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-[#0071E3]" />
+          <span>
+            Showing procurement results from{" "}
+            <strong className="text-foreground">{formatDate(data.startDate)}</strong> to{" "}
+            <strong className="text-foreground">{formatDate(data.endDate)}</strong>
+          </span>
+        </div>
+        <Badge variant="outline" className="font-mono text-[11px]">
+          {data.purchaseCount} Consignments Received
+        </Badge>
+      </div>
 
       {/* 2. Top 3 Pastel KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

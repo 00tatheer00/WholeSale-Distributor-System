@@ -10,13 +10,14 @@ import {
   Search,
   Building2,
   Eye,
+  FileSpreadsheet,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/lib/utils";
-import { exportToCSV } from "@/lib/export-utils";
+import { exportToCSV, exportToExcel } from "@/lib/export-utils";
 
 interface SupplierDuesClientProps {
   reportData?: any;
@@ -37,23 +38,23 @@ export function SupplierDuesClient({ reportData }: SupplierDuesClientProps) {
       return (
         s.name.toLowerCase().includes(q) ||
         (s.drugLicenseNo && s.drugLicenseNo.toLowerCase().includes(q)) ||
-        s.phone.toLowerCase().includes(q)
+        (s.phone && s.phone.includes(q))
       );
     }
     return true;
   });
 
-  const handleExportCSV = () => {
-    const headers = [
-      "Manufacturer Name",
-      "Drug License #",
-      "Phone",
-      "Credit Period (Days)",
-      "Outstanding Payable Due (AFN)",
-      "Status",
-    ];
+  const exportHeaders = [
+    "Manufacturer Name",
+    "Drug License #",
+    "Phone",
+    "Credit Period (Days)",
+    "Outstanding Payable Due (PKR)",
+    "Status",
+  ];
 
-    const rows = filteredItems.map((s: any) => [
+  const getExportRows = () =>
+    filteredItems.map((s: any) => [
       s.name,
       s.drugLicenseNo,
       s.phone,
@@ -62,7 +63,12 @@ export function SupplierDuesClient({ reportData }: SupplierDuesClientProps) {
       s.status,
     ]);
 
-    exportToCSV("Supplier_Accounts_Payable_Dues_Report", headers, rows);
+  const handleExportCSV = () => {
+    exportToCSV("Supplier_Accounts_Payable_Dues_Report", exportHeaders, getExportRows());
+  };
+
+  const handleExportExcel = () => {
+    exportToExcel("Supplier_Accounts_Payable_Dues_Report", exportHeaders, getExportRows(), "Supplier AP Dues");
   };
 
   return (
@@ -92,9 +98,18 @@ export function SupplierDuesClient({ reportData }: SupplierDuesClientProps) {
 
           <Button
             onClick={handleExportCSV}
+            variant="outline"
+            size="sm"
+            className="rounded-xl text-xs h-9 border-border/80"
+          >
+            <Download className="h-4 w-4 mr-1.5" /> Export CSV
+          </Button>
+
+          <Button
+            onClick={handleExportExcel}
             className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-3.5 shadow-sm"
           >
-            <Download className="h-4 w-4 mr-1.5" /> Export Filtered CSV
+            <FileSpreadsheet className="h-4 w-4 mr-1.5" /> Export Excel (.xls)
           </Button>
         </div>
       </div>

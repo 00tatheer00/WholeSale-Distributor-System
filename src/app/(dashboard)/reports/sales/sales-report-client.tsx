@@ -28,7 +28,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { exportToCSV } from "@/lib/export-utils";
+import { exportToCSV, exportToExcel } from "@/lib/export-utils";
+import { FileSpreadsheet } from "lucide-react";
 
 interface SalesReportClientProps {
   reportData?: any;
@@ -77,22 +78,22 @@ export function SalesReportClient({
     router.push(`/reports/sales?${current.toString()}`);
   };
 
-  const handleExportCSV = () => {
-    const headers = [
-      "Sale Number",
-      "Invoice Number",
-      "Customer Pharmacy",
-      "Sales Representative",
-      "Date",
-      "Grand Total (AFN)",
-      "Paid Amount (AFN)",
-      "Due Amount (AFN)",
-      "COGS (AFN)",
-      "Gross Profit (AFN)",
-      "Status",
-    ];
+  const exportHeaders = [
+    "Sale Number",
+    "Invoice Number",
+    "Customer Pharmacy",
+    "Sales Representative",
+    "Date",
+    "Grand Total (PKR)",
+    "Paid Amount (PKR)",
+    "Due Amount (PKR)",
+    "COGS (PKR)",
+    "Gross Profit (PKR)",
+    "Status",
+  ];
 
-    const rows = data.sales.map((s: any) => [
+  const getExportRows = () =>
+    data.sales.map((s: any) => [
       s.saleNumber,
       s.invoiceNumber,
       s.customerName,
@@ -106,7 +107,12 @@ export function SalesReportClient({
       s.status,
     ]);
 
-    exportToCSV(`Wholesale_Sales_Report_${data.startDate}_to_${data.endDate}`, headers, rows);
+  const handleExportCSV = () => {
+    exportToCSV(`Wholesale_Sales_Report_${data.startDate}_to_${data.endDate}`, exportHeaders, getExportRows());
+  };
+
+  const handleExportExcel = () => {
+    exportToExcel(`Wholesale_Sales_Report_${data.startDate}_to_${data.endDate}`, exportHeaders, getExportRows(), "Wholesale Sales");
   };
 
   const presets = [
@@ -144,9 +150,18 @@ export function SalesReportClient({
 
           <Button
             onClick={handleExportCSV}
+            variant="outline"
+            size="sm"
+            className="rounded-xl text-xs h-9 border-border/80"
+          >
+            <Download className="h-4 w-4 mr-1.5" /> Export CSV
+          </Button>
+
+          <Button
+            onClick={handleExportExcel}
             className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-3.5 shadow-sm"
           >
-            <Download className="h-4 w-4 mr-1.5" /> Export Filtered CSV
+            <FileSpreadsheet className="h-4 w-4 mr-1.5" /> Export Excel (.xls)
           </Button>
         </div>
       </div>
@@ -171,6 +186,21 @@ export function SalesReportClient({
           ))}
         </div>
       </PageHeader>
+
+      {/* Active Period Banner */}
+      <div className="px-4 py-2.5 rounded-xl bg-muted/30 border border-border/70 flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-[#0071E3]" />
+          <span>
+            Showing wholesale sales results from{" "}
+            <strong className="text-foreground">{formatDate(data.startDate)}</strong> to{" "}
+            <strong className="text-foreground">{formatDate(data.endDate)}</strong>
+          </span>
+        </div>
+        <Badge variant="outline" className="font-mono text-[11px]">
+          {data.salesCount} Orders Booked
+        </Badge>
+      </div>
 
       {/* 2. Top 4 Pastel KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

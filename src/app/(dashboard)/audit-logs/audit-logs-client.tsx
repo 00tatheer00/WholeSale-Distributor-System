@@ -34,6 +34,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { formatDate } from "@/lib/utils";
+import { exportToCSV, exportToExcel } from "@/lib/export-utils";
+import { FileSpreadsheet, Download, Printer } from "lucide-react";
 
 interface AuditLogsClientProps {
   initialData?: {
@@ -95,6 +97,95 @@ export function AuditLogsClient({ initialData }: AuditLogsClientProps) {
     return <Badge variant="outline" className="text-[10px] font-mono">{act}</Badge>;
   };
 
+  const getHumanDescription = (l: any) => {
+    switch (l.action) {
+      case "UPDATE_COMPANY_SETTINGS":
+        return "Updated system enterprise settings & policies";
+      case "CREATE_USER_ACCOUNT":
+        return `Enrolled new staff member account (${l.entityId})`;
+      case "UPDATE_USER_ACCOUNT":
+        return `Updated staff profile & operational permissions`;
+      case "RESET_USER_PASSWORD":
+        return `Administrator reset staff login password`;
+      case "DEACTIVATE_USER_ACCOUNT":
+        return `Revoked user account access & deactivated`;
+      case "ACTIVATE_USER_ACCOUNT":
+        return `Reactivated staff member account`;
+      case "UPDATE_USER_PROFILE":
+        return "User updated personal profile details";
+      case "CREATE_SALE":
+        return `Booked wholesale order (${l.entityId})`;
+      case "CANCEL_SALE":
+        return `Cancelled wholesale order & restocked inventory`;
+      case "CREATE_PURCHASE":
+        return `Received purchase consignment intake (${l.entityId})`;
+      case "CANCEL_PURCHASE":
+        return `Cancelled consignment & reversed AP liability`;
+      case "STOCK_ADJUSTMENT":
+        return `Reconciled physical warehouse batch stock`;
+      case "CREATE_CUSTOMER_PAYMENT":
+        return `Recorded customer collection receipt (${l.entityId})`;
+      case "CREATE_SUPPLIER_PAYMENT":
+        return `Disbursed supplier payment voucher (${l.entityId})`;
+      case "CREATE_EXPENSE":
+        return `Recorded business operating expense voucher`;
+      case "UPDATE_EXPENSE":
+        return `Modified operating expense record`;
+      case "CANCEL_EXPENSE":
+        return `Cancelled operating expense voucher`;
+      default:
+        return `${l.action.replace(/_/g, " ")} on ${l.entityName}`;
+    }
+  };
+
+  const handleExportCSV = () => {
+    const headers = [
+      "Timestamp",
+      "Action",
+      "Description",
+      "Entity Name",
+      "Entity ID",
+      "Actor Name",
+      "Actor Email",
+      "Client IP",
+    ];
+    const rows = data.logs.map((l: any) => [
+      l.createdAt,
+      l.action,
+      getHumanDescription(l),
+      l.entityName,
+      l.entityId,
+      l.userName,
+      l.userEmail,
+      l.ipAddress,
+    ]);
+    exportToCSV(`Audit_Trail_Log_${new Date().toISOString().split("T")[0]}`, headers, rows);
+  };
+
+  const handleExportExcel = () => {
+    const headers = [
+      "Timestamp",
+      "Action",
+      "Description",
+      "Entity Name",
+      "Entity ID",
+      "Actor Name",
+      "Actor Email",
+      "Client IP",
+    ];
+    const rows = data.logs.map((l: any) => [
+      l.createdAt,
+      l.action,
+      getHumanDescription(l),
+      l.entityName,
+      l.entityId,
+      l.userName,
+      l.userEmail,
+      l.ipAddress,
+    ]);
+    exportToExcel(`Audit_Trail_Log_${new Date().toISOString().split("T")[0]}`, headers, rows, "Audit Ledger");
+  };
+
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto pb-20">
       {/* 1. Header Navigation */}
@@ -110,9 +201,36 @@ export function AuditLogsClient({ initialData }: AuditLogsClientProps) {
           </Link>
         </Button>
 
-        <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200 gap-1.5">
-          <Lock className="h-3 w-3" /> Append-Only Immutable Security Ledger
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200 gap-1.5">
+            <Lock className="h-3 w-3" /> Append-Only Immutable Security Ledger
+          </Badge>
+
+          <Button
+            onClick={() => window.print()}
+            variant="outline"
+            size="sm"
+            className="rounded-xl text-xs h-9 border-border/80"
+          >
+            <Printer className="h-4 w-4 mr-1.5" /> Print
+          </Button>
+
+          <Button
+            onClick={handleExportCSV}
+            variant="outline"
+            size="sm"
+            className="rounded-xl text-xs h-9 border-border/80"
+          >
+            <Download className="h-4 w-4 mr-1.5" /> Export CSV
+          </Button>
+
+          <Button
+            onClick={handleExportExcel}
+            className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-9 px-3.5 shadow-sm"
+          >
+            <FileSpreadsheet className="h-4 w-4 mr-1.5" /> Export Excel (.xls)
+          </Button>
+        </div>
       </div>
 
       <PageHeader
@@ -156,6 +274,8 @@ export function AuditLogsClient({ initialData }: AuditLogsClientProps) {
             <SelectItem value="STOCK_ADJUSTMENT">Stock Adjustment</SelectItem>
             <SelectItem value="CREDIT_OVERRIDE">Credit Override</SelectItem>
             <SelectItem value="UPDATE_COMPANY_SETTINGS">Settings Update</SelectItem>
+            <SelectItem value="CREATE_USER_ACCOUNT">User Enrolled</SelectItem>
+            <SelectItem value="DEACTIVATE_USER_ACCOUNT">User Deactivated</SelectItem>
           </SelectContent>
         </Select>
 
@@ -178,6 +298,7 @@ export function AuditLogsClient({ initialData }: AuditLogsClientProps) {
             <SelectItem value="Supplier">Supplier Manufacturer</SelectItem>
             <SelectItem value="BusinessExpense">Business Expense</SelectItem>
             <SelectItem value="CompanySettings">Company Settings</SelectItem>
+            <SelectItem value="User">User Account</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -190,6 +311,7 @@ export function AuditLogsClient({ initialData }: AuditLogsClientProps) {
               <tr>
                 <th className="px-5 py-3.5">Timestamp</th>
                 <th className="px-4 py-3.5">Action</th>
+                <th className="px-4 py-3.5">Activity Description</th>
                 <th className="px-4 py-3.5">Entity & ID</th>
                 <th className="px-4 py-3.5">Actor / User</th>
                 <th className="px-4 py-3.5">Client & IP</th>
@@ -199,7 +321,7 @@ export function AuditLogsClient({ initialData }: AuditLogsClientProps) {
             <tbody className="divide-y divide-border/60">
               {data.logs.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-muted-foreground">
+                  <td colSpan={7} className="px-5 py-10 text-center text-muted-foreground">
                     No security audit logs found matching the filter criteria.
                   </td>
                 </tr>
@@ -210,9 +332,12 @@ export function AuditLogsClient({ initialData }: AuditLogsClientProps) {
                       {formatDate(l.createdAt)}
                     </td>
                     <td className="px-4 py-3.5">{getActionBadge(l.action)}</td>
+                    <td className="px-4 py-3.5 font-medium text-foreground max-w-xs">
+                      {getHumanDescription(l)}
+                    </td>
                     <td className="px-4 py-3.5">
                       <div className="font-semibold text-foreground">{l.entityName}</div>
-                      <div className="text-[10px] text-muted-foreground font-mono truncate max-w-[180px]">
+                      <div className="text-[10px] text-muted-foreground font-mono truncate max-w-[150px]">
                         {l.entityId}
                       </div>
                     </td>

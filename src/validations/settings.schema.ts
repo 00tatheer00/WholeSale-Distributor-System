@@ -9,8 +9,8 @@ export const companySettingsSchema = z.object({
   phone: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
   city: z.string().optional().nullable(),
-  country: z.string().default("Afghanistan"),
-  currency: z.string().default("AFN"),
+  country: z.string().default("Pakistan"),
+  currency: z.string().default("PKR"),
   logoUrl: z.string().optional().nullable(),
   invoiceFooterText: z.string().optional().nullable(),
   
@@ -83,3 +83,48 @@ export const userManagementSchema = z.object({
 });
 
 export type UserManagementInput = z.infer<typeof userManagementSchema>;
+
+export const createUserSchema = z.object({
+  name: z.string().min(2, "Staff full name is required"),
+  email: z.string().email("Valid email address is required"),
+  phone: z.string().optional().nullable(),
+  role: z.enum([
+    "SUPER_ADMIN",
+    "SALES_MANAGER",
+    "SALESMAN",
+    "WAREHOUSE_MANAGER",
+    "INVENTORY_OFFICER",
+    "ACCOUNTS_OFFICER",
+    "CASHIER",
+  ]),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  status: z.enum(["ACTIVE", "INACTIVE", "SUSPENDED"]).default("ACTIVE"),
+});
+
+export type CreateUserInput = z.infer<typeof createUserSchema>;
+
+export const updateUserSchema = z.object({
+  id: z.string().min(1, "User ID is required"),
+  name: z.string().min(2, "Staff full name is required"),
+  email: z.string().email("Valid email address is required"),
+  phone: z.string().optional().nullable(),
+  role: z.enum([
+    "SUPER_ADMIN",
+    "SALES_MANAGER",
+    "SALESMAN",
+    "WAREHOUSE_MANAGER",
+    "INVENTORY_OFFICER",
+    "ACCOUNTS_OFFICER",
+    "CASHIER",
+  ]),
+  status: z.enum(["ACTIVE", "INACTIVE", "SUSPENDED"]).default("ACTIVE"),
+});
+
+export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+
+export const adminResetPasswordSchema = z.object({
+  userId: z.string().min(1, "User ID is required"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+});
+
+export type AdminResetPasswordInput = z.infer<typeof adminResetPasswordSchema>;

@@ -212,6 +212,33 @@ model Company {
   enableFefoStrict  Boolean  @default(true) @map("enable_fefo_strict")
   lowStockThreshold Int      @default(10) @map("low_stock_threshold")
   nearExpiryDays    Int      @default(90) @map("near_expiry_days")
+
+  // Invoice & Print Settings
+  invoicePrefix         String?  @default("INV-") @map("invoice_prefix")
+  showTaxOnInvoice      Boolean  @default(true) @map("show_tax_on_invoice")
+  showDiscountOnInvoice Boolean  @default(true) @map("show_discount_on_invoice")
+  showBatchOnInvoice    Boolean  @default(true) @map("show_batch_on_invoice")
+  showExpiryOnInvoice   Boolean  @default(true) @map("show_expiry_on_invoice")
+
+  // Tax & Discount Settings
+  enableGlobalDiscount Boolean  @default(true) @map("enable_global_discount")
+  maxDiscountPercent   Decimal  @default(20.00) @map("max_discount_percent")
+
+  // Inventory & FEFO Safety Settings
+  allowExpiredSales Boolean @default(false) @map("allow_expired_sales")
+
+  // Credit & Aging Settings
+  enforceCreditLimit            Boolean  @default(true) @map("enforce_credit_limit")
+  creditWarningThresholdPercent Decimal  @default(80.00) @map("credit_warning_threshold_percent")
+  requireApprovalOnCreditExceed Boolean  @default(true) @map("require_approval_on_credit_exceed")
+
+  // Alert & Notification Settings
+  notifyLowStock      Boolean @default(true) @map("notify_low_stock")
+  notifyNearExpiry    Boolean @default(true) @map("notify_near_expiry")
+  notifyExpiredStock  Boolean @default(true) @map("notify_expired_stock")
+  notifyCreditBreach  Boolean @default(true) @map("notify_credit_breach")
+  notifySupplierDues  Boolean @default(true) @map("notify_supplier_dues")
+
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
