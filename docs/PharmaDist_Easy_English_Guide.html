@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PharmaDist Wholesale ERP — Easy Step-by-Step User Guide & Video Script</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+    :root {
+      --primary: #0f766e;
+      --primary-dark: #042f2e;
+      --primary-light: #ccfbf1;
+      --accent: #4f46e5;
+      --accent-light: #e0e7ff;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+      --emerald-700: #047857;
+      --emerald-600: #059669;
+      --emerald-100: #d1fae5;
+      --emerald-50: #ecfdf5;
+      --amber-700: #b45309;
+      --amber-600: #d97706;
+      --amber-100: #fef3c7;
+      --amber-50: #fffbeb;
+      --rose-600: #e11d48;
+      --rose-100: #ffe4e6;
+      --blue-700: #1d4ed8;
+      --blue-600: #2563eb;
+      --blue-100: #dbeafe;
+      --blue-50: #eff6ff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--slate-800);
+      background-color: #ffffff;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 12mm 12mm 12mm 12mm;
+    }
+
+    .page {
+      padding: 0;
+      page-break-after: always;
+    }
+
+    .page:last-child {
+      page-break-after: avoid;
+    }
+
+    .avoid-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Cover Page */
+    .cover-container {
+      min-height: 265mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      padding: 36px;
+      background: linear-gradient(135deg, #f8fafc 0%, #f0fdfa 55%, #e0f2fe 100%);
+      position: relative;
+    }
+
+    .cover-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-radius: 9999px;
+      margin-bottom: 16px;
+      width: fit-content;
+    }
+
+    .cover-title {
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: var(--slate-900);
+      margin-bottom: 12px;
+    }
+
+    .cover-title span {
+      color: var(--primary);
+    }
+
+    .cover-subtitle {
+      font-size: 14.5px;
+      font-weight: 500;
+      color: var(--slate-600);
+      max-width: 630px;
+      margin-bottom: 22px;
+      line-height: 1.6;
+    }
+
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid var(--slate-200);
+      box-shadow: 0 4px 12px rgba(15, 118, 110, 0.05);
+      margin-bottom: 22px;
+    }
+
+    .cover-meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cover-meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--slate-600);
+      margin-bottom: 2px;
+    }
+
+    .cover-meta-val {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--slate-900);
+    }
+
+    .feature-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid transparent;
+    }
+
+    .pill-teal { background: var(--primary-light); color: var(--primary); border-color: #99f6e4; }
+    .pill-indigo { background: var(--accent-light); color: var(--accent); border-color: #c7d2fe; }
+    .pill-emerald { background: var(--emerald-100); color: var(--emerald-700); border-color: #a7f3d0; }
+    .pill-amber { background: var(--amber-100); color: var(--amber-700); border-color: #fde68a; }
+
+    /* Header Bar */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+      border-bottom: 2px solid var(--slate-200);
+    }
+
+    .header-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--primary);
+    }
+
+    .header-page-no {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--slate-600);
+    }
+
+    h2.section-header {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--slate-900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 6px;
+      margin-top: 16px;
+      margin-bottom: 12px;
+      border-bottom: 2px solid var(--primary-light);
+    }
+
+    h2.section-header .num {
+      background: var(--primary);
+      color: #ffffff;
+      width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    h3.sub-header {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--slate-900);
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+
+    p {
+      margin-bottom: 8px;
+      color: var(--slate-700);
+      line-height: 1.55;
+    }
+
+    /* UI Location Breadcrumbs Box */
+    .ui-location {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      background: var(--slate-100);
+      border: 1px solid var(--slate-200);
+      border-radius: 6px;
+      padding: 6px 10px;
+      margin-bottom: 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--slate-800);
+    }
+
+    .ui-tag {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      padding: 2px 7px;
+      border-radius: 4px;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .ui-btn {
+      background: var(--primary);
+      color: #ffffff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* Tables */
+    table.custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+      margin: 10px 0 14px 0;
+      background: #ffffff;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--slate-200);
+    }
+
+    table.custom-table th {
+      background: var(--slate-100);
+      color: var(--slate-800);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 9.5px;
+      letter-spacing: 0.05em;
+      padding: 7px 10px;
+      border-bottom: 2px solid var(--slate-200);
+      text-align: left;
+    }
+
+    table.custom-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--slate-200);
+      color: var(--slate-700);
+      vertical-align: middle;
+      line-height: 1.45;
+    }
+
+    table.custom-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.custom-table tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    /* Short-form badge */
+    .abbr-badge {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 10.5px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-right: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Cards & Callouts */
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: 8px;
+      padding: 11px 13px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    .callout {
+      border-left: 4px solid;
+      border-radius: 0 6px 6px 0;
+      padding: 9px 12px;
+      margin: 8px 0;
+      font-size: 11.5px;
+      line-height: 1.5;
+    }
+
+    .callout-info {
+      background: var(--blue-50);
+      border-color: var(--blue-600);
+      color: #1e3a8a;
+    }
+
+    .callout-warning {
+      background: var(--amber-50);
+      border-color: var(--amber-600);
+      color: #78350f;
+    }
+
+    .callout-success {
+      background: var(--emerald-50);
+      border-color: var(--emerald-600);
+      color: #064e3b;
+    }
+
+    /* Step Card */
+    .step-card {
+      border: 1px solid var(--slate-200);
+      border-radius: 8px;
+      padding: 11px 13px;
+      background: #ffffff;
+      margin-bottom: 11px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .step-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .step-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-num {
+      width: 24px;
+      height: 24px;
+      background: var(--primary);
+      color: #ffffff;
+      border-radius: 5px;
+      font-size: 11.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-title-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--slate-900);
+    }
+
+    .step-url-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      background: var(--slate-100);
+      color: var(--primary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px 12px;
+      margin: 8px 0;
+      background: #fafafa;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--slate-200);
+      font-size: 11px;
+    }
+
+    .field-item {
+      display: flex;
+      gap: 4px;
+    }
+
+    .field-key {
+      font-weight: 700;
+      color: var(--slate-800);
+      white-space: nowrap;
+    }
+
+    .field-val {
+      color: var(--slate-600);
+    }
+
+    /* Scene Block */
+    .scene-box {
+      border: 1px solid var(--slate-200);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 9px;
+      background: #fafafa;
+    }
+
+    .scene-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .scene-name {
+      font-weight: 700;
+      font-size: 12.5px;
+      color: var(--accent);
+    }
+
+    .scene-time {
+      font-size: 10.5px;
+      font-weight: 600;
+      background: var(--accent-light);
+      color: var(--accent);
+      padding: 1px 7px;
+      border-radius: 999px;
+    }
+
+    .scene-meta {
+      font-size: 11px;
+      color: var(--slate-600);
+      margin-bottom: 4px;
+    }
+
+    .dialogue-box {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: 5px;
+      padding: 8px 11px;
+      font-size: 11.5px;
+      font-style: italic;
+      color: var(--slate-800);
+      line-height: 1.45;
+    }
+
+    /* Grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .kpi-card {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: 6px;
+      padding: 9px;
+      text-align: center;
+    }
+
+    .kpi-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--slate-600);
+      margin-bottom: 2px;
+    }
+
+    .kpi-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--slate-900);
+    }
+
+    .kpi-desc {
+      font-size: 9.5px;
+      color: var(--emerald-700);
+      font-weight: 600;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      background: var(--slate-100);
+      color: var(--slate-800);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== PAGE 1: COVER PAGE ==================== -->
+  <div class="page">
+    <div class="cover-container">
+      <div>
+        <div class="cover-badge">
+          🛡️ PHARMACEUTICAL WHOLESALE ERP — EASY STEP-BY-STEP USER GUIDE
+        </div>
+        <h1 class="cover-title">PharmaDist Wholesale ERP<br><span>Complete Operating Guide & Video Script</span></h1>
+        <p class="cover-subtitle">
+          A crystal-clear, step-by-step operating handbook for wholesale medicine distributors: From adding medicines to receiving factory stock (GRN), strict FEFO batch sales, DRAP wholesale tax invoice printing, market recovery, and profit audits — with every button location and full abbreviation clearly explained.
+        </p>
+
+        <div class="feature-pills">
+          <span class="pill pill-teal">⚡ 100% Offline (No Internet Needed)</span>
+          <span class="pill pill-indigo">🌐 Local Wi-Fi Multi-PC & Mobile</span>
+          <span class="pill pill-emerald">📦 Strict FEFO (First-Expire, First-Out)</span>
+          <span class="pill pill-amber">⚖️ DRAP A4 Wholesale Invoices & Challan</span>
+        </div>
+      </div>
+
+      <div class="cover-meta-grid">
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Software Platform</span>
+          <span class="cover-meta-val">PharmaDist Wholesale ERP v1.0.0</span>
+        </div>
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Primary Currency</span>
+          <span class="cover-meta-val">Pakistani Rupee (PKR / Rs.)</span>
+        </div>
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Regulatory Standard</span>
+          <span class="cover-meta-val">DRAP (Drug Regulatory Authority of Pakistan)</span>
+        </div>
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Accounting Invariant</span>
+          <span class="cover-meta-val">Strict FEFO Batch Allocation & FIFO Credit Dues</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid var(--slate-200); padding-top: 14px;">
+        <div>
+          <div style="font-size: 11px; font-weight: 700; color: var(--slate-900);">Document ID: DOC-WMDMS-EASY-ENG-2026</div>
+          <div style="font-size: 10px; color: var(--slate-600);">Includes Full Abbreviations + Exact Screen Locations for Every Feature</div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 11px; font-weight: 700; color: var(--primary);">PharmaDist Technologies</div>
+          <div style="font-size: 10px; color: var(--slate-600);">Enterprise Pharmacy Solutions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 2: ABBREVIATIONS & NETWORK ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title">PharmaDist ERP — Complete Abbreviations Glossary & LAN Network Setup</span>
+      <span class="header-page-no">Page 2</span>
+    </div>
+
+    <h2 class="section-header"><span class="num">1</span> All Short Forms with Full Names & Plain-English Meaning</h2>
+    <p>
+      In pharmaceutical wholesale distribution, several abbreviations are used. Here is what every term means in plain, simple English:
+    </p>
+
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Short Form</th>
+          <th>Full Name</th>
+          <th>What It Means in Plain English</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="abbr-badge">TP</span></td>
+          <td><strong>Trade Price</strong></td>
+          <td>The manufacturer's wholesale price at which distributors purchase and bill to pharmacies.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">MRP</span></td>
+          <td><strong>Maximum Retail Price</strong></td>
+          <td>The consumer price printed on the medicine box for retail patients.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">GRN</span></td>
+          <td><strong>Goods Receipt Note</strong></td>
+          <td>The official warehouse document recorded when factory consignments arrive (Stock-In).</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">FEFO</span></td>
+          <td><strong>First-Expire, First-Out</strong></td>
+          <td>The system automatically picks the earliest-expiring batch first to eliminate expired stock losses.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">FIFO</span></td>
+          <td><strong>First-In, First-Out</strong></td>
+          <td>When receiving customer payments, the oldest unpaid bill is cleared first.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">AR</span></td>
+          <td><strong>Accounts Receivable</strong></td>
+          <td>Total credit money owed to your agency by pharmacies and medical stores.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">AP</span></td>
+          <td><strong>Accounts Payable</strong></td>
+          <td>Total unpaid debt your agency owes to pharma manufacturers and vendors.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">COGS</span></td>
+          <td><strong>Cost of Goods Sold</strong></td>
+          <td>The exact original purchase cost of the items sold, used to calculate true profit.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">DRAP</span></td>
+          <td><strong>Drug Regulatory Authority of Pakistan</strong></td>
+          <td>The federal government regulatory body governing pharmaceutical licensing, sales, and labeling.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">NTN / STRN</span></td>
+          <td><strong>National Tax No. / Sales Tax Reg. No.</strong></td>
+          <td>Official FBR tax registration numbers printed on legal wholesale invoices.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">SKU</span></td>
+          <td><strong>Stock Keeping Unit</strong></td>
+          <td>The unique catalog code assigned to each medicine in the database.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">P&amp;L</span></td>
+          <td><strong>Profit and Loss</strong></td>
+          <td>The financial accounting statement showing business Gross and Net Profit.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">RCT / INV</span></td>
+          <td><strong>Receipt / Invoice</strong></td>
+          <td>RCT = Payment collection voucher serial; INV = Wholesale sales invoice serial.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="section-header"><span class="num">2</span> Connecting Other Office PCs & Mobile Devices via Local Wi-Fi</h2>
+    <p>
+      PharmaDist is <strong>100% Offline</strong>. No internet connection is ever required. Multiple computers and phones communicate seamlessly over your local office Wi-Fi router:
+    </p>
+
+    <div class="grid-3" style="margin-bottom: 10px;">
+      <div class="card" style="border-top: 3px solid var(--primary);">
+        <div style="font-size: 11.5px; font-weight: 700; color: var(--primary);">MAIN SERVER COMPUTER</div>
+        <p style="font-size: 11px; margin-bottom: 4px;">Holds master database (<code>wmdms.db</code>). Run application here first:</p>
+        <code>http://localhost:3000</code>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--accent);">
+        <div style="font-size: 11.5px; font-weight: 700; color: var(--accent);">BILLING WORKSTATION (PC 2)</div>
+        <p style="font-size: 11px; margin-bottom: 4px;">Connects via Server's Local IPv4 address in browser:</p>
+        <code>http://172.20.100.127:3000</code>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--emerald-600);">
+        <div style="font-size: 11.5px; font-weight: 700; color: var(--emerald-600);">MOBILE ORDER BOOKERS</div>
+        <p style="font-size: 11px; margin-bottom: 4px;">Salesmen connected to office Wi-Fi book orders instantly:</p>
+        <code>http://172.20.100.127:3000</code>
+      </div>
+    </div>
+
+    <div class="callout callout-info">
+      <strong>💡 Easy Wi-Fi Connection Tip:</strong> Open Command Prompt on the Main Server PC and type <code>ipconfig</code>. Look for the <code>IPv4 Address</code> (e.g. <code>172.20.100.127</code>). All other computers and mobile devices simply open <code>http://[Your-IP]:3000</code> in their web browser!
+    </div>
+
+    <h3 class="sub-header">Pre-Configured Login Accounts</h3>
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Login Email</th>
+          <th>Default Password</th>
+          <th>Assigned Permissions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Super Admin</strong> (Owner / CEO)</td>
+          <td><code>admin@pharmadist.com</code></td>
+          <td><code>admin123</code></td>
+          <td>Full unrestricted access, settings, backup, team accounts, and audit logs.</td>
+        </tr>
+        <tr>
+          <td><strong>Sales Manager</strong></td>
+          <td><code>sales.manager@pharmadist.com</code></td>
+          <td><code>sales123</code></td>
+          <td>Create orders, manage customer rates, approve credit limit overrides.</td>
+        </tr>
+        <tr>
+          <td><strong>Warehouse Officer</strong></td>
+          <td><code>warehouse@pharmadist.com</code></td>
+          <td><code>warehouse123</code></td>
+          <td>Receive factory consignments (GRN), inspect batches, transfer stock.</td>
+        </tr>
+        <tr>
+          <td><strong>Accounts Officer</strong></td>
+          <td><code>accounts@pharmadist.com</code></td>
+          <td><code>accounts123</code></td>
+          <td>Record recoveries, print money receipts, log expenses, audit P&L.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ==================== PAGE 3: INITIAL SETUP ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title">PharmaDist ERP — Initial Setup: Company Profile, Warehouses & Medicine Formulary</span>
+      <span class="header-page-no">Page 3</span>
+    </div>
+
+    <h2 class="section-header"><span class="num">3</span> Initial Setup (One-Time Configuration)</h2>
+    <p>When starting the system for the first time, complete these 4 initial configuration steps:</p>
+
+    <!-- STEP 1 -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">1</div>
+          <div class="step-title-text">Company Profile &amp; DRAP Wholesale License Setup</div>
+        </div>
+        <span class="step-url-badge">URL: /settings</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Location:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Administration</span> &rarr;
+        <span class="ui-tag">System Settings</span> &rarr;
+        <span class="ui-btn">Tab 1: General</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Enter your registered wholesale firm details that will appear on all printed invoices and delivery challans:
+      </p>
+      <div class="field-grid">
+        <div class="field-item"><span class="field-key">Company Name:</span> <span class="field-val">Registered agency name (e.g. Al-Noor Pharma Distributors)</span></div>
+        <div class="field-item"><span class="field-key">DRAP License No:</span> <span class="field-val">Wholesale license (e.g. DRAP/WDL/LHR-4921)</span></div>
+        <div class="field-item"><span class="field-key">NTN / STRN:</span> <span class="field-val">FBR tax registration numbers</span></div>
+        <div class="field-item"><span class="field-key">Warehouse Address:</span> <span class="field-val">Complete godown street address and phone number</span></div>
+      </div>
+      <p style="font-size: 11px; color: var(--slate-600); margin: 0;">Click the blue button at bottom-right: <strong>"Save Changes"</strong>.</p>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">2</div>
+          <div class="step-title-text">Warehouse (Godown) &amp; Storage Racks Architecture</div>
+        </div>
+        <span class="step-url-badge">URL: /warehouses</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Location:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Inventory</span> &rarr;
+        <span class="ui-tag">Warehouses</span> &rarr;
+        <span class="ui-btn">Top-Right: + New Warehouse</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Create your storage facility name (e.g. <code>Central Main Warehouse</code>). Inside, designate shelf/rack locations (e.g. <code>Rack A-01 (Antibiotics)</code>, <code>Cold Chain #1 (Insulin)</code>) so warehouse staff can locate items in seconds.
+      </p>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">3</div>
+          <div class="step-title-text">Manufacturers (Pharma Companies) &amp; Suppliers Registry</div>
+        </div>
+        <span class="step-url-badge">URL: /manufacturers and /suppliers</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Location:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Master Data</span> &rarr;
+        <span class="ui-tag">Manufacturers</span> / <span class="ui-tag">Suppliers</span> &rarr;
+        <span class="ui-btn">Top-Right: + Add Supplier</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Register licensed pharmaceutical companies (GSK, Abbott Laboratories, Getz Pharma, Searle). Input supplier contact names, phone numbers, NTN, and credit terms (e.g. 30 Days Net).
+      </p>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">4</div>
+          <div class="step-title-text">Medicines (Master Drug Catalog) Registration</div>
+        </div>
+        <span class="step-url-badge">URL: /medicines</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Location:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Master Data</span> &rarr;
+        <span class="ui-tag">Medicines</span> &rarr;
+        <span class="ui-btn">Top-Right: + Add Medicine</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Clicking the button opens a modal window. Fill in the medicine specifications:
+      </p>
+      <div class="field-grid">
+        <div class="field-item"><span class="field-key">Medicine Name:</span> <span class="field-val">Augmentin 625mg Tablets or Panadol 500mg</span></div>
+        <div class="field-item"><span class="field-key">Generic Formula:</span> <span class="field-val">Amoxicillin + Clavulanic Acid</span></div>
+        <div class="field-item"><span class="field-key">Manufacturer:</span> <span class="field-val">Select company from dropdown (e.g. GSK)</span></div>
+        <div class="field-item"><span class="field-key">Dosage Form:</span> <span class="field-val">Tablet, Syrup, Injection, or Capsule</span></div>
+        <div class="field-item"><span class="field-key">Trade Price (TP):</span> <span class="field-val">Wholesale cost rate (e.g. Rs. 240.00)</span></div>
+        <div class="field-item"><span class="field-key">Retail Price (MRP):</span> <span class="field-val">Price printed on the box (e.g. Rs. 280.00)</span></div>
+        <div class="field-item"><span class="field-key">Wholesale Discount:</span> <span class="field-val">Standard wholesale discount (e.g. 5%)</span></div>
+        <div class="field-item"><span class="field-key">Reorder Alert Level:</span> <span class="field-val">Minimum box quantity for alerts (e.g. 50 Packs)</span></div>
+      </div>
+      <p style="font-size: 11px; color: var(--slate-600); margin: 0;">Click <strong>"Save Medicine"</strong>. The medicine is now active in your catalog!</p>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 4: CUSTOMERS & PURCHASE INTAKE ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title">PharmaDist ERP — Customer Pharmacies, Credit Limits & Factory Stock-In</span>
+      <span class="header-page-no">Page 4</span>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">5</div>
+          <div class="step-title-text">Customer Pharmacies &amp; Credit Limit Governance</div>
+        </div>
+        <span class="step-url-badge">URL: /customers</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Location:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Master Data</span> &rarr;
+        <span class="ui-tag">Customer Pharmacies</span> &rarr;
+        <span class="ui-btn">Top-Right: + Add Customer</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Register medical stores, retail pharmacies, and hospital procurement departments:
+      </p>
+      <div class="field-grid">
+        <div class="field-item"><span class="field-key">Pharmacy Name:</span> <span class="field-val">Al-Shifa Medicos or City Pharmacy</span></div>
+        <div class="field-item"><span class="field-key">Drug License No:</span> <span class="field-val">Pharmacy license (e.g. DL-2026-9812)</span></div>
+        <div class="field-item"><span class="field-key">Owner Mobile / Phone:</span> <span class="field-val">Contact number (e.g. 0300-1234567)</span></div>
+        <div class="field-item"><span class="field-key">Assigned Route:</span> <span class="field-val">Sales territory (e.g. Jail Road, Saddar)</span></div>
+        <div class="field-item"><span class="field-key">Credit Limit (PKR):</span> <span class="field-val">Maximum allowed debt (e.g. Rs. 250,000)</span></div>
+        <div class="field-item"><span class="field-key">Credit Max Days:</span> <span class="field-val">Maximum allowed days (e.g. 15 or 30 Days)</span></div>
+      </div>
+      <div class="callout callout-warning">
+        <strong>⚠️ Credit Barrier Protection:</strong> If Al-Shifa Medicos exceeds their Rs. 250,000 credit ceiling, the system locks their order automatically and requires a Sales Manager override approval to proceed.
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">6</div>
+          <div class="step-title-text">Sales Representatives (Order Bookers / Field Staff) Setup</div>
+        </div>
+        <span class="step-url-badge">URL: /distributors</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Location:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Master Data</span> &rarr;
+        <span class="ui-tag">Sales Representatives</span> &rarr;
+        <span class="ui-btn">Top-Right: + Add Rep</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Register field order booking agents and delivery staff. Assign specific market routes and monthly sales targets to track their recovery and commission performance.
+      </p>
+    </div>
+
+    <h2 class="section-header"><span class="num">4</span> Daily Wholesale Operational Workflow</h2>
+
+    <!-- STEP 7: PURCHASE INTAKE -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">7</div>
+          <div class="step-title-text">Receiving Factory Shipments (Purchase Intake GRN)</div>
+        </div>
+        <span class="step-url-badge">URL: /purchases/new</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Location:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Procurement</span> &rarr;
+        <span class="ui-btn">Purchase Intake (PackagePlus Icon)</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        When delivery trucks arrive with factory consignments, open this intake form:
+      </p>
+      <div class="field-grid">
+        <div class="field-item"><span class="field-key">1. Select Supplier:</span> <span class="field-val">Choose manufacturer (e.g. Getz Pharma)</span></div>
+        <div class="field-item"><span class="field-key">2. Delivery Challan No:</span> <span class="field-val">Manufacturer invoice number (e.g. DC-7864)</span></div>
+        <div class="field-item"><span class="field-key">3. Select Medicine:</span> <span class="field-val">Medicine name (e.g. Augmentin 625mg)</span></div>
+        <div class="field-item"><span class="field-key">4. Batch Number:</span> <span class="field-val">Batch printed on carton (e.g. BT-9942)</span></div>
+        <div class="field-item"><span class="field-key">5. Expiry Date:</span> <span class="field-val">Expiry printed on carton (e.g. 2028-06-30)</span></div>
+        <div class="field-item"><span class="field-key">6. Quantity Received:</span> <span class="field-val">Number of boxes received (e.g. 500 Packs)</span></div>
+        <div class="field-item"><span class="field-key">7. Unit Purchase Cost:</span> <span class="field-val">Actual cost rate per box (e.g. Rs. 200.00)</span></div>
+        <div class="field-item"><span class="field-key">8. Warehouse Rack:</span> <span class="field-val">Physical rack coordinate (e.g. Rack B-04)</span></div>
+      </div>
+      <p style="font-size: 11px; margin-bottom: 4px;">
+        Click the blue button: <strong>"Submit Purchase Consignment"</strong>.
+      </p>
+      <div class="callout callout-success">
+        <strong>✨ Immediate Updates:</strong> 500 boxes are added to your warehouse stock, Batch BT-9942 is registered, and the supplier's balance in Accounts Payable (AP) updates instantly.
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 5: SALES, INVOICES & RECOVERY ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title">PharmaDist ERP — Wholesale Sales, FEFO Engine, Invoicing & Debt Recovery</span>
+      <span class="header-page-no">Page 5</span>
+    </div>
+
+    <!-- STEP 8: NEW SALE ORDER -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">8</div>
+          <div class="step-title-text">Wholesale Order Booking (Strict FEFO Batch Engine)</div>
+        </div>
+        <span class="step-url-badge">URL: /sales/new</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Location:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Wholesale Sales</span> &rarr;
+        <span class="ui-btn">New Sale Order (ShoppingCart Icon)</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        When a pharmacy places an order or an order booker returns from the market:
+      </p>
+      <div class="field-grid">
+        <div class="field-item"><span class="field-key">1. Customer:</span> <span class="field-val">Al-Shifa Medicos (Live Credit Gauge displays current debt)</span></div>
+        <div class="field-item"><span class="field-key">2. Sales Rep:</span> <span class="field-val">Select booking agent</span></div>
+        <div class="field-item"><span class="field-key">3. Add Medicine:</span> <span class="field-val">Choose medicine (e.g. Augmentin 625mg)</span></div>
+        <div class="field-item"><span class="field-key">4. Quantity:</span> <span class="field-val">Number of boxes (e.g. 50 Packs)</span></div>
+      </div>
+      <div class="callout callout-info">
+        <strong>⚡ FEFO Auto-Allocation Advantage:</strong> You do NOT have to search for batches manually! PharmaDist automatically selects the <strong>earliest expiring valid batch</strong> in your godown to ensure no expired stock ever gets stranded on your shelves.
+      </div>
+      <p style="font-size: 11px; margin-bottom: 0;">Click <strong>"Confirm &amp; Create Sale Order"</strong>.</p>
+    </div>
+
+    <!-- STEP 9: PRINT INVOICE & CHALLAN -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">9</div>
+          <div class="step-title-text">Printing DRAP Form 2-A Tax Invoices &amp; Delivery Challans</div>
+        </div>
+        <span class="step-url-badge">URL: /invoices</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Location:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Wholesale Sales</span> &rarr;
+        <span class="ui-tag">Tax Invoices</span> &rarr;
+        <span class="ui-btn">Action Column: Print Icon (🖨️)</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        In the invoice table, click the Print icon next to any bill. A modal opens with two dedicated buttons:
+      </p>
+      <div class="grid-2" style="margin-bottom: 6px;">
+        <div style="background: #fafafa; border: 1px solid var(--slate-200); border-radius: 6px; padding: 8px;">
+          <div style="font-weight: 700; color: var(--primary); font-size: 11.5px; margin-bottom: 3px;">📄 Print Tax Invoice (A4 Standard)</div>
+          <p style="font-size: 11px; margin: 0;">Includes Batch Number, Expiry Date, TP, MRP, wholesale discounts, tax, and authorized signature seals. Given to the pharmacy customer.</p>
+        </div>
+        <div style="background: #fafafa; border: 1px solid var(--slate-200); border-radius: 6px; padding: 8px;">
+          <div style="font-weight: 700; color: var(--accent); font-size: 11.5px; margin-bottom: 3px;">🚚 Print Delivery Challan</div>
+          <p style="font-size: 11px; margin: 0;">Omits commercial financial prices. Contains only quantities, item names, and batch numbers for delivery drivers and stock dispatchers.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 10: PAYMENTS & RECOVERY -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">10</div>
+          <div class="step-title-text">Market Recovery Collections &amp; Printable Money Receipts (RCT)</div>
+        </div>
+        <span class="step-url-badge">URL: /payments</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Location:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Finance &amp; Accounts</span> &rarr;
+        <span class="ui-tag">Collections &amp; Receipts</span> &rarr;
+        <span class="ui-btn">Top-Right: + Record Collection</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        When salesmen return with cash or cheques collected from pharmacies:
+      </p>
+      <div class="field-grid">
+        <div class="field-item"><span class="field-key">Select Customer:</span> <span class="field-val">Al-Shifa Medicos (Displays total pending debt)</span></div>
+        <div class="field-item"><span class="field-key">Amount Received:</span> <span class="field-val">Amount collected (e.g. Rs. 50,000)</span></div>
+        <div class="field-item"><span class="field-key">Payment Method:</span> <span class="field-val">Cash, Cheque, Bank Transfer, or Raast</span></div>
+        <div class="field-item"><span class="field-key">Collected By:</span> <span class="field-val">Sales representative who submitted funds</span></div>
+      </div>
+      <p style="font-size: 11px; margin-bottom: 4px;">Click <strong>"Confirm Collection"</strong>.</p>
+      <div class="callout callout-success">
+        <strong>✨ FIFO Automated Debt Clearance:</strong> The system automatically clears the customer's oldest pending invoices first and opens a printable <strong>Money Receipt (RCT-2026-0001)</strong> for customer issuance.
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 6: EXPENSES, PROFIT, BACKUP ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title">PharmaDist ERP — Expenses, Executive Profit, Backup & Audit Logs</span>
+      <span class="header-page-no">Page 6</span>
+    </div>
+
+    <!-- STEP 11: EXPENSES -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">11</div>
+          <div class="step-title-text">Operating Business Expenses Logging</div>
+        </div>
+        <span class="step-url-badge">URL: /expenses</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Location:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Finance &amp; Accounts</span> &rarr;
+        <span class="ui-tag">Operating Expenses</span> &rarr;
+        <span class="ui-btn">Top-Right: + Record Expense</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Record warehouse rent, utility bills, tea/stationery, salesman fuel allowances, and marketing promotions. These expenses are deducted to compute true Net Operational Profit.
+      </p>
+    </div>
+
+    <!-- STEP 12: PROFIT -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">12</div>
+          <div class="step-title-text">Executive Profit Cockpit (Gross Profit vs Net Profit)</div>
+        </div>
+        <span class="step-url-badge">URL: /profit</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Location:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Finance &amp; Accounts</span> &rarr;
+        <span class="ui-btn">Profit &amp; Financials (TrendingUp Icon)</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        The primary executive cockpit for business owners, displaying 4 core live indicators:
+      </p>
+      <div class="grid-4" style="margin-top: 6px;">
+        <div class="kpi-card">
+          <div class="kpi-label">Sales Revenue</div>
+          <div class="kpi-val" style="color: var(--blue-600);">Rs. 1,500,000</div>
+          <div class="kpi-desc">Total Invoiced</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">COGS (Purchase Cost)</div>
+          <div class="kpi-val" style="color: var(--slate-700);">Rs. 1,200,000</div>
+          <div class="kpi-desc">Batch Cost Basis</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Gross Profit</div>
+          <div class="kpi-val" style="color: var(--emerald-600);">Rs. 300,000</div>
+          <div class="kpi-desc">20.0% Margin</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Net Profit</div>
+          <div class="kpi-val" style="color: var(--primary);">Rs. 240,000</div>
+          <div class="kpi-desc">After All Overheads</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 13: REPORTS -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">13</div>
+          <div class="step-title-text">Management Reports Hub &amp; Excel / CSV Export</div>
+        </div>
+        <span class="step-url-badge">URL: /reports</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Location:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Reports &amp; Analytics</span> &rarr;
+        <span class="ui-tag">Reports Hub</span> &rarr;
+        <span class="ui-btn">Top-Right: Export Excel (.xls)</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Access 9 specialized reports: Customer Balances (AR), Supplier Liabilities (AP), Warehouse Stock Valuation, and 30-Day Batch Expiry Watchdog. Download any report to Excel (.xls) or CSV with a single click.
+      </p>
+    </div>
+
+    <!-- STEP 14: BACKUP -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">14</div>
+          <div class="step-title-text">Database Backup Download &amp; Instant Disaster Recovery</div>
+        </div>
+        <span class="step-url-badge">URL: /settings (Tab 8)</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Location:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Administration</span> &rarr;
+        <span class="ui-tag">System Settings</span> &rarr;
+        <span class="ui-btn">Tab 8: Backup &amp; Maintenance</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Click <strong>"Download Live Database (.db)"</strong>. Save the file to an external USB flash drive or secure storage.
+      </p>
+      <div class="callout callout-info" style="margin-bottom: 0;">
+        <strong>🛠️ Disaster Recovery Runbook (If Server Hardware Fails):</strong> On your replacement computer, simply copy your backup file into the <code>prisma/</code> folder, rename it to <code>wmdms.db</code>, and launch the application. In less than 60 seconds, 100% of transactions, ledgers, and inventory history are fully restored!
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 7: VIDEO DEMO SCRIPT ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title">PharmaDist ERP — Scene-by-Scene Client Demonstration Video Script</span>
+      <span class="header-page-no">Page 7</span>
+    </div>
+
+    <h2 class="section-header"><span class="num">5</span> Client Demonstration Video Recording Script (8 Easy Scenes)</h2>
+    <p>
+      Turn on your screen recorder and read this exact script into your microphone for an impressive, professional demonstration:
+    </p>
+
+    <!-- SCENE 1 -->
+    <div class="scene-box">
+      <div class="scene-head">
+        <span class="scene-name">🎬 Scene 1: Platform Introduction</span>
+        <span class="scene-time">0:00 - 0:45 (45 Seconds)</span>
+      </div>
+      <div class="scene-meta">Screen Focus: Main Dashboard Cockpit (<code>/dashboard</code>)</div>
+      <div class="dialogue-box">
+        "Welcome! Today we are demonstrating PharmaDist Wholesale ERP — an enterprise management platform built specifically for pharmaceutical stockists, wholesale distributors, and medicine agencies. Operating 100% offline with zero internet required, PharmaDist seamlessly connects all office workstations and field mobile order bookers over local Wi-Fi."
+      </div>
+    </div>
+
+    <!-- SCENE 2 -->
+    <div class="scene-box">
+      <div class="scene-head">
+        <span class="scene-name">🎬 Scene 2: Executive Dashboard Metrics</span>
+        <span class="scene-time">0:45 - 1:15 (30 Seconds)</span>
+      </div>
+      <div class="scene-meta">Screen Focus: Real-Time KPI Cards &amp; Expiry Feed</div>
+      <div class="dialogue-box">
+        "On the executive dashboard, the business owner gains immediate visibility into today's sales revenue, cash recoveries, total pharmacy debt receivables, and supplier liabilities. Notice the live 30-day batch expiry alerts that guarantee no unsold expiring medicine ever gets stranded in your warehouse."
+      </div>
+    </div>
+
+    <!-- SCENE 3 -->
+    <div class="scene-box">
+      <div class="scene-head">
+        <span class="scene-name">🎬 Scene 3: Factory Stock Intake (GRN)</span>
+        <span class="scene-time">1:15 - 2:15 (60 Seconds)</span>
+      </div>
+      <div class="scene-meta">Screen Focus: Procurement &rarr; Purchase Intake (<code>/purchases/new</code>)</div>
+      <div class="dialogue-box">
+        "Now let's receive a shipment from a pharmaceutical manufacturer. We select Getz Pharma, choose Augmentin 625mg, enter the factory batch number, expiry date, purchase cost, and warehouse rack location. Upon clicking Submit, inventory stock and supplier accounts payable update synchronously."
+      </div>
+    </div>
+
+    <!-- SCENE 4 -->
+    <div class="scene-box">
+      <div class="scene-head">
+        <span class="scene-name">🎬 Scene 4: Wholesale Order Booking &amp; FEFO Engine</span>
+        <span class="scene-time">2:15 - 3:45 (90 Seconds)</span>
+      </div>
+      <div class="scene-meta">Screen Focus: Wholesale Sales &rarr; New Sale Order (<code>/sales/new</code>)</div>
+      <div class="dialogue-box">
+        "Next, let's book an order for a client pharmacy. Notice how selecting Al-Shifa Medicos instantly displays their credit utilization gauge. As we add items, PharmaDist's FEFO engine automatically selects the earliest expiring batch to prevent expired inventory loss. The system also holds orders if the customer exceeds their credit limit."
+      </div>
+    </div>
+
+    <!-- SCENE 5 -->
+    <div class="scene-box">
+      <div class="scene-head">
+        <span class="scene-name">🎬 Scene 5: DRAP Single-Page Tax Invoice &amp; Challan</span>
+        <span class="scene-time">3:45 - 4:30 (45 Seconds)</span>
+      </div>
+      <div class="scene-meta">Screen Focus: Invoices List &rarr; Print Icon (<code>/invoices</code>)</div>
+      <div class="dialogue-box">
+        "With one click, PharmaDist generates a single-page DRAP-compliant Wholesale Tax Invoice with complete batch numbers, expiry dates, Trade Prices, and legal warranty endorsements. Simultaneously, a non-priced Delivery Challan is generated for dispatch staff and delivery drivers."
+      </div>
+    </div>
+
+    <!-- SCENE 6 -->
+    <div class="scene-box">
+      <div class="scene-head">
+        <span class="scene-name">🎬 Scene 6: Market Collections &amp; Money Receipts</span>
+        <span class="scene-time">4:30 - 5:15 (45 Seconds)</span>
+      </div>
+      <div class="scene-meta">Screen Focus: Finance &rarr; Collections (<code>/payments</code>)</div>
+      <div class="dialogue-box">
+        "When field recovery agents return, we record payments via cash or cheque. PharmaDist applies FIFO settlement against the oldest outstanding bills and prints an official Money Receipt voucher for the customer."
+      </div>
+    </div>
+
+    <!-- SCENE 7 & 8 -->
+    <div class="grid-2">
+      <div class="scene-box" style="margin-bottom: 0;">
+        <div class="scene-head">
+          <span class="scene-name">🎬 Scene 7: Profit Cockpit</span>
+          <span class="scene-time">5:15 - 6:00 (45s)</span>
+        </div>
+        <div class="dialogue-box" style="font-size: 11px;">
+          "Here on the Profit Cockpit, distributors analyze exact Gross Margins and Net Operational Profit after deducting warehouse expenses and staff allowances."
+        </div>
+      </div>
+      <div class="scene-box" style="margin-bottom: 0;">
+        <div class="scene-head">
+          <span class="scene-name">🎬 Scene 8: Backup &amp; Closing</span>
+          <span class="scene-time">6:00 - 6:30 (30s)</span>
+        </div>
+        <div class="dialogue-box" style="font-size: 11px;">
+          "Finally, data security. In the Backup tab, administrators can download a full SQLite database snapshot with one click to guarantee complete data sovereignty. Thank you!"
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
