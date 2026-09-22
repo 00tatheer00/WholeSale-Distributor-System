@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, dialog } = require('electron');
+const { app, BrowserWindow, Menu, dialog, session } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -257,6 +257,19 @@ function createWindow() {
             });
           },
         },
+        {
+          label: 'Lock / Logout to Login Screen',
+          click: async () => {
+            if (mainWindow) {
+              try {
+                if (session && session.defaultSession) {
+                  await session.defaultSession.clearStorageData({ storages: ['cookies'] });
+                }
+              } catch (e) {}
+              mainWindow.loadURL(`http://127.0.0.1:${PORT}/login`);
+            }
+          },
+        },
         { type: 'separator' },
         { role: 'quit', label: 'Exit Application' },
       ],
@@ -299,6 +312,12 @@ function createWindow() {
 // App lifecycle
 app.whenReady().then(async () => {
   try {
+    // Clear previous session cookies on startup so the app ALWAYS presents the login screen
+    if (session && session.defaultSession) {
+      await session.defaultSession.clearStorageData({ storages: ['cookies'] });
+      console.log('[Auth]: Cleared previous session cookies on launch to enforce login.');
+    }
+
     await startNextServer();
     const ready = await waitForServer(`http://127.0.0.1:${PORT}/login`);
     if (!ready) {
@@ -320,7 +339,12 @@ app.whenReady().then(async () => {
   });
 });
 
-app.on('will-quit', () => {
+app.on('will-quit', async () => {
+  try {
+    if (session && session.defaultSession) {
+      await session.defaultSession.clearStorageData({ storages: ['cookies'] });
+    }
+  } catch (e) {}
   if (serverProcess) {
     try {
       serverProcess.kill();

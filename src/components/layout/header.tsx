@@ -8,7 +8,6 @@ import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationsPopover } from "@/components/layout/notifications-popover";
 import { InfoGuideModal } from "@/components/layout/info-guide-modal";
-import { PWAInstaller } from "@/components/shared/pwa-installer";
 import { UserNav } from "@/components/layout/user-nav";
 import { Badge } from "@/components/ui/badge";
 
@@ -50,7 +49,6 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
 
       {/* Right: Actions, Badges, Theme, Notifications & User Profile */}
       <div className="flex items-center gap-2 shrink-0">
-        <PWAInstaller />
         <InfoGuideModal />
 
         <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/80 text-secondary-foreground text-xs font-medium border border-border/50 shrink-0 whitespace-nowrap">

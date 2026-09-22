@@ -42,9 +42,11 @@ export function UserNav({
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
+      document.cookie = "wmdms_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      document.cookie = "wmdms_demo_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       await logoutAction();
     } catch {
-      setIsLoggingOut(false);
+      window.location.href = "/login";
     }
   };
 
