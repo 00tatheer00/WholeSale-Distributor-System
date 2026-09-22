@@ -8,31 +8,44 @@
 
 ---
 
-## 2. Client Delivery via USB (USB se Client ko Dena)
+## 2. Client Delivery Methods (Client ko Software Dena)
 
-1. **Setup File:**
-   * Build ke baad `dist/` folder me `PharmaDist Wholesale ERP Setup.exe` file hogi (Size: ~150–250 MB).
-   * Is `.exe` file ko kisi bhi standard **4 GB ya 8 GB USB Drive** me copy karein.
-2. **Client PC par Installation:**
-   * Client ke **Main PC** par USB lagayein aur `PharmaDist Wholesale ERP Setup.exe` par double click karein.
-   * Software automatic install ho jayega aur Desktop par **"PharmaDist Wholesale ERP"** ka icon ban jayega.
-   * Double click karte hi software 100% offline open ho jayega!
+### Tariqa 1: Online Download Link (Google Drive / WeTransfer) — Sabse Asaan
+1. `npm run electron:build` chalane par `dist/` folder ke andar setup installer ban jayega:
+   `dist/PharmaDist Wholesale ERP Setup 1.0.0.exe` (~150-200 MB).
+2. Is `.exe` file ko apni **Google Drive** ya **WeTransfer** par upload karein.
+3. Client ko WhatsApp ya Email par **Download Link** bhej dein.
+4. Client link se download karega aur apne computer par double-click karke install kar lega!
+
+### Tariqa 2: USB Drive se Dena
+1. `PharmaDist Wholesale ERP Setup 1.0.0.exe` ko kisi bhi standard USB Drive mein copy karein.
+2. Client ke PC par USB lagayein aur setup file ko copy karke run karein.
 
 ---
 
-## 3. Default Login Credentials (Shuruati Login Data)
+## 3. Client PC par 2-Click Installation (Jese MS Word / Chrome)
+1. Client `PharmaDist Wholesale ERP Setup 1.0.0.exe` par **Double Click** karega.
+2. Standard Windows Setup Wizard khulay ga $\rightarrow$ Client **"Next"** aur **"Install"** dabaye ga.
+3. **Desktop par automatic shortcut icon** ban jayega: **"PharmaDist Wholesale ERP"**.
+4. **Start Menu** mein bhi app add ho jayegi.
+5. Client bas Desktop icon par double-click karega aur software 100% offline open ho jayega!
 
-| Role | Email | Default Password | Access Level |
+---
+
+## 4. Default Seeded Credentials (Shuruati Login Data)
+
+| Role | Login Email | Default Password | Access Level |
 |---|---|---|---|
-| **Super Admin** | `admin@erp.com` | `admin@123` | Full Executive & System Privileges |
-| **Sales Manager** | `manager@erp.com` | `manager@123` | Sales, Approvals & Distributors |
-| **Cashier** | `cashier@erp.com` | `cashier@123` | Invoicing, Receipts & POS Billing |
+| **Super Admin (Owner)** | `admin@pharmadist.com` | `admin123` | Full Executive & System Control |
+| **Sales Manager** | `sales.manager@pharmadist.com` | `sales123` | Sales Orders, Customers & Invoices |
+| **Warehouse Officer** | `warehouse@pharmadist.com` | `warehouse123` | Purchases, Batches, GRN & FEFO |
+| **Accounts Officer** | `accounts@pharmadist.com` | `accounts123` | Ledger, Vouchers & Financial Collections |
 
-> **Security Note:** Pehle login ke baad Admin settings (`Settings > Profile`) se apna password zaroor tabdeel karein.
+> **Custom Credentials Note:** Client login karne ke baad **Settings $\rightarrow$ Team & Security** mein jaa kar kisi bhi account ka Email aur Password apne mutabiq tabdeel kar sakta hai. Naya password SQLite mein permanently save ho jata hai.
 
 ---
 
-## 4. Multi-PC & Mobile Connection (Baaqi Computers aur Mobile se Connect Karna)
+## 5. Multi-PC & Mobile Connection (Baaqi Computers aur Mobile se Connect Karna)
 
 Agar client ke office me **multiple computers ya mobile phones** se software use karna ho:
 
@@ -50,7 +63,7 @@ Agar client ke office me **multiple computers ya mobile phones** se software use
 
 ---
 
-## 5. Database Backup & Safety (Data Mehfooz Rakhna)
+## 6. Database Backup & Safety (Data Mehfooz Rakhna)
 
 * SQLite database file `prisma/wmdms.db` (ya installation directory) me store hoti hai.
 * Rozana ya hafte me aik baar is `wmdms.db` file ko USB me copy karke safe rakh sakte hain.

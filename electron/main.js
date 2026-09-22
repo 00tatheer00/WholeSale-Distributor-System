@@ -61,7 +61,39 @@ async function startNextServer() {
     ? path.join(__dirname, '..')
     : path.join(process.resourcesPath, 'app');
 
-  const dbPath = path.join(projectRoot, 'prisma', 'wmdms.db');
+  // Database location resolution:
+  // In development, use project root prisma/wmdms.db
+  // In packaged desktop (.exe), use writeable AppData (userData) directory to guarantee
+  // read/write permissions for standard Windows users and preserve data across updates
+  let dbPath;
+  if (isDev) {
+    dbPath = path.join(projectRoot, 'prisma', 'wmdms.db');
+  } else {
+    const userDataDir = app.getPath('userData');
+    const userDbDir = path.join(userDataDir, 'database');
+    if (!fs.existsSync(userDbDir)) {
+      fs.mkdirSync(userDbDir, { recursive: true });
+    }
+    dbPath = path.join(userDbDir, 'wmdms.db');
+
+    // On first installation launch, copy initial seeded template database from app package
+    if (!fs.existsSync(dbPath)) {
+      const candidates = [
+        path.join(projectRoot, 'prisma', 'wmdms.db'),
+        path.join(projectRoot, '.next', 'standalone', 'prisma', 'wmdms.db'),
+        path.join(process.resourcesPath, 'prisma', 'wmdms.db'),
+        path.join(process.resourcesPath, 'wmdms.db'),
+      ];
+      for (const candidate of candidates) {
+        if (fs.existsSync(candidate)) {
+          fs.copyFileSync(candidate, dbPath);
+          console.log(`[Database]: Initialized writeable user database at: ${dbPath}`);
+          break;
+        }
+      }
+    }
+  }
+
   process.env.DATABASE_URL = `file:${dbPath.replace(/\\/g, '/')}`;
   process.env.PORT = PORT.toString();
   process.env.HOSTNAME = '0.0.0.0';
@@ -75,7 +107,7 @@ async function startNextServer() {
   // In packaged desktop mode, spawn standalone server via Electron's bundled Node.js engine
   const standaloneServer = path.join(projectRoot, '.next', 'standalone', 'server.js');
   if (fs.existsSync(standaloneServer)) {
-    console.log('Spawning standalone Next.js server child process...');
+    console.log('Spawning standalone Next.js server child process from:', standaloneServer);
     const env = {
       ...process.env,
       PORT: PORT.toString(),
@@ -121,7 +153,9 @@ function createWindow() {
     minWidth: 1024,
     minHeight: 700,
     title: `PharmaDist Wholesale ERP — Server running on http://${primaryIp}:${PORT}`,
-    icon: path.join(__dirname, 'icon.png'),
+    icon: fs.existsSync(path.join(__dirname, 'icon.ico'))
+      ? path.join(__dirname, 'icon.ico')
+      : path.join(__dirname, 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,

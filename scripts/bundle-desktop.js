@@ -50,7 +50,11 @@ const prismaClientEngine = path.join(projectRoot, 'node_modules', '.prisma');
 if (fs.existsSync(prismaClientEngine)) {
   copyFolderSync(prismaClientEngine, path.join(standaloneRoot, 'node_modules', '.prisma'));
 }
+const prismaClientPkg = path.join(projectRoot, 'node_modules', '@prisma');
+if (fs.existsSync(prismaClientPkg)) {
+  copyFolderSync(prismaClientPkg, path.join(standaloneRoot, 'node_modules', '@prisma'));
+}
 
-console.log('✅ SQLite database & Prisma schema copied to standalone.');
+console.log('✅ SQLite database & Prisma engine copied to standalone.');
 
 console.log('🎉 Standalone desktop bundle is 100% ready for packaging!');

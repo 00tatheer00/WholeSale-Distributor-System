@@ -16,15 +16,37 @@
     "db:seed": "tsx prisma/seed-offline.ts",
     "typecheck": "tsc --noEmit",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
-    "electron:build": "npm run build && node scripts/bundle-desktop.js && electron-builder --win --dir && node scripts/post-bundle.js"
+    "electron:build": "npm run build && node scripts/bundle-desktop.js && electron-builder --win",
+    "electron:build:dir": "npm run build && node scripts/bundle-desktop.js && electron-builder --win --dir && node scripts/post-bundle.js"
   },
   "build": {
     "appId": "com.pharmadist.erp",
     "productName": "PharmaDist Wholesale ERP",
     "asar": false,
+    "directories": {
+      "output": "dist"
+    },
     "win": {
-      "target": "dir",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "electron/icon.ico",
       "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "PharmaDist Wholesale ERP",
+      "uninstallDisplayName": "PharmaDist Wholesale ERP",
+      "deleteAppDataOnUninstall": false,
+      "installerIcon": "electron/icon.ico",
+      "uninstallerIcon": "electron/icon.ico"
     },
     "forceCodeSigning": false,
     "files": [
