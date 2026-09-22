@@ -56,12 +56,13 @@
       "prisma/**/*",
       "public/**/*",
       "node_modules/**/*",
+      "node_modules/.prisma/**/*",
+      "node_modules/@prisma/**/*",
       "package.json",
       "next.config.mjs",
       "!node_modules/**/*.md",
       "!node_modules/**/*.ts",
       "!node_modules/**/*.map",
-      "!node_modules/**/*.d.ts",
       "!node_modules/**/__tests__/**",
       "!node_modules/**/test/**",
       "!node_modules/**/tests/**",
@@ -79,6 +80,14 @@
       {
         "from": "prisma",
         "to": "prisma"
+      },
+      {
+        "from": "node_modules/.prisma",
+        "to": "node_modules/.prisma"
+      },
+      {
+        "from": "node_modules/.prisma",
+        "to": "app/node_modules/.prisma"
       }
     ]
   },

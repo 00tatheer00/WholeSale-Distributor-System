@@ -5,9 +5,45 @@ const os = require('os');
 const http = require('http');
 const { spawn } = require('child_process');
 
+const net = require('net');
+
 let mainWindow = null;
 let serverProcess = null;
-const PORT = process.env.PORT || 3000;
+let PORT = 3000;
+
+// Recursive folder copy helper
+function copyDirSync(src, dest) {
+  if (!fs.existsSync(src)) return;
+  fs.mkdirSync(dest, { recursive: true });
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyDirSync(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
+// Find an available TCP port starting from desired port
+function getAvailablePort(desiredPort = 3000) {
+  return new Promise((resolve) => {
+    const tester = net.createServer();
+    tester.once('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        resolve(getAvailablePort(desiredPort + 1));
+      } else {
+        resolve(desiredPort);
+      }
+    });
+    tester.once('listening', () => {
+      tester.close(() => resolve(desiredPort));
+    });
+    tester.listen(desiredPort, '127.0.0.1');
+  });
+}
 
 // Get Local LAN IP Addresses for Multi-PC / Mobile access
 function getLocalIpAddresses() {
@@ -61,15 +97,20 @@ async function startNextServer() {
     ? path.join(__dirname, '..')
     : path.join(process.resourcesPath, 'app');
 
+  // Dynamically find open port if 3000 is occupied
+  const requestedPort = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+  PORT = await getAvailablePort(requestedPort);
+  console.log(`[Server]: Determined operational port: ${PORT}`);
+
   // Database location resolution:
   // In development, use project root prisma/wmdms.db
   // In packaged desktop (.exe), use writeable AppData (userData) directory to guarantee
   // read/write permissions for standard Windows users and preserve data across updates
   let dbPath;
+  const userDataDir = app.getPath('userData');
   if (isDev) {
     dbPath = path.join(projectRoot, 'prisma', 'wmdms.db');
   } else {
-    const userDataDir = app.getPath('userData');
     const userDbDir = path.join(userDataDir, 'database');
     if (!fs.existsSync(userDbDir)) {
       fs.mkdirSync(userDbDir, { recursive: true });
@@ -88,6 +129,24 @@ async function startNextServer() {
         if (fs.existsSync(candidate)) {
           fs.copyFileSync(candidate, dbPath);
           console.log(`[Database]: Initialized writeable user database at: ${dbPath}`);
+          break;
+        }
+      }
+    }
+
+    // Ensure .prisma query engine exists in resources/app/node_modules/.prisma
+    const targetPrismaDir = path.join(projectRoot, 'node_modules', '.prisma');
+    if (!fs.existsSync(targetPrismaDir) || !fs.existsSync(path.join(targetPrismaDir, 'client'))) {
+      const prismaCandidates = [
+        path.join(process.resourcesPath, 'node_modules', '.prisma'),
+        path.join(process.resourcesPath, '.prisma'),
+        path.join(process.resourcesPath, 'app', 'node_modules', '.prisma'),
+        path.join(projectRoot, '.next', 'standalone', 'node_modules', '.prisma'),
+      ];
+      for (const cand of prismaCandidates) {
+        if (fs.existsSync(cand)) {
+          copyDirSync(cand, targetPrismaDir);
+          console.log(`[Prisma Engine]: Restored query engine to: ${targetPrismaDir}`);
           break;
         }
       }
@@ -123,6 +182,16 @@ async function startNextServer() {
       stdio: ['ignore', 'pipe', 'pipe'],
     });
 
+    // Write server output to log file in AppData for easy debugging
+    try {
+      const logFile = path.join(userDataDir, 'server.log');
+      const logStream = fs.createWriteStream(logFile, { flags: 'a' });
+      serverProcess.stdout.pipe(logStream);
+      serverProcess.stderr.pipe(logStream);
+    } catch (e) {
+      console.warn('Could not attach log stream:', e);
+    }
+
     serverProcess.stdout.on('data', (d) => {
       console.log(`[Next.js Server]: ${d.toString().trim()}`);
     });
@@ -136,8 +205,6 @@ async function startNextServer() {
     });
 
     return true;
-  } else {
-    console.warn('Standalone server.js not found at:', standaloneServer);
     return false;
   }
 }
