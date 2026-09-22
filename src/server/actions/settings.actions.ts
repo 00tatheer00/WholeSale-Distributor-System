@@ -381,6 +381,24 @@ export async function updateUserAction(data: UpdateUserInput): Promise<ActionRes
       }),
     });
 
+    // If current session belongs to this user and email changed, seamlessly update session cookie
+    const cookieStore = await cookies();
+    const sessionEmail = cookieStore.get("wmdms_session")?.value || cookieStore.get("wmdms_demo_session")?.value;
+    if (sessionEmail && sessionEmail.toLowerCase() === user.email.toLowerCase()) {
+      cookieStore.set("wmdms_session", normalizedEmail, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+        httpOnly: true,
+        sameSite: "lax",
+      });
+      cookieStore.set("wmdms_demo_session", normalizedEmail, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+        httpOnly: true,
+        sameSite: "lax",
+      });
+    }
+
     revalidatePath("/settings");
     return { success: true, message: `Account for "${updatedUser.name}" updated successfully.` };
   } catch (error: any) {

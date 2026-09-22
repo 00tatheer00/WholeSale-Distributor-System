@@ -13,11 +13,6 @@ import {
   ShieldCheck,
   Loader2,
   ArrowRight,
-  UserCheck,
-  Building2,
-  Package,
-  Wallet,
-  Sparkles,
 } from "lucide-react";
 import { loginSchema, LoginInput } from "@/validations/auth.schema";
 import { loginAction } from "@/server/actions/auth.actions";
@@ -27,47 +22,11 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 
-const DEMO_ROLES = [
-  {
-    id: "admin",
-    label: "Super Admin",
-    icon: UserCheck,
-    email: "admin@pharmadist.com",
-    roleName: "Executive & System Control",
-    badge: "Full Access",
-  },
-  {
-    id: "sales",
-    label: "Sales Manager",
-    icon: Building2,
-    email: "sales.manager@pharmadist.com",
-    roleName: "Orders, Customers & Invoicing",
-    badge: "Commercial",
-  },
-  {
-    id: "warehouse",
-    label: "Warehouse",
-    icon: Package,
-    email: "warehouse@pharmadist.com",
-    roleName: "Purchases, Batches & GRN",
-    badge: "Inventory",
-  },
-  {
-    id: "accounts",
-    label: "Accounts",
-    icon: Wallet,
-    email: "accounts@pharmadist.com",
-    roleName: "Payments & AP/AR Ledgers",
-    badge: "Finance",
-  },
-];
-
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect") || "/dashboard";
 
-  const [selectedRole, setSelectedRole] = React.useState<string>("admin");
   const [showPassword, setShowPassword] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -80,18 +39,11 @@ export default function LoginPage() {
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "admin@pharmadist.com",
-      password: "admin123",
+      email: "",
+      password: "",
       rememberMe: true,
     },
   });
-
-  const handleRoleSelect = (role: typeof DEMO_ROLES[0]) => {
-    setSelectedRole(role.id);
-    setValue("email", role.email, { shouldValidate: true });
-    setValue("password", "admin123", { shouldValidate: true });
-    setErrorMessage(null);
-  };
 
   const onSubmit = async (data: LoginInput) => {
     try {
@@ -100,46 +52,59 @@ export default function LoginPage() {
 
       const normalizedEmail = data.email.trim().toLowerCase();
 
-      // Client-side cookie setting guarantee
-      const maxAge = 60 * 60 * 24 * 7;
-      document.cookie = `wmdms_session=${encodeURIComponent(normalizedEmail)}; path=/; max-age=${maxAge}; SameSite=Lax`;
-      document.cookie = `wmdms_demo_session=${encodeURIComponent(normalizedEmail)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: normalizedEmail,
+          password: data.password,
+          rememberMe: data.rememberMe,
+        }),
+      });
 
-      try {
-        const response = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
+      const result = await response.json().catch(() => null);
 
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success) {
-            window.location.href = redirectUrl || "/dashboard";
-            return;
-          } else if (result.error) {
-            setErrorMessage(result.error);
-            setIsSubmitting(false);
-            return;
-          }
-        }
-      } catch (apiErr) {
-        console.warn("Direct API call attempt:", apiErr);
+      if (response.ok && result?.success) {
+        // Sync client-side cookies upon successful server auth
+        const maxAge = data.rememberMe ? 60 * 60 * 24 * 7 : 60 * 60 * 24;
+        document.cookie = `wmdms_session=${encodeURIComponent(normalizedEmail)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+        document.cookie = `wmdms_demo_session=${encodeURIComponent(normalizedEmail)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+
+        // Smooth navigation to dashboard
+        window.location.href = redirectUrl || "/dashboard";
+        return;
       }
 
-      // Smooth direct navigation
-      window.location.href = redirectUrl || "/dashboard";
+      // Authentication failed
+      setErrorMessage(
+        result?.error || "Invalid email or password. Please verify your credentials."
+      );
     } catch (err: any) {
       console.error("Login client error:", err);
-      window.location.href = redirectUrl || "/dashboard";
+      // Attempt fallback via Server Action
+      try {
+        const actionRes = await loginAction(data);
+        if (actionRes.success) {
+          const maxAge = 60 * 60 * 24 * 7;
+          const normalizedEmail = data.email.trim().toLowerCase();
+          document.cookie = `wmdms_session=${encodeURIComponent(normalizedEmail)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+          document.cookie = `wmdms_demo_session=${encodeURIComponent(normalizedEmail)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+          window.location.href = redirectUrl || "/dashboard";
+          return;
+        } else {
+          setErrorMessage(
+            actionRes.error || "Invalid email or password. Please verify your credentials."
+          );
+        }
+      } catch (actErr) {
+        setErrorMessage("An unexpected network error occurred. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const activeRoleData = DEMO_ROLES.find((r) => r.id === selectedRole) || DEMO_ROLES[0];
 
   return (
     <div className="w-full">
@@ -156,50 +121,6 @@ export default function LoginPage() {
           <p className="text-xs text-[#86868B]">
             Enterprise Wholesale Medicine Distribution Platform
           </p>
-        </div>
-
-        {/* Apple Segmented 1-Click Role Selector */}
-        <div className="space-y-2 mb-6">
-          <div className="flex items-center justify-between text-[11px] font-medium text-[#86868B] px-1">
-            <span className="flex items-center gap-1">
-              <Sparkles className="h-3 w-3 text-[#0071E3]" />
-              Quick Demo Access
-            </span>
-            <span className="text-[#0071E3] font-semibold">{activeRoleData.badge}</span>
-          </div>
-
-          <div className="grid grid-cols-4 gap-1.5 p-1 rounded-2xl bg-[#F5F5F7] dark:bg-[#2C2C2E] border border-black/[0.04] dark:border-white/[0.04]">
-            {DEMO_ROLES.map((role) => {
-              const isSelected = selectedRole === role.id;
-              const Icon = role.icon;
-              return (
-                <button
-                  key={role.id}
-                  type="button"
-                  onClick={() => handleRoleSelect(role)}
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl text-center transition-all duration-200",
-                    isSelected
-                      ? "bg-white dark:bg-[#3A3A3C] text-[#0071E3] dark:text-[#2997FF] shadow-sm font-semibold scale-[1.02]"
-                      : "text-[#86868B] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
-                  )}
-                >
-                  <Icon className={cn("h-4 w-4", isSelected ? "text-[#0071E3] dark:text-[#2997FF]" : "text-[#86868B]")} />
-                  <span className="text-[10px] leading-tight truncate w-full font-medium">
-                    {role.label.split(" ")[0]}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Active Role Indicator Pill */}
-          <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/40 text-[11px] text-[#0071E3] dark:text-[#2997FF] border border-blue-100 dark:border-blue-900/50">
-            <span className="font-semibold">{activeRoleData.label}:</span>
-            <span className="text-[#424245] dark:text-[#A1A1A6] text-[10px] truncate max-w-[220px]">
-              {activeRoleData.roleName}
-            </span>
-          </div>
         </div>
 
         {/* Login Form */}

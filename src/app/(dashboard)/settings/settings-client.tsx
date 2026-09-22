@@ -154,7 +154,7 @@ export function SettingsClient({
   const [editingUser, setEditingUser] = React.useState<UpdateUserInput | null>(null);
   const [isEditUserOpen, setIsEditUserOpen] = React.useState(false);
 
-  const [resetUser, setResetUser] = React.useState<{ id: string; name: string; password: string } | null>(null);
+  const [resetUser, setResetUser] = React.useState<{ id: string; name: string; password: string; confirmPassword: string } | null>(null);
   const [isResetPasswordOpen, setIsResetPasswordOpen] = React.useState(false);
 
   const [deactivateUser, setDeactivateUser] = React.useState<{ id: string; name: string; status: string } | null>(null);
@@ -226,6 +226,14 @@ export function SettingsClient({
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resetUser) return;
+    if (resetUser.password !== resetUser.confirmPassword) {
+      alert("Passwords do not match. Please verify your new password and confirmation password.");
+      return;
+    }
+    if (resetUser.password.length < 6) {
+      alert("Password must be at least 6 characters long.");
+      return;
+    }
     setIsUserProcessing(true);
     const res = await resetUserPasswordAction({
       userId: resetUser.id,
@@ -1077,6 +1085,24 @@ export function SettingsClient({
                 </Button>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
+                {/* Custom Credentials Announcement Banner */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-slate-50 dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-slate-900 border border-blue-200/70 dark:border-blue-900/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5">
+                  <div className="flex items-start gap-3">
+                    <div className="h-9 w-9 rounded-xl bg-[#0071E3] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                      <KeyRound className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-xs font-bold text-foreground">Custom Login Credentials & Password Management</h4>
+                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[9px] py-0">Local SQLite</Badge>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        You have full ownership of your credentials. You can set and reset custom login emails and secure passwords for any staff or admin account below. All updates are saved locally into your desktop SQLite database.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
                     <thead className="bg-muted/40 border-b font-semibold text-muted-foreground uppercase tracking-wider">
@@ -1112,45 +1138,87 @@ export function SettingsClient({
                             )}
                           </td>
                           <td className="px-4 py-3 text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-44 text-xs">
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    setEditingUser({
-                                      id: u.id,
-                                      name: u.name,
-                                      email: u.email,
-                                      phone: u.phone === "N/A" ? "" : u.phone,
-                                      role: u.role,
-                                      status: u.status,
-                                    });
-                                    setIsEditUserOpen(true);
-                                  }}
-                                  className="cursor-pointer gap-2"
-                                >
-                                  <Edit2 className="h-3.5 w-3.5 text-sky-600" />
-                                  Edit Account & Role
-                                </DropdownMenuItem>
+                            <div className="flex items-center justify-end gap-1.5">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setEditingUser({
+                                    id: u.id,
+                                    name: u.name,
+                                    email: u.email,
+                                    phone: u.phone === "N/A" ? "" : u.phone,
+                                    role: u.role,
+                                    status: u.status,
+                                  });
+                                  setIsEditUserOpen(true);
+                                }}
+                                className="h-7 px-2 text-[11px] rounded-lg gap-1 border-sky-200 text-sky-700 hover:bg-sky-50 dark:border-sky-900/50 dark:text-sky-400"
+                                title="Change login email and role"
+                              >
+                                <Edit2 className="h-3 w-3" />
+                                <span className="hidden sm:inline">Edit Email</span>
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setResetUser({
+                                    id: u.id,
+                                    name: u.name,
+                                    password: "",
+                                    confirmPassword: "",
+                                  });
+                                  setIsResetPasswordOpen(true);
+                                }}
+                                className="h-7 px-2 text-[11px] rounded-lg gap-1 border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-400"
+                                title="Reset login password"
+                              >
+                                <KeyRound className="h-3 w-3" />
+                                <span className="hidden sm:inline">Reset Password</span>
+                              </Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 rounded-lg">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-44 text-xs">
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setEditingUser({
+                                        id: u.id,
+                                        name: u.name,
+                                        email: u.email,
+                                        phone: u.phone === "N/A" ? "" : u.phone,
+                                        role: u.role,
+                                        status: u.status,
+                                      });
+                                      setIsEditUserOpen(true);
+                                    }}
+                                    className="cursor-pointer gap-2"
+                                  >
+                                    <Edit2 className="h-3.5 w-3.5 text-sky-600" />
+                                    Edit Account & Role
+                                  </DropdownMenuItem>
 
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    setResetUser({
-                                      id: u.id,
-                                      name: u.name,
-                                      password: "",
-                                    });
-                                    setIsResetPasswordOpen(true);
-                                  }}
-                                  className="cursor-pointer gap-2"
-                                >
-                                  <KeyRound className="h-3.5 w-3.5 text-amber-600" />
-                                  Reset Password
-                                </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setResetUser({
+                                        id: u.id,
+                                        name: u.name,
+                                        password: "",
+                                        confirmPassword: "",
+                                      });
+                                      setIsResetPasswordOpen(true);
+                                    }}
+                                    className="cursor-pointer gap-2"
+                                  >
+                                    <KeyRound className="h-3.5 w-3.5 text-amber-600" />
+                                    Reset Password
+                                  </DropdownMenuItem>
 
                                 <DropdownMenuItem
                                   onClick={() => {
@@ -1179,7 +1247,8 @@ export function SettingsClient({
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
-                          </td>
+                          </div>
+                        </td>
                         </tr>
                       ))}
                     </tbody>
@@ -1572,7 +1641,7 @@ export function SettingsClient({
 
               <div className="space-y-3 py-4">
                 <div className="space-y-1">
-                  <Label className="text-xs font-semibold">New Password (Minimum 6 characters)</Label>
+                  <Label className="text-xs font-semibold">New Password (Minimum 6 characters) *</Label>
                   <Input
                     required
                     type="password"
@@ -1581,6 +1650,24 @@ export function SettingsClient({
                     onChange={(e) => setResetUser({ ...resetUser, password: e.target.value })}
                     className="rounded-xl text-xs h-9 bg-muted/30"
                   />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Confirm New Password *</Label>
+                  <Input
+                    required
+                    type="password"
+                    placeholder="Re-type new password"
+                    value={resetUser.confirmPassword}
+                    onChange={(e) => setResetUser({ ...resetUser, confirmPassword: e.target.value })}
+                    className="rounded-xl text-xs h-9 bg-muted/30"
+                  />
+                  {resetUser.confirmPassword.length > 0 && resetUser.password !== resetUser.confirmPassword && (
+                    <p className="text-[10px] text-rose-500 font-medium">Passwords do not match</p>
+                  )}
+                  {resetUser.confirmPassword.length > 0 && resetUser.password === resetUser.confirmPassword && (
+                    <p className="text-[10px] text-emerald-600 font-medium">Passwords match</p>
+                  )}
                 </div>
               </div>
 
@@ -1596,7 +1683,11 @@ export function SettingsClient({
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isUserProcessing || resetUser.password.length < 6}
+                  disabled={
+                    isUserProcessing ||
+                    resetUser.password.length < 6 ||
+                    resetUser.password !== resetUser.confirmPassword
+                  }
                   className="bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs h-9 px-4"
                 >
                   {isUserProcessing ? "Resetting..." : "Reset Password"}

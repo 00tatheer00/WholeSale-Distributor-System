@@ -63,17 +63,6 @@ export async function loginAction(
           isPasswordValid = await bcrypt.compare(password, user.passwordHash);
         }
 
-        // Allow initial default credentials for bootstrap/first login
-        if (!isPasswordValid && (password === "admin@123" || password === "password" || password === "demo123")) {
-          isPasswordValid = true;
-          // Auto-upgrade/store hashed password
-          const newHash = await bcrypt.hash(password, 10);
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { passwordHash: newHash },
-          });
-        }
-
         if (isPasswordValid) {
           cookieStore.set("wmdms_session", normalizedEmail, {
             path: "/",
@@ -89,18 +78,23 @@ export async function loginAction(
           });
 
           return { success: true };
+        } else {
+          return {
+            success: false,
+            error: "Invalid email or password. Please verify your credentials.",
+          };
         }
       }
     } catch (dbErr) {
       console.error("Local SQLite login error:", dbErr);
     }
 
-    // 3. Fallback for initial demo/mock profiles before first DB seed
+    // 3. Fallback only if SQLite query errored or user does not exist in DB but matches mock user with correct demo password
     const demoUser = MOCK_USERS.find(
       (u) => u.email.toLowerCase() === normalizedEmail
     );
 
-    if (demoUser || password.length >= 6) {
+    if (demoUser && (password === "admin123" || password === "admin@123" || password === "sales123" || password === "warehouse123" || password === "accounts123")) {
       cookieStore.set("wmdms_session", normalizedEmail, {
         path: "/",
         maxAge: 60 * 60 * 24 * 7,

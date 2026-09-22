@@ -38,15 +38,6 @@ export async function POST(req: NextRequest) {
           isPasswordValid = await bcrypt.compare(password, user.passwordHash);
         }
 
-        if (!isPasswordValid && (password === "admin123" || password === "admin@123" || password === "sales123" || password === "warehouse123" || password === "accounts123" || password === "password")) {
-          isPasswordValid = true;
-          const newHash = await bcrypt.hash(password, 10);
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { passwordHash: newHash },
-          });
-        }
-
         if (isPasswordValid) {
           const res = NextResponse.json({ success: true, message: "Signed in successfully" });
           res.cookies.set("wmdms_session", normalizedEmail, {
@@ -62,15 +53,21 @@ export async function POST(req: NextRequest) {
             sameSite: "lax",
           });
           return res;
+        } else {
+          // Password did not match database hash
+          return NextResponse.json(
+            { success: false, error: "Invalid email or password. Please try again." },
+            { status: 401 }
+          );
         }
       }
     } catch (dbErr) {
       console.warn("Local DB lookup notice:", dbErr);
     }
 
-    // 2. Demo & Fallback Authentication
+    // 2. Emergency fallback only if SQLite connection failed and matches explicit seed
     const demoUser = MOCK_USERS.find((u) => u.email.toLowerCase() === normalizedEmail);
-    if (demoUser || password.length >= 6) {
+    if (demoUser && (password === "admin123" || password === "admin@123" || password === "sales123" || password === "warehouse123" || password === "accounts123")) {
       const res = NextResponse.json({ success: true, message: "Signed in successfully" });
       res.cookies.set("wmdms_session", normalizedEmail, {
         path: "/",
