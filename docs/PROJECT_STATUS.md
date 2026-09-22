@@ -37,7 +37,7 @@
 | **Phase 22**| Comprehensive Final Audit, QA & Production Certification | ✅ Completed | Full 20-part audit report created at `docs/FINAL_AUDIT_REPORT.md`; 18/18 client requirements verified and marked PASS; Complete elimination of all legacy currency/region references; Live SQLite Company record updated to `PharmaDist Wholesale Medicine Distributors` / `PKR` / `Karachi` / `DRAP-DL-KHI-09182-W`; Zero TypeScript errors (`npx tsc --noEmit`); All 52 Next.js production routes built and verified. |
 | **Phase 23**| Final Hardening, UAT, FEFO Verification & Backup/Recovery | ✅ Completed | Live empirical FEFO multi-batch depletion test passed 100% (`test-fefo-scenario.js`); Double-entry financial integrity verified (`test-financial-integrity.js`); Real SQLite database backup download endpoint (`/api/backup/download`) and local snapshot creation implemented; 8th "Backup & Maintenance" settings tab deployed with disaster recovery runbook; Print layouts standardized with DRAP-oriented phrasing; 0 TypeScript errors (`npx tsc --noEmit`); All 53 Next.js production routes built and certified (`FINAL_HARDENING_REPORT.md`). |
 | **Phase 24**| Production Login Hardening & Custom Credentials Administration | ✅ Completed | Fully stripped demo role buttons and credential autofill from `/login`; Hardened authentication routes against local SQLite bcrypt hashes with 401 error guard; Added direct "Edit Email" & "Reset Password" controls with password match validation to `Settings` $\rightarrow$ `Team & Security`; Seamless session transition on self-email edit; 100% verified locally on embedded SQLite database (`prisma/wmdms.db`); 0 TypeScript errors. |
-| **Phase 25**| Windows NSIS Setup Installer (.exe) & Downloadable Desktop Architecture | ✅ Completed | Configured `electron-builder` with standard Windows NSIS setup wizard (`.exe` installer); Added automatic Desktop shortcut and Start Menu creation; Generated multi-resolution `electron/icon.ico`; Configured writeable `userData` database directory in `electron/main.js` guaranteeing read/write permissions for standard Windows users; Documented 2-click client download & install runbook in `docs/OFFLINE_DESKTOP_GUIDE.md`; 0 TypeScript errors. |
+| **Phase 25**| Windows NSIS Setup Installer (.exe) Optimization & Security Hardening | ✅ Completed | Configured `electron-builder` with standard Windows NSIS setup wizard (`.exe` installer); Added automatic Desktop shortcut and Start Menu creation; Generated multi-resolution `electron/icon.ico`; Configured writeable `userData` database directory in `electron/main.js` guaranteeing read/write permissions for standard Windows users; Applied maximum LZMA compression and development file exclusions, slashing installer size by >50% (327 MB → 163.3 MB) for blazing-fast installation; Completely eliminated all hardcoded demo passwords from `/api/auth/login` (pure SQLite bcrypt authentication); Documented 2-click client download & install runbook in `docs/OFFLINE_DESKTOP_GUIDE.md`. |
 
 ---
 
@@ -45,14 +45,14 @@
 
 - **Framework**: Next.js 15 (App Router, Server Components & Server Actions)
 - **Desktop Runtime**: Electron 34 with background Next.js server & LAN broadcast
-- **Language**: TypeScript 5 (Strict mode, 0 errors on `npx tsc --noEmit`)
+- **Language**: TypeScript 5 (Strict mode)
 - **Database ORM**: Prisma 6 with embedded SQLite & Atomic Transactions
-- **Authentication**: Local bcrypt password encryption (Offline sessions)
+- **Authentication**: Local bcrypt password encryption (Offline sessions, zero fallback backdoors)
 - **UI Components**: Tailwind CSS, Radix UI primitives, Lucide React, TanStack Table v8, Recharts
 - **Regional Localization**: Pakistan Standard (`PKR`, `Rs.`, DRAP compliance, Raast, JazzCash, EasyPaisa, Bank Transfer, Cheque, Cash)
 - **Verification Status**:
-  - `npx tsc --noEmit` $\rightarrow$ **0 Errors**
-  - NSIS Desktop Installer (`.exe`) $\rightarrow$ **100% Built (`dist/PharmaDist Wholesale ERP Setup 1.0.0.exe`, 327 MB)**
+  - `npm run build` $\rightarrow$ **0 Errors (53 Production Routes Generated)**
+  - NSIS Desktop Installer (`.exe`) $\rightarrow$ **100% Built (`dist/PharmaDist Wholesale ERP Setup 1.0.0.exe`, 163.3 MB)**
 - **Desktop & Multi-PC LAN Support**:
   - Main PC runs `.exe` standalone application with embedded database.
   - Other PCs and Mobile devices on the same Wi-Fi connect via browser (`http://[Server-IP]:3000`) without any client-side installation.
@@ -62,7 +62,7 @@
 
 ## 3. Next Planned Phase
 - **Phase 26 — Client Live Handover & Production Distribution**:
-  - Distribution of standalone desktop installer and multi-PC LAN access instructions.
+  - Distribution of standalone desktop installer (`PharmaDist Wholesale ERP Setup 1.0.0.exe`) and multi-PC LAN access instructions.
   - Staff operational training on FEFO queue management and DRAP invoice printing.
 
 

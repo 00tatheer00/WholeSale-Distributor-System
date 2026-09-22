@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { loginSchema } from "@/validations/auth.schema";
-import { MOCK_USERS } from "@/server/actions/mock-data";
 
 export async function POST(req: NextRequest) {
   try {
@@ -63,25 +62,6 @@ export async function POST(req: NextRequest) {
       }
     } catch (dbErr) {
       console.warn("Local DB lookup notice:", dbErr);
-    }
-
-    // 2. Emergency fallback only if SQLite connection failed and matches explicit seed
-    const demoUser = MOCK_USERS.find((u) => u.email.toLowerCase() === normalizedEmail);
-    if (demoUser && (password === "admin123" || password === "admin@123" || password === "sales123" || password === "warehouse123" || password === "accounts123")) {
-      const res = NextResponse.json({ success: true, message: "Signed in successfully" });
-      res.cookies.set("wmdms_session", normalizedEmail, {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-        httpOnly: true,
-        sameSite: "lax",
-      });
-      res.cookies.set("wmdms_demo_session", normalizedEmail, {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-        httpOnly: true,
-        sameSite: "lax",
-      });
-      return res;
     }
 
     return NextResponse.json(
