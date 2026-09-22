@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+  <meta charset="UTF-8">
+  <title>PharmaDist Wholesale ERP — Asan Roman Urdu Step-by-Step Operating Guide</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+    :root {
+      --primary: #0f766e;
+      --primary-dark: #042f2e;
+      --primary-light: #ccfbf1;
+      --accent: #4f46e5;
+      --accent-light: #e0e7ff;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+      --emerald-700: #047857;
+      --emerald-600: #059669;
+      --emerald-100: #d1fae5;
+      --emerald-50: #ecfdf5;
+      --amber-700: #b45309;
+      --amber-600: #d97706;
+      --amber-100: #fef3c7;
+      --amber-50: #fffbeb;
+      --rose-600: #e11d48;
+      --rose-100: #ffe4e6;
+      --rose-50: #fff1f2;
+      --blue-700: #1d4ed8;
+      --blue-600: #2563eb;
+      --blue-100: #dbeafe;
+      --blue-50: #eff6ff;
+      --purple-700: #6d28d9;
+      --purple-100: #ede9fe;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--slate-800);
+      background-color: #ffffff;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 12mm 12mm 12mm 12mm;
+    }
+
+    .page {
+      padding: 0;
+      page-break-after: always;
+    }
+
+    .page:last-child {
+      page-break-after: avoid;
+    }
+
+    .avoid-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Cover Page */
+    .cover-container {
+      min-height: 265mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      padding: 36px;
+      background: linear-gradient(135deg, #f8fafc 0%, #f0fdfa 55%, #e0f2fe 100%);
+      position: relative;
+    }
+
+    .cover-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-radius: 9999px;
+      margin-bottom: 16px;
+      width: fit-content;
+    }
+
+    .cover-title {
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: var(--slate-900);
+      margin-bottom: 12px;
+    }
+
+    .cover-title span {
+      color: var(--primary);
+    }
+
+    .cover-subtitle {
+      font-size: 14.5px;
+      font-weight: 500;
+      color: var(--slate-600);
+      max-width: 630px;
+      margin-bottom: 22px;
+      line-height: 1.6;
+    }
+
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid var(--slate-200);
+      box-shadow: 0 4px 12px rgba(15, 118, 110, 0.05);
+      margin-bottom: 22px;
+    }
+
+    .cover-meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cover-meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--slate-600);
+      margin-bottom: 2px;
+    }
+
+    .cover-meta-val {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--slate-900);
+    }
+
+    .feature-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid transparent;
+    }
+
+    .pill-teal { background: var(--primary-light); color: var(--primary); border-color: #99f6e4; }
+    .pill-indigo { background: var(--accent-light); color: var(--accent); border-color: #c7d2fe; }
+    .pill-emerald { background: var(--emerald-100); color: var(--emerald-700); border-color: #a7f3d0; }
+    .pill-amber { background: var(--amber-100); color: var(--amber-700); border-color: #fde68a; }
+
+    /* Header Bar */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+      border-bottom: 2px solid var(--slate-200);
+    }
+
+    .header-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--primary);
+    }
+
+    .header-page-no {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--slate-600);
+    }
+
+    h2.section-header {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--slate-900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 6px;
+      margin-top: 16px;
+      margin-bottom: 12px;
+      border-bottom: 2px solid var(--primary-light);
+    }
+
+    h2.section-header .num {
+      background: var(--primary);
+      color: #ffffff;
+      width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    h3.sub-header {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--slate-900);
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+
+    p {
+      margin-bottom: 8px;
+      color: var(--slate-700);
+      line-height: 1.55;
+    }
+
+    /* UI Location Breadcrumbs Box */
+    .ui-location {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      background: var(--slate-100);
+      border: 1px solid var(--slate-200);
+      border-radius: 6px;
+      padding: 6px 10px;
+      margin-bottom: 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--slate-800);
+    }
+
+    .ui-tag {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      padding: 2px 7px;
+      border-radius: 4px;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .ui-btn {
+      background: var(--primary);
+      color: #ffffff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* Tables */
+    table.custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+      margin: 10px 0 14px 0;
+      background: #ffffff;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--slate-200);
+    }
+
+    table.custom-table th {
+      background: var(--slate-100);
+      color: var(--slate-800);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 9.5px;
+      letter-spacing: 0.05em;
+      padding: 7px 10px;
+      border-bottom: 2px solid var(--slate-200);
+      text-align: left;
+    }
+
+    table.custom-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--slate-200);
+      color: var(--slate-700);
+      vertical-align: middle;
+      line-height: 1.45;
+    }
+
+    table.custom-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.custom-table tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    /* Short-form badge */
+    .abbr-badge {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 10.5px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-right: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Cards & Callouts */
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: 8px;
+      padding: 11px 13px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    .callout {
+      border-left: 4px solid;
+      border-radius: 0 6px 6px 0;
+      padding: 9px 12px;
+      margin: 8px 0;
+      font-size: 11.5px;
+      line-height: 1.5;
+    }
+
+    .callout-info {
+      background: var(--blue-50);
+      border-color: var(--blue-600);
+      color: #1e3a8a;
+    }
+
+    .callout-warning {
+      background: var(--amber-50);
+      border-color: var(--amber-600);
+      color: #78350f;
+    }
+
+    .callout-success {
+      background: var(--emerald-50);
+      border-color: var(--emerald-600);
+      color: #064e3b;
+    }
+
+    /* Step Card */
+    .step-card {
+      border: 1px solid var(--slate-200);
+      border-radius: 8px;
+      padding: 11px 13px;
+      background: #ffffff;
+      margin-bottom: 11px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .step-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .step-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-num {
+      width: 24px;
+      height: 24px;
+      background: var(--primary);
+      color: #ffffff;
+      border-radius: 5px;
+      font-size: 11.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-title-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--slate-900);
+    }
+
+    .step-url-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      background: var(--slate-100);
+      color: var(--primary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px 12px;
+      margin: 8px 0;
+      background: #fafafa;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--slate-200);
+      font-size: 11px;
+    }
+
+    .field-item {
+      display: flex;
+      gap: 4px;
+    }
+
+    .field-key {
+      font-weight: 700;
+      color: var(--slate-800);
+      white-space: nowrap;
+    }
+
+    .field-val {
+      color: var(--slate-600);
+    }
+
+    /* Scene Block */
+    .scene-box {
+      border: 1px solid var(--slate-200);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 9px;
+      background: #fafafa;
+    }
+
+    .scene-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .scene-name {
+      font-weight: 700;
+      font-size: 12.5px;
+      color: var(--accent);
+    }
+
+    .scene-time {
+      font-size: 10.5px;
+      font-weight: 600;
+      background: var(--accent-light);
+      color: var(--accent);
+      padding: 1px 7px;
+      border-radius: 999px;
+    }
+
+    .scene-meta {
+      font-size: 11px;
+      color: var(--slate-600);
+      margin-bottom: 4px;
+    }
+
+    .dialogue-box {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: 5px;
+      padding: 8px 11px;
+      font-size: 11.5px;
+      font-style: italic;
+      color: var(--slate-800);
+      line-height: 1.45;
+    }
+
+    /* Grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .kpi-card {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: 6px;
+      padding: 9px;
+      text-align: center;
+    }
+
+    .kpi-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--slate-600);
+      margin-bottom: 2px;
+    }
+
+    .kpi-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--slate-900);
+    }
+
+    .kpi-desc {
+      font-size: 9.5px;
+      color: var(--emerald-700);
+      font-weight: 600;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      background: var(--slate-100);
+      color: var(--slate-800);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== PAGE 1: COVER PAGE ==================== -->
+  <div class="page">
+    <div class="cover-container">
+      <div>
+        <div class="cover-badge">
+          🇵🇰 WHOLESALE MEDICINE ERP — ASAN STEP-BY-STEP OPERATING MANUAL
+        </div>
+        <h1 class="cover-title">PharmaDist Wholesale ERP<br><span>Mukammal System Guide (Asan Roman Urdu)</span></h1>
+        <p class="cover-subtitle">
+          Dawaiyon ki wholesale agency chalane ka mukammal tareeqa: Medicine add karne se lekar, factory se maal lene (GRN), FEFO batch sale karne, DRAP wholesale tax invoice print karne, aur market recovery tak — har button aur screen ki asan wazahat.
+        </p>
+
+        <div class="feature-pills">
+          <span class="pill pill-teal">⚡ 100% Offline (Internet Ke Baghair)</span>
+          <span class="pill pill-indigo">🌐 Wi-Fi Par Multi-PC & Mobile</span>
+          <span class="pill pill-emerald">📦 Strict FEFO (Pehle Expire Pehle Out)</span>
+          <span class="pill pill-amber">⚖️ DRAP A4 Wholesale Invoices & Challan</span>
+        </div>
+      </div>
+
+      <div class="cover-meta-grid">
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Software Platform</span>
+          <span class="cover-meta-val">PharmaDist Wholesale ERP v1.0.0</span>
+        </div>
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Currency & Format</span>
+          <span class="cover-meta-val">Pakistani Rupee (PKR / Rs.)</span>
+        </div>
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Regulatory Standard</span>
+          <span class="cover-meta-val">DRAP (Drug Regulatory Authority of Pakistan)</span>
+        </div>
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Hisaab Ka Usool</span>
+          <span class="cover-meta-val">Strict FEFO Batch Allocation & FIFO Dues</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid var(--slate-200); padding-top: 14px;">
+        <div>
+          <div style="font-size: 11px; font-weight: 700; color: var(--slate-900);">Document ID: DOC-WMDMS-ASAN-URDU-2026</div>
+          <div style="font-size: 10px; color: var(--slate-600);">Har Short Form Ki Full Form + Har Option Ki Screen Location Ke Sath</div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 11px; font-weight: 700; color: var(--primary);">PharmaDist Technologies</div>
+          <div style="font-size: 10px; color: var(--slate-600);">Enterprise Pharmacy Solutions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 2: SHORT FORMS & NETWORK ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title">PharmaDist ERP — Tamam Short Forms Ki Full Forms Aur LAN Setup</span>
+      <span class="header-page-no">Page 2</span>
+    </div>
+
+    <h2 class="section-header"><span class="num">1</span> Tamam Short Forms Ki Full Forms Aur Asan Matlab</h2>
+    <p>
+      Pharma distribution mein jo mukhtasir alfaaz (abbreviations) istemal hotay hain, unka asan matlab yeh hai:
+    </p>
+
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Short Form</th>
+          <th>Full Form (Poora Naam)</th>
+          <th>Asan Roman Urdu Mein Matlab</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="abbr-badge">TP</span></td>
+          <td><strong>Trade Price</strong></td>
+          <td>Factory ki wholesale qeemat (jis rate par agency dawai khareedti ya pharmacy ko deti hai).</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">MRP</span></td>
+          <td><strong>Maximum Retail Price</strong></td>
+          <td>Dhabbe par chappi hui qeemat (jis rate par medical store mareez ko bechta hai).</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">GRN</span></td>
+          <td><strong>Goods Receipt Note</strong></td>
+          <td>Factory se consignments godown mein dakhil karne ki raseed (Stock-In).</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">FEFO</span></td>
+          <td><strong>First-Expire, First-Out</strong></td>
+          <td>Jo dawai pehle expire hogi, system pehle usi ko bechega taake godown mein expire na ho.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">FIFO</span></td>
+          <td><strong>First-In, First-Out</strong></td>
+          <td>Recovery aane par customer ka sab se purana bill pehle clear karna.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">AR</span></td>
+          <td><strong>Accounts Receivable</strong></td>
+          <td>Pharmacies / Customers par kul udhaar jo humne market se wasool karna hai.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">AP</span></td>
+          <td><strong>Accounts Payable</strong></td>
+          <td>Factory ya medicine company ko jo baqaya paise humne ada karne hain.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">COGS</span></td>
+          <td><strong>Cost of Goods Sold</strong></td>
+          <td>Bikay huay maal ki asal khareed qeemat (asal lagat).</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">DRAP</span></td>
+          <td><strong>Drug Regulatory Authority of Pakistan</strong></td>
+          <td>Pakistan mein dawaiyon aur pharmaceutical licensing ka sarkari idara.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">NTN / STRN</span></td>
+          <td><strong>National Tax No. / Sales Tax Reg. No.</strong></td>
+          <td>FBR ka tax registration number jo legal wholesale invoice par chapta hai.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">SKU</span></td>
+          <td><strong>Stock Keeping Unit</strong></td>
+          <td>Har dawai ka system ke andar unique pehchan code.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">P&amp;L</span></td>
+          <td><strong>Profit and Loss</strong></td>
+          <td>Karobar ka asal munafa aur nuqsan ka hisaab kitab.</td>
+        </tr>
+        <tr>
+          <td><span class="abbr-badge">RCT / INV</span></td>
+          <td><strong>Receipt / Invoice</strong></td>
+          <td>RCT = Payment wasooli raseed ka code; INV = Wholesale sale bill ka code.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="section-header"><span class="num">2</span> Local Wi-Fi Par Doosre Computers / Mobiles Connect Karna</h2>
+    <p>
+      Yeh software <strong>100% Offline</strong> hai. Internet na bhi ho toh daftar ke tamam computers aur salesmen ke mobiles chalte hain:
+    </p>
+
+    <div class="grid-3" style="margin-bottom: 10px;">
+      <div class="card" style="border-top: 3px solid var(--primary);">
+        <div style="font-size: 11.5px; font-weight: 700; color: var(--primary);">MAIN SERVER COMPUTER</div>
+        <p style="font-size: 11px; margin-bottom: 4px;">Asal database (<code>wmdms.db</code>) yahan hai. Is computer ke browser par kholein:</p>
+        <code>http://localhost:3000</code>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--accent);">
+        <div style="font-size: 11.5px; font-weight: 700; color: var(--accent);">BILLING COUNTER (PC 2)</div>
+        <p style="font-size: 11px; margin-bottom: 4px;">Doosra computer Wi-Fi se connect ho kar browser mein yeh likhay:</p>
+        <code>http://172.20.100.127:3000</code>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--emerald-600);">
+        <div style="font-size: 11.5px; font-weight: 700; color: var(--emerald-600);">SALESMAN MOBILE</div>
+        <p style="font-size: 11px; margin-bottom: 4px;">Salesman mobile par Wi-Fi se connect ho kar foran order book karein:</p>
+        <code>http://172.20.100.127:3000</code>
+      </div>
+    </div>
+
+    <div class="callout callout-info">
+      <strong>💡 Wi-Fi Connect Karne Ka Asan Tareeqa:</strong> Main computer par Command Prompt khol kar <code>ipconfig</code> likhein. Wahan <code>IPv4 Address</code> (maslan <code>172.20.100.127</code>) nazar aayega. Doosre computer par browser mein <code>http://[Aapka-IP]:3000</code> likh kar Enter karein.
+    </div>
+
+    <h3 class="sub-header">Pre-Created Login Accounts (Pehle Se Bane Huay Logins)</h3>
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Role (Uhda)</th>
+          <th>Login Email</th>
+          <th>Password</th>
+          <th>Ikhtiyarat (Kia Kar Sakta Hai)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Super Admin</strong> (Distributor Owner)</td>
+          <td><code>admin@pharmadist.com</code></td>
+          <td><code>admin123</code></td>
+          <td>Har cheez ka full access, settings, backup, team aur audit logs.</td>
+        </tr>
+        <tr>
+          <td><strong>Sales Manager</strong></td>
+          <td><code>sales.manager@pharmadist.com</code></td>
+          <td><code>sales123</code></td>
+          <td>Naye orders banana, rate lagana, credit limit override approve karna.</td>
+        </tr>
+        <tr>
+          <td><strong>Warehouse Officer</strong></td>
+          <td><code>warehouse@pharmadist.com</code></td>
+          <td><code>warehouse123</code></td>
+          <td>Factory se maal dakhil karna (GRN), batches check karna, transfer.</td>
+        </tr>
+        <tr>
+          <td><strong>Accounts Officer</strong></td>
+          <td><code>accounts@pharmadist.com</code></td>
+          <td><code>accounts123</code></td>
+          <td>Market recovery dakhil karna, money receipts, expenses, munafa dekhna.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ==================== PAGE 3: INITIAL SETUP (STEPS 1 TO 4) ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title">PharmaDist ERP — Pehle Din Ka Setup: Company, Godown, Factories & Dawaiyan</span>
+      <span class="header-page-no">Page 3</span>
+    </div>
+
+    <h2 class="section-header"><span class="num">3</span> Pehle Din Ka Setup (One-Time Configuration)</h2>
+    <p>Software shuru karne ke baad sab se pehle yeh 4 cheezein set karni hain:</p>
+
+    <!-- STEP 1 -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">1</div>
+          <div class="step-title-text">Company Profile Aur DRAP Wholesale License Setup</div>
+        </div>
+        <span class="step-url-badge">URL: /settings</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Par Kahan Hai:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Administration</span> &rarr;
+        <span class="ui-tag">System Settings</span> &rarr;
+        <span class="ui-btn">Tab 1: General</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Yahan apni wholesale agency ka official data enter karein jo print hone walay har bill par aayega:
+      </p>
+      <div class="field-grid">
+        <div class="field-item"><span class="field-key">Company Name:</span> <span class="field-val">Apni wholesale agency ka naam (e.g. Al-Noor Pharma Distributors)</span></div>
+        <div class="field-item"><span class="field-key">DRAP License No:</span> <span class="field-val">Wholesale license (e.g. DRAP/WDL/LHR-4921)</span></div>
+        <div class="field-item"><span class="field-key">NTN / STRN:</span> <span class="field-val">FBR tax registration number</span></div>
+        <div class="field-item"><span class="field-key">Warehouse Address:</span> <span class="field-val">Godown ka mukammal pata aur phone number</span></div>
+      </div>
+      <p style="font-size: 11px; color: var(--slate-600); margin: 0;">Neeche right side par neelay button <strong>"Save Changes"</strong> par click karein.</p>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">2</div>
+          <div class="step-title-text">Warehouse (Godown) Aur Racks Structure Banana</div>
+        </div>
+        <span class="step-url-badge">URL: /warehouses</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Par Kahan Hai:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Inventory</span> &rarr;
+        <span class="ui-tag">Warehouses</span> &rarr;
+        <span class="ui-btn">Top-Right: + New Warehouse</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Yahan apne godown ka naam banayein (maslan <code>Central Main Warehouse</code>). Iske andar shelves aur racks (maslan <code>Rack A-01 (Antibiotics)</code>, <code>Cold Chain #1 (Insulin)</code>) banayein taake staff ko pata ho dawai kis rack mein padi hai.
+      </p>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">3</div>
+          <div class="step-title-text">Manufacturers (Pharma Companies) Aur Suppliers Register Karna</div>
+        </div>
+        <span class="step-url-badge">URL: /manufacturers aur /suppliers</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Par Kahan Hai:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Master Data</span> &rarr;
+        <span class="ui-tag">Manufacturers</span> / <span class="ui-tag">Suppliers</span> &rarr;
+        <span class="ui-btn">Top-Right: + Add Supplier</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Factory companies (GSK, Abbott Laboratories, Getz Pharma, Searle) ko register karein. Supplier ka naam, phone number, NTN, aur payment terms (jaise 30 din ka udhaar) likh kar save karein.
+      </p>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">4</div>
+          <div class="step-title-text">Medicines (Dawaiyon Ka Master Catalog) Add Karna</div>
+        </div>
+        <span class="step-url-badge">URL: /medicines</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Par Kahan Hai:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Master Data</span> &rarr;
+        <span class="ui-tag">Medicines</span> &rarr;
+        <span class="ui-btn">Top-Right: + Add Medicine</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Button dabate hi pop-up khulay ga. Yahan dawai ka basic profile banayein:
+      </p>
+      <div class="field-grid">
+        <div class="field-item"><span class="field-key">Medicine Name:</span> <span class="field-val">Augmentin 625mg Tablets ya Panadol 500mg</span></div>
+        <div class="field-item"><span class="field-key">Generic Name (Formula):</span> <span class="field-val">Amoxicillin + Clavulanic Acid</span></div>
+        <div class="field-item"><span class="field-key">Manufacturer:</span> <span class="field-val">Dropdown se company chunein (e.g. GSK)</span></div>
+        <div class="field-item"><span class="field-key">Dosage Form:</span> <span class="field-val">Tablet, Syrup, Injection, ya Capsule</span></div>
+        <div class="field-item"><span class="field-key">Trade Price (TP):</span> <span class="field-val">Factory wholesale rate (e.g. Rs. 240.00)</span></div>
+        <div class="field-item"><span class="field-key">Retail Price (MRP):</span> <span class="field-val">Dhabbe par likhi qeemat (e.g. Rs. 280.00)</span></div>
+        <div class="field-item"><span class="field-key">Wholesale Discount:</span> <span class="field-val">Aam discount percentage (e.g. 5%)</span></div>
+        <div class="field-item"><span class="field-key">Reorder Alert Level:</span> <span class="field-val">Dhabbon ki tadad jab alert aaye (e.g. 50 Packs)</span></div>
+      </div>
+      <p style="font-size: 11px; color: var(--slate-600); margin: 0;">Click karein <strong>"Save Medicine"</strong>. Dawai master list mein register ho gayi!</p>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 4: CUSTOMERS, SALES REPS & PURCHASE INTAKE ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title">PharmaDist ERP — Customers, Order Bookers Aur Factory Se Maal Lene Ka Tareeqa</span>
+      <span class="header-page-no">Page 4</span>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">5</div>
+          <div class="step-title-text">Customer Pharmacies (Medical Stores) &amp; Credit Limit Setup</div>
+        </div>
+        <span class="step-url-badge">URL: /customers</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Par Kahan Hai:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Master Data</span> &rarr;
+        <span class="ui-tag">Customer Pharmacies</span> &rarr;
+        <span class="ui-btn">Top-Right: + Add Customer</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Medical stores aur clinics register karein jinko wholesale maal supply karna hai:
+      </p>
+      <div class="field-grid">
+        <div class="field-item"><span class="field-key">Pharmacy Name:</span> <span class="field-val">Al-Shifa Medicos ya City Pharmacy</span></div>
+        <div class="field-item"><span class="field-key">Drug License No:</span> <span class="field-val">Store ka license (e.g. DL-2026-9812)</span></div>
+        <div class="field-item"><span class="field-key">Owner Mobile / Phone:</span> <span class="field-val">Raabta number (e.g. 0300-1234567)</span></div>
+        <div class="field-item"><span class="field-key">Assigned Route:</span> <span class="field-val">Area (e.g. Jail Road, Mall Road, Saddar)</span></div>
+        <div class="field-item"><span class="field-key">Credit Limit (PKR):</span> <span class="field-val">Udhaar ki hadh (e.g. Rs. 250,000)</span></div>
+        <div class="field-item"><span class="field-key">Credit Max Days:</span> <span class="field-val">Kitne din ka udhaar (e.g. 15 ya 30 Days)</span></div>
+      </div>
+      <div class="callout callout-warning">
+        <strong>⚠️ Credit Limit Engine:</strong> Agar Al-Shifa Medicos ka udhaar Rs. 250,000 se barh jaye, toh bill banate waqt system foran warning dega aur bill ko manager ke approval ke baghair aagay nahi jane dega.
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">6</div>
+          <div class="step-title-text">Sales Representatives (Order Bookers / Field Staff) Setup</div>
+        </div>
+        <span class="step-url-badge">URL: /distributors</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Par Kahan Hai:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Master Data</span> &rarr;
+        <span class="ui-tag">Sales Representatives</span> &rarr;
+        <span class="ui-btn">Top-Right: + Add Rep</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Order bookers ke naam, mobile number, assigned market route, aur monthly sales recovery target enter karein taake har salesman ka commission aur performance check ho sakay.
+      </p>
+    </div>
+
+    <h2 class="section-header"><span class="num">4</span> Rozana Ka Karobari Chakar (Daily Operations)</h2>
+
+    <!-- STEP 7: PURCHASE INTAKE -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">7</div>
+          <div class="step-title-text">Factory Se Maal Dakhil Karna (Purchase Intake GRN)</div>
+        </div>
+        <span class="step-url-badge">URL: /purchases/new</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Par Kahan Hai:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Procurement</span> &rarr;
+        <span class="ui-btn">Purchase Intake (PackagePlus Icon)</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Jab factory se gari aaye aur dhabbe godown mein utarein, toh yeh screen kholen:
+      </p>
+      <div class="field-grid">
+        <div class="field-item"><span class="field-key">1. Select Supplier:</span> <span class="field-val">Dropdown se factory chunein (e.g. Getz Pharma)</span></div>
+        <div class="field-item"><span class="field-key">2. Delivery Challan No:</span> <span class="field-val">Factory invoice number (e.g. DC-7864)</span></div>
+        <div class="field-item"><span class="field-key">3. Select Medicine:</span> <span class="field-val">Dawai select karein (e.g. Augmentin 625mg)</span></div>
+        <div class="field-item"><span class="field-key">4. Batch Number:</span> <span class="field-val">Dhabbe par likha batch (e.g. BT-9942)</span></div>
+        <div class="field-item"><span class="field-key">5. Expiry Date:</span> <span class="field-val">Dhabbe ki expiry date (e.g. 2028-06-30)</span></div>
+        <div class="field-item"><span class="field-key">6. Quantity Received:</span> <span class="field-val">Kitne dhabbe aaye (e.g. 500 Packs)</span></div>
+        <div class="field-item"><span class="field-key">7. Unit Purchase Cost:</span> <span class="field-val">Factory se kitne ka mila (e.g. Rs. 200.00)</span></div>
+        <div class="field-item"><span class="field-key">8. Warehouse Rack:</span> <span class="field-val">Godown ki location (e.g. Rack B-04)</span></div>
+      </div>
+      <p style="font-size: 11px; margin-bottom: 4px;">
+        Neeche right par neelay button <strong>"Submit Purchase Consignment"</strong> par click karein.
+      </p>
+      <div class="callout callout-success">
+        <strong>✨ Kia Tabdeeli Hui?</strong> Godown stock mein 500 dhabbe foran shamil ho gaye, batch BT-9942 register ho gaya, aur Accounts Payable (AP) mein factory ke baqaya paise darj ho gaye.
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 5: WHOLESALE SALE, INVOICE & RECOVERY ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title">PharmaDist ERP — Wholesale Sale, FEFO Engine, Bill Print Aur Cash Recovery</span>
+      <span class="header-page-no">Page 5</span>
+    </div>
+
+    <!-- STEP 8: NEW SALE ORDER -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">8</div>
+          <div class="step-title-text">Wholesale Order Book Karna (Strict FEFO Engine)</div>
+        </div>
+        <span class="step-url-badge">URL: /sales/new</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Par Kahan Hai:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Wholesale Sales</span> &rarr;
+        <span class="ui-btn">New Sale Order (ShoppingCart Icon)</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Jab medical store se order aaye ya salesman booking laye:
+      </p>
+      <div class="field-grid">
+        <div class="field-item"><span class="field-key">1. Customer:</span> <span class="field-val">Al-Shifa Medicos (Saamne Credit Limit Gauge aa jayega)</span></div>
+        <div class="field-item"><span class="field-key">2. Sales Rep:</span> <span class="field-val">Order laane wala salesman chunein</span></div>
+        <div class="field-item"><span class="field-key">3. Add Medicine:</span> <span class="field-val">Dawai chunein (e.g. Augmentin 625mg)</span></div>
+        <div class="field-item"><span class="field-key">4. Quantity:</span> <span class="field-val">Kitne dhabbe chahiye (e.g. 50 Packs)</span></div>
+      </div>
+      <div class="callout callout-info">
+        <strong>⚡ FEFO Ka Jaadoo:</strong> Aapko batch dhoondne ki zaroorat nahi! System godown ke tamam batches mein se khud ba khud <strong>sab se qareeb expire hone wala batch</strong> pick karega taake purana maal pehle bikay aur expiry ka nuqsan na ho.
+      </div>
+      <p style="font-size: 11px; margin-bottom: 0;">Click karein <strong>"Confirm &amp; Create Sale Order"</strong>.</p>
+    </div>
+
+    <!-- STEP 9: PRINT INVOICE & CHALLAN -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">9</div>
+          <div class="step-title-text">DRAP Form 2-A Tax Invoice Aur Delivery Challan Print Karna</div>
+        </div>
+        <span class="step-url-badge">URL: /invoices</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Par Kahan Hai:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Wholesale Sales</span> &rarr;
+        <span class="ui-tag">Tax Invoices</span> &rarr;
+        <span class="ui-btn">Action Column: Print Icon (🖨️)</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Invoice list mein apne bill ke aagay Print icon dabayein. Pop-up khulay ga jisme do buttons hain:
+      </p>
+      <div class="grid-2" style="margin-bottom: 6px;">
+        <div style="background: #fafafa; border: 1px solid var(--slate-200); border-radius: 6px; padding: 8px;">
+          <div style="font-weight: 700; color: var(--primary); font-size: 11.5px; margin-bottom: 3px;">📄 Print Tax Invoice (A4 Size)</div>
+          <p style="font-size: 11px; margin: 0;">Isme Batch No, Expiry Date, TP, MRP, Wholesale Discount, Tax, Total Dues aur legal signatures hotay hain. Yeh pharmacy ko diya jata hai.</p>
+        </div>
+        <div style="background: #fafafa; border: 1px solid var(--slate-200); border-radius: 6px; padding: 8px;">
+          <div style="font-weight: 700; color: var(--accent); font-size: 11.5px; margin-bottom: 3px;">🚚 Print Delivery Challan</div>
+          <p style="font-size: 11px; margin: 0;">Isme keemat NAHI hoti. Sirf dhabbon ki tadad, dawai ka naam aur batch number hota hai taake delivery boy maal theek deliver kar sakay.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 10: PAYMENTS & RECOVERY -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">10</div>
+          <div class="step-title-text">Market Recovery Collections &amp; Printable Money Receipt (RCT)</div>
+        </div>
+        <span class="step-url-badge">URL: /payments</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Par Kahan Hai:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Finance &amp; Accounts</span> &rarr;
+        <span class="ui-tag">Collections &amp; Receipts</span> &rarr;
+        <span class="ui-btn">Top-Right: + Record Collection</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Jab salesman market se cash ya cheque wasool karke aaye:
+      </p>
+      <div class="field-grid">
+        <div class="field-item"><span class="field-key">Select Customer:</span> <span class="field-val">Al-Shifa Medicos (Unka kul udhaar nazar aayega)</span></div>
+        <div class="field-item"><span class="field-key">Amount Received:</span> <span class="field-val">Kitne paise wasool huay (e.g. Rs. 50,000)</span></div>
+        <div class="field-item"><span class="field-key">Payment Method:</span> <span class="field-val">Cash, Cheque, Bank Transfer, ya Raast / JazzCash</span></div>
+        <div class="field-item"><span class="field-key">Collected By:</span> <span class="field-val">Salesman ka naam jisne paise jama karwaye</span></div>
+      </div>
+      <p style="font-size: 11px; margin-bottom: 4px;">Click karein <strong>"Confirm Collection"</strong>.</p>
+      <div class="callout callout-success">
+        <strong>✨ FIFO Settlement:</strong> System khud ba khud customer ke sab se purane unpaid bills ko pehle clear karega aur foran <strong>Print Money Receipt (RCT-2026-0001)</strong> khol dega jo aap customer ko issue kar sakte hain.
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 6: EXPENSES, PROFIT, BACKUP & AUDIT ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title">PharmaDist ERP — Kharchay, Asal Munafa, Backup Aur Audit Logs</span>
+      <span class="header-page-no">Page 6</span>
+    </div>
+
+    <!-- STEP 11: EXPENSES -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">11</div>
+          <div class="step-title-text">Rozmarrah Ke Kharchay (Business Operating Expenses)</div>
+        </div>
+        <span class="step-url-badge">URL: /expenses</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Par Kahan Hai:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Finance &amp; Accounts</span> &rarr;
+        <span class="ui-tag">Operating Expenses</span> &rarr;
+        <span class="ui-btn">Top-Right: + Record Expense</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Godown ka kiraya, bijli ke bill, chai/stationary, salesman ka fuel allowance, aur doctor marketing darj karein taake asal net profit calculate ho sakay.
+      </p>
+    </div>
+
+    <!-- STEP 12: PROFIT -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">12</div>
+          <div class="step-title-text">Executive Profit Cockpit (Gross Profit vs Net Profit)</div>
+        </div>
+        <span class="step-url-badge">URL: /profit</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Par Kahan Hai:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Finance &amp; Accounts</span> &rarr;
+        <span class="ui-btn">Profit &amp; Financials (TrendingUp Icon)</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Agency owner ke liye sab se ahem screen jahan 4 baray cards munafa dikhate hain:
+      </p>
+      <div class="grid-4" style="margin-top: 6px;">
+        <div class="kpi-card">
+          <div class="kpi-label">Sales Revenue</div>
+          <div class="kpi-val" style="color: var(--blue-600);">Rs. 1,500,000</div>
+          <div class="kpi-desc">Total Bika Maal</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">COGS (Khareed)</div>
+          <div class="kpi-val" style="color: var(--slate-700);">Rs. 1,200,000</div>
+          <div class="kpi-desc">Asal Batch Cost</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Gross Profit</div>
+          <div class="kpi-val" style="color: var(--emerald-600);">Rs. 300,000</div>
+          <div class="kpi-desc">20.0% Khaam Munafa</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Net Profit</div>
+          <div class="kpi-val" style="color: var(--primary);">Rs. 240,000</div>
+          <div class="kpi-desc">Kharchay Nikaal Kar</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 13: REPORTS -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">13</div>
+          <div class="step-title-text">Reports Suite &amp; Excel / CSV Export</div>
+        </div>
+        <span class="step-url-badge">URL: /reports</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Par Kahan Hai:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Reports &amp; Analytics</span> &rarr;
+        <span class="ui-tag">Reports Hub</span> &rarr;
+        <span class="ui-btn">Top-Right: Export Excel (.xls)</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Customer Balances (AR), Supplier Liabilities (AP), Godown Stock Valuation, aur 30-Day Expiry Watchdog reports ko ek click par Excel file mein download karein.
+      </p>
+    </div>
+
+    <!-- STEP 14: BACKUP -->
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-title-wrap">
+          <div class="step-num">14</div>
+          <div class="step-title-text">Database Backup Download &amp; Computer Kharab Hone Par Restore</div>
+        </div>
+        <span class="step-url-badge">URL: /settings (Tab 8)</span>
+      </div>
+      <div class="ui-location">
+        <span>📍 Screen Par Kahan Hai:</span>
+        <span class="ui-tag">Left Sidebar Menu</span> &rarr;
+        <span class="ui-tag">Administration</span> &rarr;
+        <span class="ui-tag">System Settings</span> &rarr;
+        <span class="ui-btn">Tab 8: Backup &amp; Maintenance</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">
+        Click karein <strong>"Download Live Database (.db)"</strong>. File download ho kar aapke computer mein aa jayegi. Ise USB mein mehfooz kar lein.
+      </p>
+      <div class="callout callout-info" style="margin-bottom: 0;">
+        <strong>🛠️ Restore Runbook (Agar Computer Jal Ya Kharab Ho Jaye):</strong> Naye computer mein software install karein, purani backup file ko <code>prisma/wmdms.db</code> bana dein aur software start karein. 1 minute mein 100% data, bills aur ledgers wapas aa jayenge!
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 7: VIDEO DEMO SCRIPT ==================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title">PharmaDist ERP — Client Ko Video Bna Kar Dikhane Ka Lafz-ba-Lafz Script</span>
+      <span class="header-page-no">Page 7</span>
+    </div>
+
+    <h2 class="section-header"><span class="num">5</span> Client Demo Video Recording Script (8 Asan Scenes)</h2>
+    <p>
+      Screen recorder on karein aur microphone par yeh script aaram se bolein:
+    </p>
+
+    <!-- SCENE 1 -->
+    <div class="scene-box">
+      <div class="scene-head">
+        <span class="scene-name">🎬 Scene 1: Introduction (Software Ka Taaruf)</span>
+        <span class="scene-time">0:00 - 0:45 (45 Sec)</span>
+      </div>
+      <div class="scene-meta">Screen: Dashboard Home Cockpit (<code>/dashboard</code>)</div>
+      <div class="dialogue-box">
+        "Assalam-o-Alaikum! Aaj hum PharmaDist Wholesale Medicine Distribution ERP ka live walkthrough dekhenge. Yeh software khas taur par medicine distributors aur stockists ke liye banaya gaya hai. Yeh 100% offline chalta hai aur baghair kisi internet ke office ke tamam computers aur salesmen ke mobiles ko Wi-Fi ke zariye aapas mein connect kar sakta hai."
+      </div>
+    </div>
+
+    <!-- SCENE 2 -->
+    <div class="scene-box">
+      <div class="scene-head">
+        <span class="scene-name">🎬 Scene 2: Dashboard Metrics</span>
+        <span class="scene-time">0:45 - 1:15 (30 Sec)</span>
+      </div>
+      <div class="scene-meta">Screen: Dashboard Cards &amp; Expiry Feed</div>
+      <div class="dialogue-box">
+        "Dashboard par ek glance mein aaj ki sale, cash recovery, pharmacies ka total udhaar, aur factory ke baqaya paise live update hotay hain. Sath hi agle 30 dinon mein expire hone wali dawaiyon ke live alerts hain taake godown mein koi maal zaya na ho."
+      </div>
+    </div>
+
+    <!-- SCENE 3 -->
+    <div class="scene-box">
+      <div class="scene-head">
+        <span class="scene-name">🎬 Scene 3: Factory Stock Intake (GRN)</span>
+        <span class="scene-time">1:15 - 2:15 (60 Sec)</span>
+      </div>
+      <div class="scene-meta">Screen: Procurement &rarr; Purchase Intake (<code>/purchases/new</code>)</div>
+      <div class="dialogue-box">
+        "Ab hum factory se maal dakhil karte hain. Humne Getz Pharma select kia, dawai Augmentin chuni, batch number daala, expiry date daali, aur Rack location B-4 select ki. Submit karte hi yeh batch hamare godown stock mein shamil ho gaya."
+      </div>
+    </div>
+
+    <!-- SCENE 4 -->
+    <div class="scene-box">
+      <div class="scene-head">
+        <span class="scene-name">🎬 Scene 4: Wholesale Sale &amp; FEFO Engine</span>
+        <span class="scene-time">2:15 - 3:45 (90 Sec)</span>
+      </div>
+      <div class="scene-meta">Screen: Wholesale Sales &rarr; New Sale Order (<code>/sales/new</code>)</div>
+      <div class="dialogue-box">
+        "Ab hum pharmacy ko bill banate hain. Humne Al-Shifa Medicos chuna — notice karein inka credit gauge aa gaya ke purana udhaar kitna hai. Jaise hi dawai dali, system ne First-Expire First-Out (FEFO) ke mutabiq sab se pehle expire hone wala batch khud select kar liya taake koi expired batch godown mein na phansay."
+      </div>
+    </div>
+
+    <!-- SCENE 5 -->
+    <div class="scene-box">
+      <div class="scene-head">
+        <span class="scene-name">🎬 Scene 5: DRAP Single-Page Tax Invoice &amp; Challan</span>
+        <span class="scene-time">3:45 - 4:30 (45 Sec)</span>
+      </div>
+      <div class="scene-meta">Screen: Invoices List &rarr; Print Icon (<code>/invoices</code>)</div>
+      <div class="dialogue-box">
+        "Yeh dekhein, system ne foran DRAP standards ke mutabiq A4 size ka professional Wholesale Tax Invoice generate kar diya jisme batch number, expiry date, Trade Price aur warranty stamp hai. Sath hi delivery boy ke liye bina rate wala Delivery Challan print ho jata hai."
+      </div>
+    </div>
+
+    <!-- SCENE 6 -->
+    <div class="scene-box">
+      <div class="scene-head">
+        <span class="scene-name">🎬 Scene 6: Cash Recovery &amp; Money Receipt</span>
+        <span class="scene-time">4:30 - 5:15 (45 Sec)</span>
+      </div>
+      <div class="scene-meta">Screen: Finance &rarr; Collections (<code>/payments</code>)</div>
+      <div class="dialogue-box">
+        "Jab salesman market se recovery laye, toh Payments par ja kar Record Collection par click karein. Amount Rs. 50,000 daali, system ne FIFO rule ke mutabiq purana bill pehle clear kar diya aur customer ke liye instant Money Receipt print ho gayi."
+      </div>
+    </div>
+
+    <!-- SCENE 7 & 8 -->
+    <div class="grid-2">
+      <div class="scene-box" style="margin-bottom: 0;">
+        <div class="scene-head">
+          <span class="scene-name">🎬 Scene 7: Profit Cockpit</span>
+          <span class="scene-time">5:15 - 6:00 (45s)</span>
+        </div>
+        <div class="dialogue-box" style="font-size: 11px;">
+          "Yahan Profit cockpit par distributor apna asal Gross Profit aur tamam kharchay nikaal kar Net Profit dekh sakta hai."
+        </div>
+      </div>
+      <div class="scene-box" style="margin-bottom: 0;">
+        <div class="scene-head">
+          <span class="scene-name">🎬 Scene 8: Backup &amp; Closing</span>
+          <span class="scene-time">6:00 - 6:30 (30s)</span>
+        </div>
+        <div class="dialogue-box" style="font-size: 11px;">
+          "Aakhri baat: Settings mein ja kar ek click par poore database ka backup download karein. Shukriya!"
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
