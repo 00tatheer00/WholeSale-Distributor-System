@@ -52,7 +52,7 @@
 - **Regional Localization**: Pakistan Standard (`PKR`, `Rs.`, DRAP compliance, Raast, JazzCash, EasyPaisa, Bank Transfer, Cheque, Cash)
 - **Verification Status**:
   - `npx tsc --noEmit` $\rightarrow$ **0 Errors**
-  - NSIS Desktop Packaging Configuration $\rightarrow$ **100% Configured & Verified**
+  - NSIS Desktop Installer (`.exe`) $\rightarrow$ **100% Built (`dist/PharmaDist Wholesale ERP Setup 1.0.0.exe`, 327 MB)**
 - **Desktop & Multi-PC LAN Support**:
   - Main PC runs `.exe` standalone application with embedded database.
   - Other PCs and Mobile devices on the same Wi-Fi connect via browser (`http://[Server-IP]:3000`) without any client-side installation.
