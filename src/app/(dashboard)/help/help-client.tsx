@@ -57,7 +57,7 @@ interface Chapter {
 }
 
 export function HelpClient() {
-  const [lang, setLang] = React.useState<Language>("ps");
+  const [lang, setLang] = React.useState<Language>("ur");
   const [activeTab, setActiveTab] = React.useState<string>("quickstart");
   const [searchQuery, setSearchQuery] = React.useState("");
 
