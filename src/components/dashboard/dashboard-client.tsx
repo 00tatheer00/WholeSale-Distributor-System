@@ -9,6 +9,11 @@ import {
   ArrowLeftRight,
   Store,
   Pill,
+  ShoppingCart,
+  PackagePlus,
+  Building2,
+  Warehouse,
+  Wallet,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
@@ -93,77 +98,143 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
         }
       />
 
-      {/* Staff Operational Quick Action Deck */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-        <Link
-          href="/sales/new"
-          className="group flex flex-col p-3.5 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-[#0071E3]/50 hover:scale-[1.01]"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <div className="h-9 w-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-[#0071E3] flex items-center justify-center group-hover:bg-[#0071E3] group-hover:text-white transition-all shadow-sm">
-              <FileSpreadsheet className="h-4 w-4" />
-            </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Sales</span>
-          </div>
-          <span className="text-xs font-bold text-foreground group-hover:text-[#0071E3] transition-colors">+ Book Sale Order</span>
-          <span className="text-[11px] text-muted-foreground mt-0.5">FEFO queue & invoice</span>
-        </Link>
+      {/* Staff Operational Quick Action Deck (Universal Direct Add Deck) */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+            Quick Actions • Click Any Button Below to Add / Record
+          </span>
+          <span className="text-[11px] text-muted-foreground">Everything is 1-click away</span>
+        </div>
 
-        <Link
-          href="/purchases/new"
-          className="group flex flex-col p-3.5 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-emerald-500/50 hover:scale-[1.01]"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <div className="h-9 w-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm">
-              <ReceiptText className="h-4 w-4" />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {/* 1. New Sale Bill */}
+          <Link
+            href="/sales/new"
+            className="group relative flex flex-col p-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-card border border-emerald-500/30 shadow-sm hover:shadow-lg hover:shadow-emerald-500/10 transition-all hover:border-emerald-500 hover:-translate-y-0.5"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="h-10 w-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/20 group-hover:scale-110 transition-transform">
+                <ShoppingCart className="h-5 w-5" />
+              </div>
+              <Badge className="text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-none">
+                Sell
+              </Badge>
             </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Intake</span>
-          </div>
-          <span className="text-xs font-bold text-foreground group-hover:text-emerald-600 transition-colors">+ Purchase Intake</span>
-          <span className="text-[11px] text-muted-foreground mt-0.5">Batch shelf-life & stock</span>
-        </Link>
+            <span className="text-xs font-extrabold text-foreground group-hover:text-emerald-600 transition-colors">
+              + New Sale Bill
+            </span>
+            <span className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
+              Sell drugs & print instant invoice
+            </span>
+          </Link>
 
-        <Link
-          href="/inventory/transfers"
-          className="group flex flex-col p-3.5 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-teal-500/50 hover:scale-[1.01]"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <div className="h-9 w-9 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 flex items-center justify-center group-hover:bg-teal-600 group-hover:text-white transition-all shadow-sm">
-              <ArrowLeftRight className="h-4 w-4" />
+          {/* 2. Factory Purchase */}
+          <Link
+            href="/purchases/new"
+            className="group relative flex flex-col p-4 rounded-2xl bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-card border border-blue-500/30 shadow-sm hover:shadow-lg hover:shadow-blue-500/10 transition-all hover:border-blue-500 hover:-translate-y-0.5"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="h-10 w-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-600/20 group-hover:scale-110 transition-transform">
+                <PackagePlus className="h-5 w-5" />
+              </div>
+              <Badge className="text-[9px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-none">
+                Stock In
+              </Badge>
             </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Transfer</span>
-          </div>
-          <span className="text-xs font-bold text-foreground group-hover:text-teal-600 transition-colors">+ Transfer Stock</span>
-          <span className="text-[11px] text-muted-foreground mt-0.5">Inter-warehouse moves</span>
-        </Link>
+            <span className="text-xs font-extrabold text-foreground group-hover:text-blue-600 transition-colors">
+              + Add Factory Stock
+            </span>
+            <span className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
+              Enter batches received from factory
+            </span>
+          </Link>
 
-        <Link
-          href="/customers"
-          className="group flex flex-col p-3.5 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-amber-500/50 hover:scale-[1.01]"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <div className="h-9 w-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition-all shadow-sm">
-              <Store className="h-4 w-4" />
+          {/* 3. Add Customer Pharmacy */}
+          <Link
+            href="/customers/new"
+            className="group relative flex flex-col p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-card border border-purple-500/30 shadow-sm hover:shadow-lg hover:shadow-purple-500/10 transition-all hover:border-purple-500 hover:-translate-y-0.5"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="h-10 w-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shadow-md shadow-purple-600/20 group-hover:scale-110 transition-transform">
+                <Store className="h-5 w-5" />
+              </div>
+              <Badge className="text-[9px] font-bold uppercase tracking-wider bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border-none">
+                Customer
+              </Badge>
             </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">AR Dues</span>
-          </div>
-          <span className="text-xs font-bold text-foreground group-hover:text-amber-600 transition-colors">Customer Dues (AR)</span>
-          <span className="text-[11px] text-muted-foreground mt-0.5">Pharmacies & recovery</span>
-        </Link>
+            <span className="text-xs font-extrabold text-foreground group-hover:text-purple-600 transition-colors">
+              + Add Pharmacy
+            </span>
+            <span className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
+              Register medical store or hospital
+            </span>
+          </Link>
 
-        <Link
-          href="/medicines"
-          className="group flex flex-col p-3.5 rounded-2xl bg-white dark:bg-[#1C1C1E] border border-border/80 shadow-sm hover:shadow-md transition-all hover:border-purple-500/50 hover:scale-[1.01]"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <div className="h-9 w-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm">
-              <Pill className="h-4 w-4" />
+          {/* 4. Add Supplier Company */}
+          <Link
+            href="/suppliers"
+            className="group relative flex flex-col p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-card border border-amber-500/30 shadow-sm hover:shadow-lg hover:shadow-amber-500/10 transition-all hover:border-amber-500 hover:-translate-y-0.5"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="h-10 w-10 rounded-xl bg-amber-600 text-white flex items-center justify-center shadow-md shadow-amber-600/20 group-hover:scale-110 transition-transform">
+                <Building2 className="h-5 w-5" />
+              </div>
+              <Badge className="text-[9px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-none">
+                Supplier
+              </Badge>
             </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Catalog</span>
-          </div>
-          <span className="text-xs font-bold text-foreground group-hover:text-purple-600 transition-colors">Medicine Master</span>
-          <span className="text-[11px] text-muted-foreground mt-0.5">Drug catalog & prices</span>
-        </Link>
+            <span className="text-xs font-extrabold text-foreground group-hover:text-amber-600 transition-colors">
+              + Add Supplier
+            </span>
+            <span className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
+              Register factory, vendor or distributor
+            </span>
+          </Link>
+
+          {/* 5. Add Storage Warehouse */}
+          <Link
+            href="/warehouses"
+            className="group relative flex flex-col p-4 rounded-2xl bg-gradient-to-br from-teal-500/10 via-teal-500/5 to-card border border-teal-500/30 shadow-sm hover:shadow-lg hover:shadow-teal-500/10 transition-all hover:border-teal-500 hover:-translate-y-0.5"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="h-10 w-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-md shadow-teal-600/20 group-hover:scale-110 transition-transform">
+                <Warehouse className="h-5 w-5" />
+              </div>
+              <Badge className="text-[9px] font-bold uppercase tracking-wider bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300 border-none">
+                Godown
+              </Badge>
+            </div>
+            <span className="text-xs font-extrabold text-foreground group-hover:text-teal-600 transition-colors">
+              + Add Godown
+            </span>
+            <span className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
+              Add storage warehouse or room
+            </span>
+          </Link>
+
+          {/* 6. Record Expense */}
+          <Link
+            href="/expenses"
+            className="group relative flex flex-col p-4 rounded-2xl bg-gradient-to-br from-rose-500/10 via-rose-500/5 to-card border border-rose-500/30 shadow-sm hover:shadow-lg hover:shadow-rose-500/10 transition-all hover:border-rose-500 hover:-translate-y-0.5"
+          >
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="h-10 w-10 rounded-xl bg-rose-600 text-white flex items-center justify-center shadow-md shadow-rose-600/20 group-hover:scale-110 transition-transform">
+                <Wallet className="h-5 w-5" />
+              </div>
+              <Badge className="text-[9px] font-bold uppercase tracking-wider bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border-none">
+                Expense
+              </Badge>
+            </div>
+            <span className="text-xs font-extrabold text-foreground group-hover:text-rose-600 transition-colors">
+              + Record Expense
+            </span>
+            <span className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
+              Rent, bills, fuel, salaries & tea
+            </span>
+          </Link>
+        </div>
       </div>
 
       {/* 1. Core KPIs & Operational Status Badges */}

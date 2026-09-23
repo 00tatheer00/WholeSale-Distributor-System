@@ -153,13 +153,13 @@ export function AdjustmentsClient({
           </Link>
         </Button>
         <PageHeader
-          title="Stock Adjustments &amp; Physical Reconciliations"
-          description="Voucher-based inventory reconciliation for damages, expiry removals, count discrepancies, and factory returns."
-          badge={<Badge variant="outline">Stock Control</Badge>}
+          title="Stock Correction (+ Add / - Remove Damaged)"
+          description="Fix medicine quantities: add found stock (+) or write off broken/expired medicines (-) from your warehouse."
+          badge={<Badge variant="outline" className="border-amber-500/30 text-amber-600 bg-amber-50/50">Stock Control</Badge>}
           actions={
-            <Button onClick={handleOpenCreate} size="sm" className="h-9 text-xs gap-1.5 font-semibold">
+            <Button onClick={handleOpenCreate} size="sm" className="h-9 text-xs gap-1.5 font-bold bg-amber-600 hover:bg-amber-700 text-white rounded-xl shadow-sm">
               <Plus className="h-4 w-4" />
-              Record Stock Adjustment
+              + Fix / Correct Stock (+ / -)
             </Button>
           }
         />

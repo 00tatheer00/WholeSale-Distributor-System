@@ -194,9 +194,9 @@ export function MedicineDetailClient({
             </Badge>
           }
           actions={
-            <Button onClick={handleOpenAddBatch} size="sm" className="h-9 text-xs gap-1.5 font-semibold">
+            <Button onClick={handleOpenAddBatch} size="sm" className="h-9 text-xs gap-1.5 font-bold bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl shadow-sm px-4">
               <Plus className="h-4 w-4" />
-              Add Medicine Batch
+              + Add Medicine Batch (Stock)
             </Button>
           }
         />

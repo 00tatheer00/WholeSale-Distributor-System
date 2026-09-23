@@ -43,6 +43,8 @@ import {
 } from "@/components/ui/dialog";
 import { formatCurrency } from "@/lib/utils";
 import { createPurchaseOrderAction } from "@/server/actions/purchase.actions";
+import { createSupplierAction } from "@/server/actions/supplier.actions";
+import { createWarehouseAction } from "@/server/actions/warehouse.actions";
 import { PurchaseOrderInput, PurchaseItemInput } from "@/validations/purchase.schema";
 
 interface PurchaseFormClientProps {
@@ -70,6 +72,9 @@ export function PurchaseFormClient({
 }: PurchaseFormClientProps) {
   const router = useRouter();
 
+  const [supplierList, setSupplierList] = React.useState(suppliers);
+  const [warehouseList, setWarehouseList] = React.useState(warehouses);
+
   const [supplierId, setSupplierId] = React.useState(
     preselectedSupplierId || suppliers[0]?.id || ""
   );
@@ -82,6 +87,92 @@ export function PurchaseFormClient({
     warehouses.find((w) => w.isDefault)?.id || warehouses[0]?.id || ""
   );
   const [notes, setNotes] = React.useState("");
+
+  // Quick Add Supplier Dialog State
+  const [isQuickSupplierOpen, setIsQuickSupplierOpen] = React.useState(false);
+  const [quickSupplier, setQuickSupplier] = React.useState({
+    name: "",
+    phone: "",
+    address: "",
+    creditDays: 30,
+    creditLimit: 500000,
+  });
+  const [isSavingQuickSupplier, setIsSavingQuickSupplier] = React.useState(false);
+
+  // Quick Add Warehouse Dialog State
+  const [isQuickWarehouseOpen, setIsQuickWarehouseOpen] = React.useState(false);
+  const [quickWarehouse, setQuickWarehouse] = React.useState({
+    name: "",
+    code: "",
+    location: "",
+  });
+  const [isSavingQuickWarehouse, setIsSavingQuickWarehouse] = React.useState(false);
+
+  const handleSaveQuickSupplier = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickSupplier.name.trim() || !quickSupplier.phone.trim()) {
+      alert("Supplier Name and Phone are required.");
+      return;
+    }
+    setIsSavingQuickSupplier(true);
+    const res = await createSupplierAction({
+      name: quickSupplier.name.trim(),
+      phone: quickSupplier.phone.trim(),
+      address: quickSupplier.address.trim() || null,
+      creditDays: Number(quickSupplier.creditDays) || 30,
+      creditLimit: Number(quickSupplier.creditLimit) || 500000,
+      openingBalance: 0,
+      country: "Pakistan",
+      status: "ACTIVE",
+    });
+    setIsSavingQuickSupplier(false);
+    if (res.success && res.data) {
+      const newSup = {
+        id: res.data.id,
+        name: res.data.name,
+        code: res.data.code,
+        creditDays: res.data.creditDays || 30,
+        currentPayable: 0,
+      };
+      setSupplierList([newSup, ...supplierList]);
+      setSupplierId(newSup.id);
+      setIsQuickSupplierOpen(false);
+      setQuickSupplier({ name: "", phone: "", address: "", creditDays: 30, creditLimit: 500000 });
+    } else {
+      alert(res.error || "Failed to create supplier.");
+    }
+  };
+
+  const handleSaveQuickWarehouse = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickWarehouse.name.trim() || !quickWarehouse.code.trim()) {
+      alert("Warehouse Name and Code are required.");
+      return;
+    }
+    setIsSavingQuickWarehouse(true);
+    const res = await createWarehouseAction({
+      name: quickWarehouse.name.trim(),
+      code: quickWarehouse.code.trim().toUpperCase(),
+      location: quickWarehouse.location.trim() || "Main Facility",
+      isDefault: false,
+      isActive: true,
+    });
+    setIsSavingQuickWarehouse(false);
+    if (res.success && res.data) {
+      const newWh = {
+        id: res.data.id,
+        name: res.data.name,
+        code: res.data.code,
+        isDefault: false,
+      };
+      setWarehouseList([newWh, ...warehouseList]);
+      setWarehouseId(newWh.id);
+      setIsQuickWarehouseOpen(false);
+      setQuickWarehouse({ name: "", code: "", location: "" });
+    } else {
+      alert(res.error || "Failed to create warehouse.");
+    }
+  };
 
   // Payment section
   const [paidAmount, setPaidAmount] = React.useState<number>(0);
@@ -310,15 +401,26 @@ export function PurchaseFormClient({
           <CardContent className="p-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div className="space-y-1.5 sm:col-span-2">
-                <Label htmlFor="supplier" className="text-xs font-semibold">
-                  Supplier / Manufacturer <span className="text-rose-500">*</span>
-                </Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="supplier" className="text-xs font-semibold">
+                    Supplier / Manufacturer <span className="text-rose-500">*</span>
+                  </Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsQuickSupplierOpen(true)}
+                    className="h-6 px-2 text-[10px] rounded-lg text-primary border-primary/30 hover:bg-primary/5 font-bold gap-1"
+                  >
+                    <Plus className="h-3 w-3" /> New Supplier
+                  </Button>
+                </div>
                 <Select value={supplierId} onValueChange={setSupplierId}>
                   <SelectTrigger id="supplier" className="text-xs h-9">
                     <SelectValue placeholder="Select manufacturer" />
                   </SelectTrigger>
                   <SelectContent>
-                    {suppliers.map((s) => (
+                    {supplierList.map((s) => (
                       <SelectItem key={s.id} value={s.id}>
                         {s.name} (Due: {formatCurrency(s.currentPayable)})
                       </SelectItem>
@@ -347,15 +449,26 @@ export function PurchaseFormClient({
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="warehouse" className="text-xs font-semibold">
-                  Receiving Warehouse <span className="text-rose-500">*</span>
-                </Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="warehouse" className="text-xs font-semibold">
+                    Receiving Warehouse <span className="text-rose-500">*</span>
+                  </Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsQuickWarehouseOpen(true)}
+                    className="h-6 px-2 text-[10px] rounded-lg text-teal-600 border-teal-300 hover:bg-teal-50 font-bold gap-1"
+                  >
+                    <Plus className="h-3 w-3" /> New Godown
+                  </Button>
+                </div>
                 <Select value={warehouseId} onValueChange={setWarehouseId}>
                   <SelectTrigger id="warehouse" className="text-xs h-9">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {warehouses.map((w) => (
+                    {warehouseList.map((w) => (
                       <SelectItem key={w.id} value={w.id}>
                         {w.name} ({w.code})
                       </SelectItem>
@@ -887,6 +1000,160 @@ export function PurchaseFormClient({
           </DialogContent>
         </Dialog>
       )}
+
+      {/* QUICK ADD SUPPLIER MODAL */}
+      <Dialog open={isQuickSupplierOpen} onOpenChange={setIsQuickSupplierOpen}>
+        <DialogContent className="sm:max-w-[480px] rounded-2xl">
+          <form onSubmit={handleSaveQuickSupplier}>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-base font-bold text-foreground">
+                <Building2 className="h-5 w-5 text-primary" />
+                Quick Register New Supplier
+              </DialogTitle>
+              <DialogDescription className="text-xs">
+                Quickly add a pharmaceutical company or vendor without leaving your purchase intake.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-3 py-4 text-xs">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Company / Manufacturer Name *</Label>
+                <Input
+                  required
+                  placeholder="e.g., Getz Pharma, Abbott Laboratories"
+                  value={quickSupplier.name}
+                  onChange={(e) => setQuickSupplier({ ...quickSupplier, name: e.target.value })}
+                  className="rounded-xl text-xs h-9"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Phone Number *</Label>
+                  <Input
+                    required
+                    placeholder="e.g., 03001234567"
+                    value={quickSupplier.phone}
+                    onChange={(e) => setQuickSupplier({ ...quickSupplier, phone: e.target.value })}
+                    className="rounded-xl text-xs h-9 font-mono"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Payment Credit Days</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="30"
+                    value={quickSupplier.creditDays}
+                    onChange={(e) => setQuickSupplier({ ...quickSupplier, creditDays: parseInt(e.target.value, 10) || 0 })}
+                    className="rounded-xl text-xs h-9 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Factory / Office Address</Label>
+                <Input
+                  placeholder="e.g., Korangi Industrial Area, Karachi"
+                  value={quickSupplier.address}
+                  onChange={(e) => setQuickSupplier({ ...quickSupplier, address: e.target.value })}
+                  className="rounded-xl text-xs h-9"
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 pt-2 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsQuickSupplierOpen(false)}
+                className="rounded-xl text-xs h-9"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSavingQuickSupplier}
+                className="bg-primary hover:bg-primary/90 text-white rounded-xl text-xs h-9 font-bold px-4"
+              >
+                {isSavingQuickSupplier ? "Saving..." : "Add & Select Supplier"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* QUICK ADD WAREHOUSE MODAL */}
+      <Dialog open={isQuickWarehouseOpen} onOpenChange={setIsQuickWarehouseOpen}>
+        <DialogContent className="sm:max-w-[440px] rounded-2xl">
+          <form onSubmit={handleSaveQuickWarehouse}>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-base font-bold text-foreground">
+                <WarehouseIcon className="h-5 w-5 text-teal-600" />
+                Quick Add Storage Godown / Warehouse
+              </DialogTitle>
+              <DialogDescription className="text-xs">
+                Add a new warehouse, shelf or storage room for incoming stock.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-3 py-4 text-xs">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Godown / Facility Name *</Label>
+                <Input
+                  required
+                  placeholder="e.g., Secondary Godown, Basement Cold Room"
+                  value={quickWarehouse.name}
+                  onChange={(e) => setQuickWarehouse({ ...quickWarehouse, name: e.target.value })}
+                  className="rounded-xl text-xs h-9"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Godown Code *</Label>
+                  <Input
+                    required
+                    placeholder="e.g., WH-02, GD-NORTH"
+                    value={quickWarehouse.code}
+                    onChange={(e) => setQuickWarehouse({ ...quickWarehouse, code: e.target.value.toUpperCase() })}
+                    className="rounded-xl text-xs h-9 font-mono"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Location / Rack</Label>
+                  <Input
+                    placeholder="e.g., Floor 1, Rack B"
+                    value={quickWarehouse.location}
+                    onChange={(e) => setQuickWarehouse({ ...quickWarehouse, location: e.target.value })}
+                    className="rounded-xl text-xs h-9"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 pt-2 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsQuickWarehouseOpen(false)}
+                className="rounded-xl text-xs h-9"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSavingQuickWarehouse}
+                className="bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs h-9 font-bold px-4"
+              >
+                {isSavingQuickWarehouse ? "Saving..." : "Add & Select Godown"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

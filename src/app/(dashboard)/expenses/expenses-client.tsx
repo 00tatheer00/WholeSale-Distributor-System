@@ -285,8 +285,8 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
     <div className="space-y-6 max-w-[1400px] mx-auto pb-16">
       {/* 1. Header */}
       <PageHeader
-        title="Business Operating Expenses"
-        description="Warehouse rent, delivery fuel, utilities, employee allowances, and administrative overheads."
+        title="Daily Expenses & Bills (+ Record Kharcha)"
+        description="Record warehouse rent, delivery fuel, electricity bills, staff tea & lunch, salaries, and daily maintenance expenses."
       >
         <div className="flex items-center gap-2">
           <Button
@@ -300,10 +300,10 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
 
           <Button
             onClick={() => setIsAddExpenseOpen(true)}
-            className="bg-[#0071E3] hover:bg-[#0077ED] text-white shadow-sm rounded-xl font-medium px-4 h-10 transition-all active:scale-95 text-xs"
+            className="bg-rose-600 hover:bg-rose-700 text-white shadow-sm rounded-xl font-bold px-4 h-10 transition-all active:scale-95 text-xs"
           >
             <Plus className="h-4 w-4 mr-1.5" />
-            Record Expense Voucher
+            + Record Daily Expense
           </Button>
         </div>
       </PageHeader>

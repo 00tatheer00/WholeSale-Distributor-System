@@ -515,9 +515,9 @@ export function MedicineClient({
               </Link>
             </Button>
 
-            <Button onClick={handleOpenAdd} size="sm" className="h-9 text-xs gap-1.5 font-semibold">
+            <Button onClick={handleOpenAdd} size="sm" className="h-9 text-xs gap-1.5 font-bold bg-primary hover:bg-primary/90 text-white rounded-xl shadow-sm px-4">
               <Plus className="h-4 w-4" />
-              Register New Medicine
+              + Add New Medicine (Item)
             </Button>
           </div>
         }

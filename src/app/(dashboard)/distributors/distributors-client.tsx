@@ -174,10 +174,10 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
       >
         <Button
           onClick={() => setIsAddOpen(true)}
-          className="bg-[#0071E3] hover:bg-[#0077ED] text-white shadow-sm rounded-xl font-medium px-4 h-10 transition-all active:scale-95"
+          className="bg-primary hover:bg-primary/90 text-white shadow-sm rounded-xl font-bold px-4 h-10 transition-all active:scale-95 text-xs"
         >
           <Plus className="h-4 w-4 mr-1.5" />
-          Add Sales Representative
+          + Add New Sales Rep (Order Booker)
         </Button>
       </PageHeader>
 

@@ -44,6 +44,8 @@ import {
 } from "@/components/ui/select";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { createSaleOrderAction } from "@/server/actions/sales.actions";
+import { createCustomerAction } from "@/server/actions/customer.actions";
+import { createDistributorAction } from "@/server/actions/distributor.actions";
 import { SaleOrderInput, SaleItemInput } from "@/validations/sales.schema";
 
 
@@ -104,8 +106,116 @@ interface SaleOrderFormProps {
 export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderFormProps) {
   const router = useRouter();
 
+  const [customerList, setCustomerList] = React.useState(customers);
+  const [distributorList, setDistributorList] = React.useState(distributors);
+
   const [selectedCustomerId, setSelectedCustomerId] = React.useState<string>("");
   const [selectedDistributorId, setSelectedDistributorId] = React.useState<string>("");
+
+  // Quick Add Customer Dialog State
+  const [isQuickCustomerOpen, setIsQuickCustomerOpen] = React.useState(false);
+  const [quickCustomer, setQuickCustomer] = React.useState({
+    tradeName: "",
+    proprietorName: "",
+    phone: "",
+    deliveryAddress: "",
+    city: "Karachi",
+    creditLimit: 100000,
+    drugLicenseNo: "",
+  });
+  const [isSavingQuickCustomer, setIsSavingQuickCustomer] = React.useState(false);
+
+  // Quick Add Sales Rep Dialog State
+  const [isQuickDistributorOpen, setIsQuickDistributorOpen] = React.useState(false);
+  const [quickDistributor, setQuickDistributor] = React.useState({
+    name: "",
+    phone: "",
+    assignedTerritory: "",
+    commissionPercent: 2,
+  });
+  const [isSavingQuickDistributor, setIsSavingQuickDistributor] = React.useState(false);
+
+  const handleSaveQuickCustomer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickCustomer.tradeName.trim() || !quickCustomer.phone.trim()) {
+      alert("Pharmacy / Customer Name and Phone are required.");
+      return;
+    }
+    setIsSavingQuickCustomer(true);
+    const res = await createCustomerAction({
+      tradeName: quickCustomer.tradeName.trim(),
+      proprietorName: quickCustomer.proprietorName?.trim() || null,
+      phone: quickCustomer.phone.trim(),
+      deliveryAddress: quickCustomer.deliveryAddress.trim() || "Local Address",
+      city: quickCustomer.city.trim() || "Karachi",
+      creditLimit: Number(quickCustomer.creditLimit) || 100000,
+      drugLicenseNo: quickCustomer.drugLicenseNo?.trim() || "DL-PENDING",
+      drugLicenseExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      customerType: "RETAIL_PHARMACY",
+      maxDueDays: 30,
+      openingBalance: 0,
+      defaultDiscountPercent: 0,
+      status: "ACTIVE",
+    });
+    setIsSavingQuickCustomer(false);
+    if (res.success && res.data) {
+      const newCust: CustomerOption = {
+        id: res.data.id,
+        customerCode: res.data.customerCode,
+        tradeName: res.data.tradeName,
+        proprietorName: res.data.proprietorName,
+        customerType: res.data.customerType,
+        drugLicenseNo: res.data.drugLicenseNo,
+        drugLicenseExpiry: res.data.drugLicenseExpiry ? res.data.drugLicenseExpiry.toString() : "",
+        phone: res.data.phone,
+        deliveryAddress: res.data.deliveryAddress,
+        city: res.data.city,
+        creditLimit: Number(res.data.creditLimit),
+        currentDue: Number(res.data.currentDue || 0),
+        availableCredit: Number(res.data.availableCredit || res.data.creditLimit),
+        status: res.data.status,
+      };
+      setCustomerList([newCust, ...customerList]);
+      setSelectedCustomerId(newCust.id);
+      setIsQuickCustomerOpen(false);
+      setQuickCustomer({ tradeName: "", proprietorName: "", phone: "", deliveryAddress: "", city: "Karachi", creditLimit: 100000, drugLicenseNo: "" });
+    } else {
+      alert(res.error || "Failed to create customer.");
+    }
+  };
+
+  const handleSaveQuickDistributor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickDistributor.name.trim() || !quickDistributor.phone.trim()) {
+      alert("Representative Name and Phone are required.");
+      return;
+    }
+    setIsSavingQuickDistributor(true);
+    const res = await createDistributorAction({
+      name: quickDistributor.name.trim(),
+      phone: quickDistributor.phone.trim(),
+      assignedTerritory: quickDistributor.assignedTerritory.trim() || "General Beat",
+      commissionRatePercent: Number(quickDistributor.commissionPercent) || 2.5,
+      monthlySalesTarget: 500000,
+      status: "ACTIVE",
+    });
+    setIsSavingQuickDistributor(false);
+    if (res.success && res.data) {
+      const newRep: DistributorOption = {
+        id: res.data.id,
+        name: res.data.name,
+        phone: res.data.phone,
+        assignedTerritory: res.data.assignedTerritory || "General Beat",
+      };
+      setDistributorList([newRep, ...distributorList]);
+      setSelectedDistributorId(newRep.id);
+      setIsQuickDistributorOpen(false);
+      setQuickDistributor({ name: "", phone: "", assignedTerritory: "", commissionPercent: 2 });
+    } else {
+      alert(res.error || "Failed to create sales representative.");
+    }
+  };
+
   const [orderDate, setOrderDate] = React.useState<string>(
     new Date().toISOString().split("T")[0]
   );
@@ -173,7 +283,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
     },
   ]);
 
-  const selectedCustomer = customers.find((c) => c.id === selectedCustomerId);
+  const selectedCustomer = customerList.find((c) => c.id === selectedCustomerId);
 
   // When customer changes, update default delivery address
   React.useEffect(() => {
@@ -467,9 +577,25 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
       </div>
 
       <PageHeader
-        title="Create Wholesale Sales Order & Tax Invoice"
-        description="Book bulk pharmacy orders with strict FEFO batch allocation, historical COGS capture, and credit barrier verification."
+        title="Create Sale Invoice & Bill (+ Naya Bill)"
+        description="Select customer pharmacy, choose medicine batches (auto-sorted earliest expiry first), and print instant wholesale invoice."
       />
+
+      {/* 3-Step Idiot-Proof Progress Bar */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 p-3 rounded-2xl bg-gradient-to-r from-blue-500/10 via-purple-500/5 to-emerald-500/10 border border-blue-500/20 text-xs shadow-sm">
+        <div className="flex items-center gap-2.5 font-bold text-blue-900 dark:text-blue-300">
+          <span className="h-6 w-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[11px] shrink-0 font-extrabold shadow-sm">1</span>
+          <span>Step 1: Choose Customer Pharmacy</span>
+        </div>
+        <div className="flex items-center gap-2.5 font-bold text-purple-900 dark:text-purple-300">
+          <span className="h-6 w-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-[11px] shrink-0 font-extrabold shadow-sm">2</span>
+          <span>Step 2: Add Medicines & Stock Batches</span>
+        </div>
+        <div className="flex items-center gap-2.5 font-bold text-emerald-900 dark:text-emerald-300">
+          <span className="h-6 w-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[11px] shrink-0 font-extrabold shadow-sm">3</span>
+          <span>Step 3: Save & Print Invoice</span>
+        </div>
+      </div>
 
       {serverError && (
         <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-medium flex items-center gap-2 animate-in fade-in">
@@ -486,17 +612,28 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
               <Store className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="font-semibold text-sm text-foreground">Step 1 — Customer Pharmacy & Step 2 — Sales Representative</h3>
-              <p className="text-xs text-muted-foreground">Select licensed retail pharmacy or institutional buyer and responsible representative.</p>
+              <h3 className="font-semibold text-sm text-foreground">Step 1 — Customer Pharmacy & Sales Representative</h3>
+              <p className="text-xs text-muted-foreground">Select licensed retail pharmacy or medical store, and responsible sales officer.</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Customer Pharmacy */}
             <div className="space-y-1.5 md:col-span-2">
-              <Label className="text-xs font-semibold text-foreground">
-                Customer Pharmacy <span className="text-rose-500">*</span>
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-semibold text-foreground">
+                  Customer Pharmacy / Medical Store <span className="text-rose-500">*</span>
+                </Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsQuickCustomerOpen(true)}
+                  className="h-6 px-2 text-[10px] rounded-lg text-primary border-primary/30 hover:bg-primary/5 font-bold gap-1"
+                >
+                  <Plus className="h-3 w-3" /> New Customer
+                </Button>
+              </div>
               <Select
                 value={selectedCustomerId}
                 onValueChange={(val) => setSelectedCustomerId(val)}
@@ -505,7 +642,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                   <SelectValue placeholder="Select Customer Pharmacy / Medical Store" />
                 </SelectTrigger>
                 <SelectContent className="max-h-72">
-                  {customers.map((c) => (
+                  {customerList.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
                       <div className="flex items-center gap-2 text-xs">
                         <span className="font-semibold">{c.tradeName}</span>
@@ -520,7 +657,18 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
 
             {/* Sales Representative */}
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-foreground">Sales Representative</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-semibold text-foreground">Sales Representative</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsQuickDistributorOpen(true)}
+                  className="h-6 px-2 text-[10px] rounded-lg text-primary border-primary/30 hover:bg-primary/5 font-bold gap-1"
+                >
+                  <Plus className="h-3 w-3" /> New Rep
+                </Button>
+              </div>
               <Select
                 value={selectedDistributorId}
                 onValueChange={(val) => setSelectedDistributorId(val)}
@@ -530,7 +678,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="">Direct Order / HQ Cashier</SelectItem>
-                  {distributors.map((d) => (
+                  {distributorList.map((d) => (
                     <SelectItem key={d.id} value={d.id}>
                       {d.name} ({d.assignedTerritory})
                     </SelectItem>
@@ -674,9 +822,14 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
 
                     {/* 2. Batch Selector (FEFO) */}
                     <div className="md:col-span-3 space-y-1">
-                      <Label className="text-[11px] font-semibold text-foreground">
-                        Batch (FEFO Order)
-                      </Label>
+                      <div className="flex items-center justify-between">
+                        <Label className="text-[11px] font-bold text-foreground">
+                          Batch & Expiry Date
+                        </Label>
+                        <span className="text-[9px] font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded">
+                          FEFO (Earliest Expiry)
+                        </span>
+                      </div>
                       <Select
                         value={row.batchId}
                         disabled={!row.medicineId || row.batches.length === 0}
@@ -684,16 +837,24 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                       >
                         <SelectTrigger className="h-9 rounded-xl text-xs bg-background font-mono">
                           <SelectValue
-                            placeholder={row.batches.length === 0 ? "No active stock" : "Select Batch"}
+                            placeholder={
+                              !row.medicineId
+                                ? "Select medicine first"
+                                : row.batches.length === 0
+                                ? "❌ Out of stock"
+                                : "Select Batch & Expiry"
+                            }
                           />
                         </SelectTrigger>
                         <SelectContent>
                           {row.batches.map((b) => (
                             <SelectItem key={b.id} value={b.id}>
-                              <div className="text-xs font-mono">
-                                <span>{b.batchNumber}</span>{" "}
-                                <span className="text-muted-foreground">({formatDate(b.expiryDate)})</span>
-                                <span className="text-emerald-700 ml-1.5 font-bold">• {b.quantityOnHand} available</span>
+                              <div className="text-xs font-mono flex items-center gap-1.5">
+                                <span className="font-bold text-foreground">{b.batchNumber}</span>
+                                <span className="text-amber-700 dark:text-amber-300 font-semibold bg-amber-50 dark:bg-amber-950/40 px-1 py-0.5 rounded text-[10px]">
+                                  Exp: {formatDate(b.expiryDate)}
+                                </span>
+                                <span className="text-emerald-700 dark:text-emerald-400 font-bold">• {b.quantityOnHand} in stock</span>
                               </div>
                             </SelectItem>
                           ))}
@@ -1270,6 +1431,181 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
         </DialogContent>
       </Dialog>
 
+      {/* QUICK ADD CUSTOMER / PHARMACY MODAL */}
+      <Dialog open={isQuickCustomerOpen} onOpenChange={setIsQuickCustomerOpen}>
+        <DialogContent className="sm:max-w-[480px] rounded-2xl">
+          <form onSubmit={handleSaveQuickCustomer}>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-base font-bold text-foreground">
+                <Store className="h-5 w-5 text-primary" />
+                Quick Register New Pharmacy / Customer
+              </DialogTitle>
+              <DialogDescription className="text-xs">
+                Quickly register a new medical store or pharmacy without leaving your sale bill.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-3 py-4 text-xs">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Pharmacy / Medical Store Name *</Label>
+                <Input
+                  required
+                  placeholder="e.g., Al-Shifa Chemist, Care Pharmacy"
+                  value={quickCustomer.tradeName}
+                  onChange={(e) => setQuickCustomer({ ...quickCustomer, tradeName: e.target.value })}
+                  className="rounded-xl text-xs h-9"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Proprietor / Owner Name</Label>
+                  <Input
+                    placeholder="e.g., Dr. Tariq Mahmood"
+                    value={quickCustomer.proprietorName}
+                    onChange={(e) => setQuickCustomer({ ...quickCustomer, proprietorName: e.target.value })}
+                    className="rounded-xl text-xs h-9"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Phone Number *</Label>
+                  <Input
+                    required
+                    placeholder="e.g., 03001234567"
+                    value={quickCustomer.phone}
+                    onChange={(e) => setQuickCustomer({ ...quickCustomer, phone: e.target.value })}
+                    className="rounded-xl text-xs h-9 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Delivery Address *</Label>
+                <Input
+                  required
+                  placeholder="e.g., Shop 4, Main Market, Saddar"
+                  value={quickCustomer.deliveryAddress}
+                  onChange={(e) => setQuickCustomer({ ...quickCustomer, deliveryAddress: e.target.value })}
+                  className="rounded-xl text-xs h-9"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">DRAP Drug License #</Label>
+                  <Input
+                    placeholder="e.g., 05-421-0089"
+                    value={quickCustomer.drugLicenseNo}
+                    onChange={(e) => setQuickCustomer({ ...quickCustomer, drugLicenseNo: e.target.value })}
+                    className="rounded-xl text-xs h-9 font-mono"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Credit Limit (Rs.)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="100000"
+                    value={quickCustomer.creditLimit}
+                    onChange={(e) => setQuickCustomer({ ...quickCustomer, creditLimit: parseInt(e.target.value, 10) || 0 })}
+                    className="rounded-xl text-xs h-9 font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 pt-2 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsQuickCustomerOpen(false)}
+                className="rounded-xl text-xs h-9"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSavingQuickCustomer}
+                className="bg-primary hover:bg-primary/90 text-white rounded-xl text-xs h-9 font-bold px-4"
+              >
+                {isSavingQuickCustomer ? "Saving..." : "Add & Select Pharmacy"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* QUICK ADD SALES REP MODAL */}
+      <Dialog open={isQuickDistributorOpen} onOpenChange={setIsQuickDistributorOpen}>
+        <DialogContent className="sm:max-w-[440px] rounded-2xl">
+          <form onSubmit={handleSaveQuickDistributor}>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-base font-bold text-foreground">
+                <Building2 className="h-5 w-5 text-primary" />
+                Quick Register Sales Representative
+              </DialogTitle>
+              <DialogDescription className="text-xs">
+                Add an order booker or medical sales representative.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-3 py-4 text-xs">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Full Name *</Label>
+                <Input
+                  required
+                  placeholder="e.g., Muhammad Imran, Ali Raza"
+                  value={quickDistributor.name}
+                  onChange={(e) => setQuickDistributor({ ...quickDistributor, name: e.target.value })}
+                  className="rounded-xl text-xs h-9"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Phone Number *</Label>
+                  <Input
+                    required
+                    placeholder="e.g., 03211234567"
+                    value={quickDistributor.phone}
+                    onChange={(e) => setQuickDistributor({ ...quickDistributor, phone: e.target.value })}
+                    className="rounded-xl text-xs h-9 font-mono"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Assigned Beat / Territory</Label>
+                  <Input
+                    placeholder="e.g., Saddar & Clifton"
+                    value={quickDistributor.assignedTerritory}
+                    onChange={(e) => setQuickDistributor({ ...quickDistributor, assignedTerritory: e.target.value })}
+                    className="rounded-xl text-xs h-9"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 pt-2 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsQuickDistributorOpen(false)}
+                className="rounded-xl text-xs h-9"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSavingQuickDistributor}
+                className="bg-primary hover:bg-primary/90 text-white rounded-xl text-xs h-9 font-bold px-4"
+              >
+                {isSavingQuickDistributor ? "Saving..." : "Add & Select Rep"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

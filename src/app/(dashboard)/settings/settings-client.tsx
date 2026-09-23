@@ -88,6 +88,16 @@ export function SettingsClient({
 
   const [users, setUsers] = React.useState<any[]>(initialUsers);
 
+  // Admin login credentials state (Super easy direct access for client)
+  const adminUser = users.find((u) => u.role === "SUPER_ADMIN" || u.role === "ADMIN") || users[0];
+  const [adminCredentials, setAdminCredentials] = React.useState({
+    email: adminUser?.email || "admin@pharmadist.com",
+    password: "",
+    confirmPassword: "",
+  });
+  const [isUpdatingAdminCreds, setIsUpdatingAdminCreds] = React.useState(false);
+  const [adminCredsFeedback, setAdminCredsFeedback] = React.useState<{ type: "success" | "error"; message: string } | null>(null);
+
   const [settings, setSettings] = React.useState<CompanySettingsInput>({
     name: initialCompany.name || "PharmaDist Wholesale Medicine Distribution Ltd.",
     tradeLicenseNo: initialCompany.tradeLicenseNo || "TR-KHI-2026-8891",
@@ -251,6 +261,66 @@ export function SettingsClient({
     }
   };
 
+  const handleUpdateAdminCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminUser) return;
+
+    if (adminCredentials.password) {
+      if (adminCredentials.password.length < 6) {
+        setAdminCredsFeedback({ type: "error", message: "Password must be at least 6 characters long." });
+        return;
+      }
+      if (adminCredentials.password !== adminCredentials.confirmPassword) {
+        setAdminCredsFeedback({ type: "error", message: "Passwords do not match. Please verify confirmation password." });
+        return;
+      }
+    }
+
+    setIsUpdatingAdminCreds(true);
+    setAdminCredsFeedback(null);
+
+    try {
+      if (adminCredentials.email && adminCredentials.email !== adminUser.email) {
+        const emailRes = await updateUserAction({
+          id: adminUser.id,
+          name: adminUser.name,
+          email: adminCredentials.email,
+          phone: adminUser.phone === "N/A" ? "" : (adminUser.phone || ""),
+          role: adminUser.role,
+          status: adminUser.status,
+        });
+        if (!emailRes.success) {
+          setAdminCredsFeedback({ type: "error", message: emailRes.error || "Failed to update email address." });
+          setIsUpdatingAdminCreds(false);
+          return;
+        }
+      }
+
+      if (adminCredentials.password) {
+        const passRes = await resetUserPasswordAction({
+          userId: adminUser.id,
+          newPassword: adminCredentials.password,
+        });
+        if (!passRes.success) {
+          setAdminCredsFeedback({ type: "error", message: passRes.error || "Failed to update password." });
+          setIsUpdatingAdminCreds(false);
+          return;
+        }
+      }
+
+      setAdminCredsFeedback({
+        type: "success",
+        message: "Admin login credentials updated successfully! You can now use these details to login.",
+      });
+      setAdminCredentials((prev) => ({ ...prev, password: "", confirmPassword: "" }));
+      setTimeout(() => setAdminCredsFeedback(null), 6000);
+    } catch (err: any) {
+      setAdminCredsFeedback({ type: "error", message: err?.message || "An unexpected error occurred." });
+    } finally {
+      setIsUpdatingAdminCreds(false);
+    }
+  };
+
   const handleToggleUserStatus = async () => {
     if (!deactivateUser) return;
     setIsUserProcessing(true);
@@ -409,10 +479,91 @@ export function SettingsClient({
 
         {/* Right: Active Settings Card */}
         <div className="md:col-span-3">
-          {/* Section 1: Business Profile */}
+          {/* Section 1: Business Profile & Admin Credentials */}
           {activeTab === "business" && (
-            <Card className="border border-border/80 rounded-2xl shadow-sm">
-              <CardHeader className="border-b bg-muted/20 pb-4">
+            <div className="space-y-6">
+              {/* TOP PRIORITY CARD: ADMIN LOGIN CREDENTIALS & PASSWORD */}
+              <Card className="border-2 border-primary/40 bg-gradient-to-br from-primary/5 via-blue-500/5 to-card rounded-2xl shadow-sm">
+                <CardHeader className="border-b bg-primary/10 pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-bold flex items-center gap-2 text-foreground">
+                      <div className="h-7 w-7 rounded-lg bg-primary text-white flex items-center justify-center shadow-sm">
+                        <KeyRound className="h-4 w-4" />
+                      </div>
+                      Admin Login Email & Password (Apna Login & Password Badlein)
+                    </CardTitle>
+                    <Badge className="bg-primary/20 text-primary border-primary/30 text-[10px] font-bold uppercase">
+                      Direct Access
+                    </Badge>
+                  </div>
+                  <CardDescription className="text-xs">
+                    Easily change your system login email address and account password directly here anytime without technical hassle.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <form onSubmit={handleUpdateAdminCredentials} className="space-y-4">
+                    {adminCredsFeedback && (
+                      <div className={`p-3 rounded-xl border text-xs font-semibold flex items-center gap-2 ${
+                        adminCredsFeedback.type === "success" 
+                          ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                          : "bg-rose-50 text-rose-800 border-rose-200"
+                      }`}>
+                        {adminCredsFeedback.type === "success" ? <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" /> : <AlertTriangle className="h-4 w-4 text-rose-600 shrink-0" />}
+                        {adminCredsFeedback.message}
+                      </div>
+                    )}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-semibold">Admin Login Email Address</Label>
+                        <Input
+                          type="email"
+                          required
+                          value={adminCredentials.email}
+                          onChange={(e) => setAdminCredentials({ ...adminCredentials, email: e.target.value })}
+                          className="rounded-xl text-xs h-9 bg-background font-medium"
+                          placeholder="admin@pharmadist.com"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-semibold">New Password</Label>
+                        <Input
+                          type="password"
+                          value={adminCredentials.password}
+                          onChange={(e) => setAdminCredentials({ ...adminCredentials, password: e.target.value })}
+                          className="rounded-xl text-xs h-9 bg-background font-mono"
+                          placeholder="Min. 6 characters"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-semibold">Confirm New Password</Label>
+                        <Input
+                          type="password"
+                          value={adminCredentials.confirmPassword}
+                          onChange={(e) => setAdminCredentials({ ...adminCredentials, confirmPassword: e.target.value })}
+                          className="rounded-xl text-xs h-9 bg-background font-mono"
+                          placeholder="Re-type password"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-border/60">
+                      <p className="text-[11px] text-muted-foreground">
+                        Leave password empty if you only want to change your email address.
+                      </p>
+                      <Button
+                        type="submit"
+                        disabled={isUpdatingAdminCreds}
+                        className="bg-primary hover:bg-primary/90 text-white font-bold rounded-xl text-xs h-9 px-5 shadow-sm shrink-0"
+                      >
+                        {isUpdatingAdminCreds ? "Updating..." : "Save My Email & Password"}
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+
+              {/* Business Profile */}
+              <Card className="border border-border/80 rounded-2xl shadow-sm">
+                <CardHeader className="border-b bg-muted/20 pb-4">
                 <CardTitle className="text-sm font-bold flex items-center gap-2">
                   <Building2 className="h-4 w-4 text-[#0071E3]" />
                   Distributor Enterprise Profile & Licensing
@@ -533,6 +684,7 @@ export function SettingsClient({
                 </div>
               </CardContent>
             </Card>
+            </div>
           )}
 
           {/* Section 2: Invoice & Print Settings */}

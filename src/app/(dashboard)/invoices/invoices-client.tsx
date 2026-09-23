@@ -84,16 +84,16 @@ export function InvoicesClient({ initialInvoicesData, customers }: InvoicesClien
     <div className="space-y-6 max-w-[1400px] mx-auto pb-16">
       {/* 1. Header Section */}
       <PageHeader
-        title="Wholesale Tax Invoices & Delivery Challans"
-        description="Formal DRAP-compliant wholesale tax invoices, delivery challans, and customer accounts receivable settlement."
+        title="Sales Invoices & Delivery Challans (Bills)"
+        description="View all issued sales bills, print DRAP wholesale cash memos and delivery challans, or click '+ Create New Sale Invoice' below."
       >
         <Button
           asChild
-          className="bg-[#0071E3] hover:bg-[#0077ED] text-white shadow-sm rounded-xl font-medium px-4 h-10 transition-all active:scale-95"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm rounded-xl font-bold px-4 h-10 transition-all active:scale-95"
         >
           <Link href="/sales/new">
             <Plus className="h-4 w-4 mr-1.5" />
-            Issue New Invoice
+            + Create New Sale Invoice / Bill
           </Link>
         </Button>
       </PageHeader>

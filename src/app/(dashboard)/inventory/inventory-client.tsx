@@ -19,6 +19,8 @@ import {
   TrendingDown,
   DollarSign,
   Package,
+  PackagePlus,
+  Plus,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { DataTable } from "@/components/shared/data-table";
@@ -260,27 +262,52 @@ export function InventoryClient({
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Warehouse Inventory & FEFO Ledger"
-        description="Authoritative batch-level pharmaceutical stock balances, historical purchase cost valuation, and FEFO expiry queues."
-        badge={<Badge variant="outline">Engine Module M04</Badge>}
+        title="Medicine Stock & Batches (Inventory)"
+        description="Available pharmaceutical stock, batch expiry dates, godown locations, and stock valuation."
+        badge={<Badge variant="outline" className="border-emerald-500/30 text-emerald-600 bg-emerald-50/50">Live Stock Cockpit</Badge>}
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" size="sm" asChild className="h-9 text-xs gap-1.5">
-              <Link href="/inventory/movements">
-                <History className="h-4 w-4 text-primary" />
-                Movement Ledger
+            <Button asChild size="sm" className="h-9 text-xs gap-1.5 font-bold bg-[#0071E3] hover:bg-[#0077ED] text-white shadow-sm rounded-xl">
+              <Link href="/purchases/new">
+                <PackagePlus className="h-4 w-4" />
+                + Add New Stock (Factory Intake)
               </Link>
             </Button>
 
-            <Button size="sm" asChild className="h-9 text-xs gap-1.5 font-semibold">
+            <Button variant="outline" size="sm" asChild className="h-9 text-xs gap-1.5 font-semibold rounded-xl border-amber-300 hover:bg-amber-50 text-amber-800 dark:border-amber-800 dark:text-amber-300">
               <Link href="/inventory/adjustments">
-                <SlidersHorizontal className="h-4 w-4" />
-                Stock Adjustments
+                <SlidersHorizontal className="h-4 w-4 text-amber-600" />
+                ± Correct Stock / Damage
+              </Link>
+            </Button>
+
+            <Button variant="outline" size="sm" asChild className="h-9 text-xs gap-1.5 rounded-xl border-border">
+              <Link href="/inventory/movements">
+                <History className="h-4 w-4 text-muted-foreground" />
+                Stock In/Out History
               </Link>
             </Button>
           </div>
         }
       />
+
+      {/* Helper Banner for Idiot-Proof Clarity */}
+      <div className="p-3.5 rounded-2xl bg-gradient-to-r from-blue-500/10 via-indigo-500/5 to-transparent border border-blue-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2.5">
+          <div className="h-8 w-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-blue-600/20">
+            <PackagePlus className="h-4 w-4" />
+          </div>
+          <div>
+            <div className="font-bold text-foreground">Want to add new medicines received from factory?</div>
+            <div className="text-muted-foreground">Click the blue &ldquo;+ Add New Stock&rdquo; button above to record invoice, batch number, and expiry date.</div>
+          </div>
+        </div>
+        <Button size="sm" asChild className="h-8 px-3 text-xs bg-blue-600 hover:bg-blue-700 text-white shrink-0 font-bold rounded-xl shadow-sm">
+          <Link href="/purchases/new">
+            + Add Stock Now
+          </Link>
+        </Button>
+      </div>
 
       {/* Real-time KPI Summary Metrics Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

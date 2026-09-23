@@ -205,9 +205,9 @@ export function WarehousesClient({ initialWarehouses }: WarehousesClientProps) {
         title="Warehouses & Storage Facilities"
         description="Physical distribution hubs, central warehouses, and secondary stock locations."
       >
-        <Button onClick={handleOpenAdd} className="gap-2 shadow-sm font-semibold">
+        <Button onClick={handleOpenAdd} className="gap-2 shadow-sm font-bold bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs h-10 px-4">
           <Plus className="h-4 w-4" />
-          Add Warehouse
+          + Add New Godown / Warehouse
         </Button>
       </PageHeader>
 

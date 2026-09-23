@@ -38,6 +38,7 @@
 | **Phase 23**| Final Hardening, UAT, FEFO Verification & Backup/Recovery | ✅ Completed | Live empirical FEFO multi-batch depletion test passed 100% (`test-fefo-scenario.js`); Double-entry financial integrity verified (`test-financial-integrity.js`); Real SQLite database backup download endpoint (`/api/backup/download`) and local snapshot creation implemented; 8th "Backup & Maintenance" settings tab deployed with disaster recovery runbook; Print layouts standardized with DRAP-oriented phrasing; 0 TypeScript errors (`npx tsc --noEmit`); All 53 Next.js production routes built and certified (`FINAL_HARDENING_REPORT.md`). |
 | **Phase 24**| Production Login Hardening & Custom Credentials Administration | ✅ Completed | Fully stripped demo role buttons and credential autofill from `/login`; Hardened authentication routes against local SQLite bcrypt hashes with 401 error guard; Added direct "Edit Email" & "Reset Password" controls with password match validation to `Settings` $\rightarrow$ `Team & Security`; Seamless session transition on self-email edit; 100% verified locally on embedded SQLite database (`prisma/wmdms.db`); 0 TypeScript errors. |
 | **Phase 25**| Windows NSIS Setup Installer (.exe) Optimization, Login Enforcement & Header UI Polish | ✅ Completed | Configured `electron-builder` with standard Windows NSIS setup wizard (`.exe` installer); Added automatic Desktop shortcut and Start Menu creation; Generated multi-resolution `electron/icon.ico`; Configured writeable `userData` database directory in `electron/main.js` guaranteeing read/write permissions for standard Windows users; Fixed dot-folder exclusion of `node_modules/.prisma` query engine by explicitly mapping `extraResources` and adding self-healing fallback copy in `main.js` (resolving packaged 500 internal server error); Enforced clean `/login` screen requirement on every application startup by clearing session storage; Removed obsolete "Install Mobile App" PWA installer button from Header; Added top menu "Lock / Logout to Login Screen"; Added dynamic port allocation to eliminate localhost:3000 collision crashes; Applied maximum LZMA compression and development file exclusions (327 MB → 189 MB total self-contained offline installer); Completely eliminated all hardcoded demo passwords from `/api/auth/login` (pure SQLite bcrypt authentication); Documented 2-click client download & install runbook in `docs/OFFLINE_DESKTOP_GUIDE.md`. |
+| **Phase 26**| Idiot-Proof Universal Quick-Add & UI/UX Simplification | ✅ Completed | Deployed 6-card high-visibility Quick Action Deck on Dashboard (`+ New Sale Bill`, `+ Add Factory Stock`, `+ Add Pharmacy`, `+ Add Supplier`, `+ Add Godown`, `+ Record Expense`) with rich colorful gradients; Added inline `[+ New Pharmacy]` and `[+ New Sales Rep]` quick modals in `/sales/new`; Added inline `[+ New Supplier]` and `[+ New Godown]` quick modals in `/purchases/new`; Added direct Admin Login Email & Password reset card right at the top of Tab 1 in `/settings`; Enhanced FEFO batch selector with prominent badges and expiry formatting; Standardized plain-language, idiot-proof titles across Sidebar navigation, Stock inventory, Invoices, and Expenses. Verified with 0 TypeScript errors (`npx tsc --noEmit`) and 53 Next.js production routes built cleanly. |
 
 ---
 
@@ -51,6 +52,7 @@
 - **UI Components**: Tailwind CSS, Radix UI primitives, Lucide React, TanStack Table v8, Recharts
 - **Regional Localization**: Pakistan Standard (`PKR`, `Rs.`, DRAP compliance, Raast, JazzCash, EasyPaisa, Bank Transfer, Cheque, Cash)
 - **Verification Status**:
+  - `npx tsc --noEmit` $\rightarrow$ **0 Errors (Strict Type Safety)**
   - `npm run build` $\rightarrow$ **0 Errors (53 Production Routes Generated)**
   - Empirical Route Verification $\rightarrow$ **`/login` (200 OK) & `/dashboard` (200 OK) verified on packaged standalone server**
   - NSIS Desktop Installer (`.exe`) $\rightarrow$ **100% Built (`dist/PharmaDist Wholesale ERP Setup 1.0.0.exe`, 189 MB)**
@@ -62,8 +64,8 @@
 ---
 
 ## 3. Next Planned Phase
-- **Phase 26 — Client Live Handover & Production Distribution**:
-  - Distribution of standalone desktop installer (`PharmaDist Wholesale ERP Setup 1.0.0.exe`) and multi-PC LAN access instructions.
-  - Staff operational training on FEFO queue management and DRAP invoice printing.
+- **Phase 27 — Client Live Handover & Operational Training**:
+  - Handover of simplified system and `.exe` installer to client.
+  - Final client acceptance walkthrough of 1-click Quick Action Deck and inline dropdown creation.
 
 

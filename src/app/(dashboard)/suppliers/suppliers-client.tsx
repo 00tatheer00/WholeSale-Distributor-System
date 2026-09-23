@@ -488,18 +488,18 @@ export function SuppliersClient({ initialData, currentParams }: SuppliersClientP
         description="Manage pharmaceutical manufacturers, trade payment terms, accounts payable (AP) ledgers, and purchase history."
       >
         <div className="flex items-center gap-2">
-          <Button asChild variant="outline" className="gap-2">
+          <Button asChild variant="outline" className="gap-2 rounded-xl text-xs h-10 border-blue-200 text-blue-700 hover:bg-blue-50">
             <Link href="/purchases/new">
-              <Truck className="h-4 w-4 text-primary" />
-              New Purchase Intake
+              <Truck className="h-4 w-4 text-blue-600" />
+              + Add Stock (Factory Intake)
             </Link>
           </Button>
 
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-sm">
+              <Button className="gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs h-10 shadow-sm">
                 <Plus className="h-4 w-4" />
-                Add Supplier
+                + Add New Supplier / Company
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[620px] max-h-[90vh] overflow-y-auto">
