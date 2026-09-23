@@ -54,7 +54,7 @@ import {
   getTransferEligibleBatchesAction,
   getStockTransfersAction,
 } from "@/server/actions/transfer.actions";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatDateTime } from "@/lib/utils";
 
 interface TransfersClientProps {
   initialTransfers: any[];
@@ -368,7 +368,7 @@ export function TransfersClient({
                       {t.transferNumber}
                     </TableCell>
                     <TableCell className="text-xs text-slate-600 whitespace-nowrap">
-                      {formatDate(t.createdAt)}
+                      {formatDateTime(t.createdAt)}
                     </TableCell>
                     <TableCell>
                       <div className="text-xs font-semibold text-slate-900">
@@ -450,8 +450,9 @@ export function TransfersClient({
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-700">
-                  Destination Warehouse *
+                <Label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                  <WarehouseIcon className="h-3.5 w-3.5 text-teal-600" />
+                  Destination Godown / Warehouse (منزل گودام) *
                 </Label>
                 <Select
                   value={destWarehouseId}

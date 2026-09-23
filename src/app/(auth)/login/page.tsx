@@ -233,13 +233,16 @@ export default function LoginPage() {
           </Button>
 
           {/* Security & Compliance Footer */}
-          <div className="text-center pt-2">
+          <div className="text-center pt-2 space-y-1">
             <p className="text-[11px] text-[#86868B] flex items-center justify-center gap-1.5">
               <span>🔒 256-bit SSL</span>
               <span>•</span>
               <span>FEFO Inventory Engine</span>
               <span>•</span>
               <span>Strictly Wholesale</span>
+            </p>
+            <p className="text-[10px] text-muted-foreground/80 font-medium">
+              Built by Tech4Edges • CEO Tatheer • 03374005515
             </p>
           </div>
         </form>

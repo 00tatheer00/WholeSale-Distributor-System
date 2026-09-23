@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, dialog, session } = require('electron');
+const { app, BrowserWindow, Menu, dialog, session, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -10,6 +10,27 @@ const net = require('net');
 let mainWindow = null;
 let serverProcess = null;
 let PORT = 3000;
+
+// Register IPC Print Handler for clean native desktop printing
+ipcMain.handle('print-document', async (event, options = {}) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (!win) return { success: false, error: 'No active window found' };
+
+  return new Promise((resolve) => {
+    win.webContents.print(
+      {
+        silent: false,
+        printBackground: true,
+        pageSize: 'A4',
+        margins: { marginType: 'custom', top: 0.2, bottom: 0.2, left: 0.2, right: 0.2 },
+        ...options,
+      },
+      (success, failureReason) => {
+        resolve({ success, failureReason });
+      }
+    );
+  });
+});
 
 // Recursive folder copy helper
 function copyDirSync(src, dest) {

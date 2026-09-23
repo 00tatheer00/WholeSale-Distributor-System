@@ -44,7 +44,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
+import { triggerPrint } from "@/lib/print-utils";
 import { PaymentQueryResult, PaymentDetailRecord } from "@/server/services/payment.service";
 import { recordCustomerPaymentAction, getPaymentByIdAction } from "@/server/actions/payment.actions";
 import { CustomerPaymentInput } from "@/validations/payment.schema";
@@ -230,9 +231,9 @@ export function PaymentsClient({
       {/* 2. Top Metric Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Total Collected */}
-        <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-emerald-800">Total Money Collected</span>
+            <span className="text-xs font-semibold text-emerald-800">Total Money Collected</span>
             <div className="h-8 w-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-700">
               <Receipt className="h-4 w-4" />
             </div>
@@ -244,9 +245,9 @@ export function PaymentsClient({
         </div>
 
         {/* Bank & MFS */}
-        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-sky-800">Bank & Digital Transfers</span>
+            <span className="text-xs font-semibold text-sky-800">Bank & Digital Transfers</span>
             <div className="h-8 w-8 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-700">
               <Landmark className="h-4 w-4" />
             </div>
@@ -258,9 +259,9 @@ export function PaymentsClient({
         </div>
 
         {/* Cheques */}
-        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-amber-800">Cheques in Holding</span>
+            <span className="text-xs font-semibold text-amber-800">Cheques in Holding</span>
             <div className="h-8 w-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700">
               <Clock className="h-4 w-4" />
             </div>
@@ -272,9 +273,9 @@ export function PaymentsClient({
         </div>
 
         {/* Receipts Count */}
-        <div className="bg-purple-50/70 border border-purple-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-purple-50/70 border border-purple-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-purple-800">Receipts Issued</span>
+            <span className="text-xs font-semibold text-purple-800">Receipts Issued</span>
             <div className="h-8 w-8 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-700">
               <FileText className="h-4 w-4" />
             </div>
@@ -413,9 +414,9 @@ export function PaymentsClient({
                       </div>
                     </td>
 
-                    {/* Date */}
+                    {/* Date with Time */}
                     <td className="px-4 py-4 text-xs text-muted-foreground whitespace-nowrap">
-                      {formatDate(p.paymentDate)}
+                      {formatDateTime(p.paymentDate)}
                     </td>
 
                     {/* Method */}
@@ -573,7 +574,7 @@ export function PaymentsClient({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-foreground">
-                  Payment Amount (Rs.) <span className="text-rose-500">*</span>
+                  Payment Amount (Afs.) <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   type="number"
@@ -761,7 +762,7 @@ export function PaymentsClient({
 
       {/* 7. Printable Money Receipt Modal */}
       <Dialog open={receiptModalOpen} onOpenChange={setReceiptModalOpen}>
-        <DialogContent className="max-w-2xl rounded-2xl p-6 sm:p-8">
+        <DialogContent className="max-w-2xl rounded-2xl p-6 sm:p-8 printable-receipt print-container">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between border-b pb-3">
               <span className="text-base font-bold flex items-center gap-2">
@@ -770,7 +771,7 @@ export function PaymentsClient({
               </span>
               <Button
                 size="sm"
-                onClick={() => window.print()}
+                onClick={() => triggerPrint()}
                 className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs h-8 px-3 print:hidden"
               >
                 <Printer className="h-3.5 w-3.5 mr-1" /> Print Receipt
@@ -792,7 +793,7 @@ export function PaymentsClient({
                     {selectedReceipt.receiptNo}
                   </div>
                   <div className="text-muted-foreground text-[11px]">
-                    Date: <strong>{formatDate(selectedReceipt.paymentDate)}</strong>
+                    Date & Time: <strong>{formatDateTime(selectedReceipt.paymentDate)}</strong>
                   </div>
                 </div>
               </div>
@@ -867,6 +868,11 @@ export function PaymentsClient({
                   <p className="font-semibold text-foreground">Customer Representative</p>
                   <p className="text-[10px]">Signature & Seal</p>
                 </div>
+              </div>
+
+              {/* Watermark Branding */}
+              <div className="text-[9px] text-muted-foreground text-center pt-3 border-t border-border/40">
+                Official Wholesale Payment Receipt. Computer-generated financial record. • Built by Tech4Edges - CEO Tatheer - 03374005515
               </div>
             </div>
           )}

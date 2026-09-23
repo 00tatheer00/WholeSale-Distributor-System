@@ -22,6 +22,7 @@ import {
   MapPin,
   Route,
   Award,
+  Trash2,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +35,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -46,6 +48,8 @@ import { formatCurrency } from "@/lib/utils";
 import { DistributorQueryResult } from "@/server/services/distributor.service";
 import {
   createDistributorAction,
+  updateDistributorAction,
+  deleteDistributorAction,
   toggleDistributorStatusAction,
 } from "@/server/actions/distributor.actions";
 import { DistributorInput } from "@/validations/distributor.schema";
@@ -78,6 +82,25 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
     status: "ACTIVE",
     notes: "",
   });
+
+  const [isEditOpen, setIsEditOpen] = React.useState(false);
+  const [editingDistributorId, setEditingDistributorId] = React.useState<string | null>(null);
+  const [editFormData, setEditFormData] = React.useState<DistributorInput>({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    assignedTerritory: "",
+    assignedRoute: "",
+    monthlySalesTarget: 0,
+    commissionRatePercent: 0,
+    status: "ACTIVE",
+    notes: "",
+  });
+
+  const [deleteCandidate, setDeleteCandidate] = React.useState<DistributorRecord | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   const data = initialData || {
     distributors: [],
@@ -165,6 +188,64 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
     }
   };
 
+  const handleOpenEdit = (d: DistributorRecord) => {
+    setEditingDistributorId(d.id);
+    setEditFormData({
+      name: d.name,
+      phone: d.phone,
+      email: d.email || "",
+      address: d.address || "",
+      assignedTerritory: d.assignedTerritory || "Clifton & Saddar, Karachi",
+      assignedRoute: d.assignedRoute || "Morning Beat 1",
+      monthlySalesTarget: Number(d.monthlySalesTarget) || 500000,
+      commissionRatePercent: Number(d.commissionRatePercent) || 2.5,
+      status: (d.status as any) || "ACTIVE",
+      notes: d.notes || "",
+    });
+    setIsEditOpen(true);
+  };
+
+  const handleUpdateDistributor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingDistributorId) return;
+    try {
+      setIsSubmitting(true);
+      const res = await updateDistributorAction(editingDistributorId, editFormData);
+      if (res.success) {
+        setFeedback({ type: "success", message: res.message || "Representative updated successfully." });
+        setIsEditOpen(false);
+        setEditingDistributorId(null);
+        router.refresh();
+      } else {
+        setFeedback({ type: "error", message: res.error || "Failed to update representative." });
+      }
+    } catch {
+      setFeedback({ type: "error", message: "Unexpected error occurred." });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteCandidate) return;
+    try {
+      setIsDeleting(true);
+      const res = await deleteDistributorAction(deleteCandidate.id);
+      if (res.success) {
+        setFeedback({ type: "success", message: res.message || "Representative deleted." });
+        setIsDeleteOpen(false);
+        setDeleteCandidate(null);
+        router.refresh();
+      } else {
+        setFeedback({ type: "error", message: res.error || "Failed to delete representative." });
+      }
+    } catch {
+      setFeedback({ type: "error", message: "Unexpected error occurred." });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto pb-16">
       {/* 1. Header Section */}
@@ -203,7 +284,7 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
       {/* 2. Top Metric Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Active Representatives */}
-        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-sky-800">Field Sales Team</span>
             <div className="h-8 w-8 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-700">
@@ -217,7 +298,7 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
         </div>
 
         {/* Total Sales Generated */}
-        <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-emerald-800">Team Sales Generated</span>
             <div className="h-8 w-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-700">
@@ -231,7 +312,7 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
         </div>
 
         {/* Collections Recovered */}
-        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-amber-800">Collections Recovered</span>
             <div className="h-8 w-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700">
@@ -245,7 +326,7 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
         </div>
 
         {/* Field Operating Expenses */}
-        <div className="bg-purple-50/70 border border-purple-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-purple-50/70 border border-purple-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-purple-800">Field Expenses</span>
             <div className="h-8 w-8 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-700">
@@ -422,16 +503,40 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
 
                       {/* Actions */}
                       <td className="px-5 py-4 text-right">
-                        <Button
-                          asChild
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 px-2.5 text-xs text-[#0071E3] hover:bg-sky-50 rounded-lg"
-                        >
-                          <Link href={`/distributors/${d.id}`}>
-                            <Eye className="h-3.5 w-3.5 mr-1" /> 360° Profile
-                          </Link>
-                        </Button>
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            asChild
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 px-2.5 text-xs text-[#0071E3] hover:bg-sky-50 rounded-lg"
+                            title="View 360° Profile"
+                          >
+                            <Link href={`/distributors/${d.id}`}>
+                              <Eye className="h-3.5 w-3.5 mr-1" /> Profile
+                            </Link>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleOpenEdit(d)}
+                            className="h-8 px-2 text-xs text-foreground hover:bg-muted rounded-lg"
+                            title="Edit Representative"
+                          >
+                            <Edit2 className="h-3.5 w-3.5 mr-1 text-muted-foreground" /> Edit
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setDeleteCandidate(d);
+                              setIsDeleteOpen(true);
+                            }}
+                            className="h-8 px-2 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg"
+                            title="Delete Representative"
+                          >
+                            <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -609,6 +714,175 @@ export function DistributorsClient({ initialData }: DistributorsClientProps) {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* 7. Edit Distributor Modal */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="max-w-xl rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base font-bold">
+              <Users className="h-5 w-5 text-[#0071E3]" />
+              Edit Sales Representative
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Update representative contact info, assigned territory, sales targets, or status.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleUpdateDistributor} className="space-y-4 pt-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">
+                  Full Name <span className="text-rose-500">*</span>
+                </Label>
+                <Input
+                  required
+                  placeholder="e.g. Tariq Mehmood"
+                  value={editFormData.name}
+                  onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                  className="h-9 rounded-xl bg-muted/20 text-xs font-medium"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">
+                  Official Phone <span className="text-rose-500">*</span>
+                </Label>
+                <Input
+                  required
+                  placeholder="0300-1234567"
+                  value={editFormData.phone}
+                  onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                  className="h-9 rounded-xl bg-muted/20 text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Assigned Territory</Label>
+                <Input
+                  placeholder="e.g. Saddar & Clifton"
+                  value={editFormData.assignedTerritory}
+                  onChange={(e) => setEditFormData({ ...editFormData, assignedTerritory: e.target.value })}
+                  className="h-9 rounded-xl bg-muted/20 text-xs"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Assigned Route (Beat)</Label>
+                <Input
+                  placeholder="e.g. Morning Beat 1"
+                  value={editFormData.assignedRoute || ""}
+                  onChange={(e) => setEditFormData({ ...editFormData, assignedRoute: e.target.value })}
+                  className="h-9 rounded-xl bg-muted/20 text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Monthly Sales Target (Afs.)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={editFormData.monthlySalesTarget}
+                  onChange={(e) => setEditFormData({ ...editFormData, monthlySalesTarget: parseFloat(e.target.value) || 0 })}
+                  className="h-9 rounded-xl bg-muted/20 text-xs font-mono font-semibold"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Commission Rate (%)</Label>
+                <Input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="50"
+                  value={editFormData.commissionRatePercent}
+                  onChange={(e) => setEditFormData({ ...editFormData, commissionRatePercent: parseFloat(e.target.value) || 0 })}
+                  className="h-9 rounded-xl bg-muted/20 text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Email Address</Label>
+                <Input
+                  type="email"
+                  placeholder="e.g. tariq@pharmadist.pk"
+                  value={editFormData.email || ""}
+                  onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                  className="h-9 rounded-xl bg-muted/20 text-xs"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Residential Address</Label>
+                <Input
+                  placeholder="e.g. Suite 402, Trade Centre, Saddar, Karachi"
+                  value={editFormData.address || ""}
+                  onChange={(e) => setEditFormData({ ...editFormData, address: e.target.value })}
+                  className="h-9 rounded-xl bg-muted/20 text-xs"
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditOpen(false)}
+                className="rounded-xl text-xs"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-xl text-xs font-medium"
+              >
+                {isSubmitting ? "Saving..." : "Save Changes"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* 8. Delete Confirmation Modal */}
+      <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <DialogContent className="max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base font-bold text-rose-600">
+              <Trash2 className="h-5 w-5" />
+              Delete Sales Representative
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Are you sure you want to permanently delete representative{" "}
+              <strong>"{deleteCandidate?.name}"</strong>? This will cleanly unlink any historical records.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="gap-2 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsDeleteOpen(false)}
+              className="rounded-xl text-xs"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              disabled={isDeleting}
+              onClick={handleConfirmDelete}
+              className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-medium"
+            >
+              {isDeleting ? "Deleting..." : "Yes, Delete Representative"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

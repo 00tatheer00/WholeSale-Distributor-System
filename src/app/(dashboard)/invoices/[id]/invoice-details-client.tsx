@@ -11,7 +11,8 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
+import { triggerPrint } from "@/lib/print-utils";
 import { InvoiceDetailRecord } from "@/server/services/invoice.service";
 
 interface InvoiceDetailsClientProps {
@@ -26,14 +27,14 @@ export function InvoiceDetailsClient({ invoice }: InvoiceDetailsClientProps) {
   React.useEffect(() => {
     if (searchParams.get("print") === "true") {
       const timer = setTimeout(() => {
-        window.print();
+        triggerPrint();
       }, 500);
       return () => clearTimeout(timer);
     }
   }, [searchParams]);
 
   const handlePrint = () => {
-    window.print();
+    triggerPrint();
   };
 
   return (
@@ -139,7 +140,7 @@ export function InvoiceDetailsClient({ invoice }: InvoiceDetailsClientProps) {
               Order Ref: <span className="text-foreground font-semibold">{invoice.saleNumber}</span>
             </div>
             <div className="text-[11px] text-muted-foreground">
-              Issue Date: <strong className="text-foreground font-mono">{formatDate(invoice.issueDate)}</strong>
+              Issue Date & Time: <strong className="text-foreground font-mono">{formatDateTime(invoice.issueDate)}</strong>
             </div>
             {activeTab === "INVOICE" && (
               <div className="text-[11px] text-muted-foreground">
@@ -340,7 +341,7 @@ export function InvoiceDetailsClient({ invoice }: InvoiceDetailsClientProps) {
           <div className="text-[9px] text-muted-foreground border-t border-border/40 pt-2 text-center">
             {invoice.companyInvoiceFooter}
             <br />
-            DRAP-oriented pharmaceutical wholesale documentation. Computer-generated tax document.
+            Pharmaceutical wholesale documentation. Computer-generated tax document. • Built by Tech4Edges - CEO Tatheer - 03374005515
           </div>
         </div>
       </div>

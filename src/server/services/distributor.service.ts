@@ -522,3 +522,93 @@ export async function recordDistributorExpense(
     return { success: false, error: error.message || "Failed to record representative expense." };
   }
 }
+
+/**
+ * Delete a Sales Representative permanently and cleanly unlink relationships
+ */
+export async function deleteDistributor(
+  id: string,
+  userId?: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const distributor = await prisma.distributor.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            sales: true,
+            invoices: true,
+            customerPayments: true,
+            customers: true,
+            distributorSales: true,
+            distributorExpenses: true,
+          },
+        },
+      },
+    });
+
+    if (!distributor) {
+      return { success: false, error: "Sales representative not found." };
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // Unlink customers
+      await tx.customer.updateMany({
+        where: { distributorId: id },
+        data: { distributorId: null },
+      });
+
+      // Unlink sales
+      await tx.sale.updateMany({
+        where: { distributorId: id },
+        data: { distributorId: null },
+      });
+
+      // Unlink invoices
+      await tx.invoice.updateMany({
+        where: { distributorId: id },
+        data: { distributorId: null },
+      });
+
+      // Unlink customer payments
+      await tx.customerPayment.updateMany({
+        where: { distributorId: id },
+        data: { distributorId: null },
+      });
+
+      // Delete associated distributor sales and expenses
+      await tx.distributorSale.deleteMany({
+        where: { distributorId: id },
+      });
+
+      await tx.distributorExpense.deleteMany({
+        where: { distributorId: id },
+      });
+
+      // Delete distributor
+      await tx.distributor.delete({
+        where: { id },
+      });
+
+      if (userId) {
+        await tx.auditLog.create({
+          data: {
+            userId,
+            action: "DELETE",
+            entityName: "Distributor",
+            entityId: id,
+            oldValues: JSON.stringify({
+              name: distributor.name,
+              employeeCode: distributor.employeeCode,
+            }),
+          },
+        });
+      }
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error deleting distributor:", error);
+    return { success: false, error: error.message || "Failed to delete sales representative." };
+  }
+}

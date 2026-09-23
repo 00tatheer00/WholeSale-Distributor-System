@@ -133,8 +133,7 @@
   footer,
   .print\:hidden,
   [data-radix-popper-content-wrapper],
-  [role="dialog"] > div[class*="fixed inset-0"],
-  button,
+  button:not(.allow-print),
   .no-print {
     display: none !important;
     visibility: hidden !important;
@@ -161,10 +160,28 @@
     print-color-adjust: exact !important;
   }
 
-  /* 3. Main Printable Invoice Container Rules */
+  /* 3. Dialog / Modal print handling */
+  div[data-state="open"][role="dialog"] {
+    position: static !important;
+    transform: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+
+  div[data-state="open"] > div[class*="fixed inset-0"] {
+    display: none !important;
+  }
+
+  /* 4. Main Printable Containers */
   .printable-invoice-sheet,
+  .printable-receipt,
   .print-container {
-    position: absolute !important;
+    position: static !important;
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
@@ -181,7 +198,7 @@
     break-after: avoid !important;
   }
 
-  /* 4. Table and Row Page-Break Guards */
+  /* 5. Table and Row Page-Break Guards */
   table {
     width: 100% !important;
     border-collapse: collapse !important;
@@ -198,7 +215,7 @@
     display: table-header-group !important;
   }
 
-  /* 5. Clean Borders for Print */
+  /* 6. Clean Borders for Print */
   .border,
   .border-b,
   .border-t,

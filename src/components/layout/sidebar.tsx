@@ -175,8 +175,8 @@ export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
         ))}
       </div>
 
-      {/* System Status Footer */}
-      <div className="p-3 border-t border-sidebar-border">
+      {/* System Status & Tech4Edges Branding Footer */}
+      <div className="p-3 border-t border-sidebar-border space-y-2">
         <div
           className={cn(
             "flex items-center rounded-xl bg-muted/60 p-2.5 text-xs border border-border/40",
@@ -187,10 +187,17 @@ export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
           {!isCollapsed && (
             <div className="flex flex-col truncate">
               <span className="text-[11px] font-semibold text-foreground">System Online</span>
-              <span className="text-[10px] text-muted-foreground">PostgreSQL / FEFO Active</span>
+              <span className="text-[10px] text-muted-foreground">FEFO Inventory Active</span>
             </div>
           )}
         </div>
+
+        {!isCollapsed && (
+          <div className="px-1 text-[10px] text-muted-foreground/80 leading-tight text-center">
+            <span className="font-semibold text-foreground/90 block">Built by Tech4Edges</span>
+            <span>CEO Tatheer • 03374005515</span>
+          </div>
+        )}
       </div>
     </aside>
   );

@@ -240,3 +240,132 @@ export async function getBatchesAction(): Promise<ActionResult<any[]>> {
     return { success: true, data: MOCK_BATCHES };
   }
 }
+
+/**
+ * Edit batch details (Batch #, Expiry, Cost, Trade Price, MRP, Godown, Quantity)
+ */
+export async function updateBatchAction(
+  batchId: string,
+  data: {
+    batchNumber: string;
+    expiryDate: string;
+    mfgDate?: string;
+    quantityOnHand: number;
+    purchaseCostPrice: number;
+    tradePrice: number;
+    mrp: number;
+    warehouseId?: string;
+    location?: string;
+  }
+): Promise<ActionResult> {
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    const existing = await prisma.medicineBatch.findUnique({
+      where: { id: batchId },
+    });
+
+    if (!existing) {
+      return { success: false, error: "Batch record not found." };
+    }
+
+    const qtyDiff = data.quantityOnHand - existing.quantityOnHand;
+    const reserved = existing.quantityReserved || 0;
+    const newAvailable = Math.max(0, data.quantityOnHand - reserved);
+
+    await prisma.$transaction(async (tx) => {
+      await tx.medicineBatch.update({
+        where: { id: batchId },
+        data: {
+          batchNumber: data.batchNumber.trim(),
+          expiryDate: new Date(data.expiryDate),
+          mfgDate: data.mfgDate ? new Date(data.mfgDate) : null,
+          quantityOnHand: data.quantityOnHand,
+          quantityAvailable: newAvailable,
+          purchaseCostPrice: data.purchaseCostPrice,
+          tradePrice: data.tradePrice,
+          mrp: data.mrp,
+          warehouseId: data.warehouseId || existing.warehouseId,
+          location: data.location ?? existing.location,
+        },
+      });
+
+      if (qtyDiff !== 0) {
+        await tx.stockMovement.create({
+          data: {
+            medicineId: existing.medicineId,
+            batchId: existing.id,
+            warehouseId: data.warehouseId || existing.warehouseId,
+            movementType: "ADJUSTMENT",
+            quantityDelta: qtyDiff,
+            quantityBefore: existing.quantityOnHand,
+            quantityAfter: data.quantityOnHand,
+            unitCostPrice: data.purchaseCostPrice,
+            reason: "Admin Stock Manual Edit",
+            notes: `Batch ${data.batchNumber} directly updated via Admin Cockpit.`,
+          },
+        });
+      }
+    });
+
+    revalidatePath("/inventory");
+    revalidatePath("/dashboard");
+    revalidatePath(`/medicines/${existing.medicineId}`);
+
+    return { success: true, message: `Batch ${data.batchNumber} updated successfully.` };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to update batch." };
+  }
+}
+
+/**
+ * Permanently delete a stock batch and its dependent ledger entries
+ */
+export async function deleteBatchAction(batchId: string): Promise<ActionResult> {
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    const existing = await prisma.medicineBatch.findUnique({
+      where: { id: batchId },
+      include: {
+        saleItems: { select: { id: true } },
+      },
+    });
+
+    if (!existing) {
+      return { success: false, error: "Batch not found or already deleted." };
+    }
+
+    if (existing.saleItems.length > 0) {
+      return {
+        success: false,
+        error: `Cannot delete batch "${existing.batchNumber}" because it is linked to ${existing.saleItems.length} billed sales invoices. You can set its quantity to 0 instead.`,
+      };
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.stockMovement.deleteMany({
+        where: { batchId },
+      });
+      await tx.stockAdjustment.deleteMany({
+        where: { batchId },
+      });
+      await tx.stockTransfer.deleteMany({
+        where: { batchId },
+      });
+      await tx.medicineBatch.delete({
+        where: { id: batchId },
+      });
+    });
+
+    revalidatePath("/inventory");
+    revalidatePath("/dashboard");
+    revalidatePath(`/medicines/${existing.medicineId}`);
+
+    return {
+      success: true,
+      message: `Batch ${existing.batchNumber} has been permanently deleted.`,
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to permanently delete batch." };
+  }
+}
+

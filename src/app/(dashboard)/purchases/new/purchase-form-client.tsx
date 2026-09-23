@@ -450,8 +450,9 @@ export function PurchaseFormClient({
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="warehouse" className="text-xs font-semibold">
-                    Receiving Warehouse <span className="text-rose-500">*</span>
+                  <Label htmlFor="warehouse" className="text-xs font-semibold flex items-center gap-1.5">
+                    <WarehouseIcon className="h-3.5 w-3.5 text-teal-600" />
+                    Destination Godown / Warehouse (منزل گودام) <span className="text-rose-500">*</span>
                   </Label>
                   <Button
                     type="button"

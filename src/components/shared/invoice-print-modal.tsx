@@ -8,7 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Printer, Building2 } from "lucide-react";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
+import { triggerPrint } from "@/lib/print-utils";
 import { Badge } from "@/components/ui/badge";
 
 export interface InvoicePrintItem {
@@ -75,7 +76,7 @@ export function InvoicePrintModal({
   if (!invoice) return null;
 
   const handlePrint = () => {
-    window.print();
+    triggerPrint();
   };
 
   return (
@@ -143,7 +144,7 @@ export function InvoicePrintModal({
                 {invoice.invoiceNumber}
               </div>
               <div className="text-[11px] text-muted-foreground">
-                Date: <strong>{formatDate(invoice.issueDate)}</strong>
+                Date & Time: <strong>{formatDateTime(invoice.issueDate)}</strong>
               </div>
               <div className="text-[11px] text-muted-foreground">
                 Due: <strong>{formatDate(invoice.dueDate)}</strong>
@@ -304,7 +305,7 @@ export function InvoicePrintModal({
 
           {/* Regulatory & Policy Footer */}
           <div className="text-[9px] text-muted-foreground text-center pt-2 border-t">
-            <p>{invoice.company.invoiceFooterText || "Licensed Wholesale Pharmaceutical Distributor. Computer generated wholesale tax invoice."}</p>
+            <p>{invoice.company.invoiceFooterText || "Licensed Wholesale Pharmaceutical Distributor. Computer generated wholesale tax invoice."} • Built by Tech4Edges - CEO Tatheer - 03374005515</p>
           </div>
         </div>
       </DialogContent>

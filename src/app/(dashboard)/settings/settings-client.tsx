@@ -107,8 +107,8 @@ export function SettingsClient({
     phone: initialCompany.phone || "+92 21 3589 1234",
     address: initialCompany.address || "Plot 45, Sector 15, Korangi Industrial Area",
     city: initialCompany.city || "Karachi",
-    country: initialCompany.country || "Pakistan",
-    currency: initialCompany.currency || "PKR",
+    country: initialCompany.country || "Afghanistan",
+    currency: initialCompany.currency || "AFN",
     logoUrl: initialCompany.logoUrl || null,
     invoiceFooterText:
       initialCompany.invoiceFooterText ||
@@ -475,6 +475,14 @@ export function SettingsClient({
               administrator credentials.
             </p>
           </div>
+
+          <div className="p-4 bg-primary/5 border border-primary/20 rounded-2xl text-[11px] text-muted-foreground space-y-1">
+            <p className="font-semibold text-foreground flex items-center gap-1.5">
+              <Shield className="h-3.5 w-3.5 text-primary" /> Engineering & System Support
+            </p>
+            <p className="text-foreground font-semibold">Built by Tech4Edges</p>
+            <p className="text-xs text-muted-foreground font-mono">CEO Tatheer • 03374005515</p>
+          </div>
         </div>
 
         {/* Right: Active Settings Card */}
@@ -651,10 +659,27 @@ export function SettingsClient({
                   <div className="space-y-1.5">
                     <Label className="text-xs font-semibold">Country</Label>
                     <Input
-                      value={settings.country || "Pakistan"}
+                      value={settings.country || "Afghanistan"}
                       onChange={(e) => setSettings({ ...settings, country: e.target.value })}
                       className="rounded-xl text-xs h-9 bg-muted/30"
                     />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">System Currency (کرنسی)</Label>
+                    <Select
+                      value={settings.currency || "AFN"}
+                      onValueChange={(val) => setSettings({ ...settings, currency: val })}
+                    >
+                      <SelectTrigger className="rounded-xl text-xs h-9 bg-muted/30">
+                        <SelectValue placeholder="Select Currency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="AFN">Afghan Afghani (Afs. / AFN)</SelectItem>
+                        <SelectItem value="PKR">Pakistani Rupee (Rs. / PKR)</SelectItem>
+                        <SelectItem value="USD">US Dollar ($ / USD)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-1.5 md:col-span-2">

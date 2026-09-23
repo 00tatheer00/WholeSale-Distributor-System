@@ -9,8 +9,8 @@ export const companySettingsSchema = z.object({
   phone: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
   city: z.string().optional().nullable(),
-  country: z.string().default("Pakistan"),
-  currency: z.string().default("PKR"),
+  country: z.string().default("Afghanistan"),
+  currency: z.string().default("AFN"),
   logoUrl: z.string().optional().nullable(),
   invoiceFooterText: z.string().optional().nullable(),
   

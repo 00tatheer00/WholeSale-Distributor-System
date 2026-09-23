@@ -19,6 +19,7 @@ import {
   Ban,
   Filter,
   Edit,
+  Trash2,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -40,7 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
 import { ExpenseQueryResult } from "@/server/services/expense.service";
 import {
   createExpenseAction,
@@ -48,6 +49,7 @@ import {
   createExpenseCategoryAction,
   toggleExpenseCategoryStatusAction,
   cancelExpenseAction,
+  deleteExpenseAction,
 } from "@/server/actions/expense.actions";
 import { ExpenseInput, UpdateExpenseInput, ExpenseCategoryInput } from "@/validations/expense.schema";
 import { ExpenseCategoryRecord, ExpenseRecord } from "@/types/models";
@@ -110,6 +112,10 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
     isDirectCost: false,
     isActive: true,
   });
+
+  // Delete Expense State
+  const [deletingExpense, setDeletingExpense] = React.useState<ExpenseRecord | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
 
   const data = initialData || {
     expenses: [],
@@ -281,6 +287,23 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
     }
   };
 
+  const handleDeleteExpense = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!deletingExpense) return;
+    setIsSubmitting(true);
+    const res = await deleteExpenseAction(deletingExpense.id);
+    setIsSubmitting(false);
+    if (res.success) {
+      setFeedback({ type: "success", message: res.message || "Expense voucher deleted permanently." });
+      setIsDeleteModalOpen(false);
+      setDeletingExpense(null);
+      router.refresh();
+      setTimeout(() => setFeedback(null), 4000);
+    } else {
+      setFeedback({ type: "error", message: res.error || "Failed to delete expense voucher." });
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto pb-16">
       {/* 1. Header */}
@@ -327,9 +350,9 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
       {/* 2. Top Pastel Metric Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Total Expenses */}
-        <div className="bg-rose-50/70 border border-rose-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-rose-50/70 border border-rose-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-rose-800">Total Operating Expenses</span>
+            <span className="text-xs font-semibold text-rose-800">Total Operating Expenses</span>
             <div className="h-8 w-8 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-700">
               <Receipt className="h-4 w-4" />
             </div>
@@ -341,9 +364,9 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
         </div>
 
         {/* Direct Logistics Cost */}
-        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-sky-800">Direct Logistics & Fuel</span>
+            <span className="text-xs font-semibold text-sky-800">Direct Logistics & Fuel</span>
             <div className="h-8 w-8 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-700">
               <Truck className="h-4 w-4" />
             </div>
@@ -357,9 +380,9 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
         </div>
 
         {/* Office & Rent */}
-        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-amber-800">Office & Utilities</span>
+            <span className="text-xs font-semibold text-amber-800">Office & Utilities</span>
             <div className="h-8 w-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700">
               <Building2 className="h-4 w-4" />
             </div>
@@ -373,9 +396,9 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
         </div>
 
         {/* Active Categories */}
-        <div className="bg-purple-50/70 border border-purple-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-purple-50/70 border border-purple-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-purple-800">Expense Heads</span>
+            <span className="text-xs font-semibold text-purple-800">Expense Heads</span>
             <div className="h-8 w-8 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-700">
               <Tag className="h-4 w-4" />
             </div>
@@ -477,7 +500,7 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
                 <th className="px-4 py-3.5">Paid To / Payee</th>
                 <th className="px-4 py-3.5">Description</th>
                 <th className="px-4 py-3.5">Method</th>
-                <th className="px-4 py-3.5 text-right">Amount (Rs.)</th>
+                <th className="px-4 py-3.5 text-right">Amount (Afs.)</th>
                 <th className="px-4 py-3.5 text-center">Status</th>
                 <th className="px-5 py-3.5 text-right">Action</th>
               </tr>
@@ -499,9 +522,9 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
                       {e.voucherNumber}
                     </td>
 
-                    {/* Date */}
+                    {/* Date with Time */}
                     <td className="px-4 py-3.5 text-muted-foreground whitespace-nowrap">
-                      {formatDate(e.expenseDate)}
+                      {formatDateTime(e.expenseDate)}
                     </td>
 
                     {/* Category */}
@@ -572,13 +595,25 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
                                 setCancellingExpense(e);
                                 setIsCancelModalOpen(true);
                               }}
-                              className="h-7 px-2 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg"
+                              className="h-7 px-2 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg"
                               title="Void Expense Voucher"
                             >
                               <Ban className="h-3 w-3 mr-1" /> Void
                             </Button>
                           </>
                         )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setDeletingExpense(e);
+                            setIsDeleteModalOpen(true);
+                          }}
+                          className="h-7 px-2 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg"
+                          title="Delete Expense Voucher"
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" /> Delete
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -663,7 +698,7 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
 
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-foreground">
-                  Amount (PKR / Rs.) <span className="text-rose-500">*</span>
+                  Amount (Afs.) <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   type="number"
@@ -800,7 +835,7 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
 
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-foreground">
-                  Amount (PKR / Rs.) <span className="text-rose-500">*</span>
+                  Amount (Afs.) <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   type="number"
@@ -1086,6 +1121,47 @@ export function ExpensesClient({ initialData, categories }: ExpensesClientProps)
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* 9. Delete Expense Dialog */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base font-bold text-rose-600">
+              <Trash2 className="h-5 w-5" />
+              Permanently Delete Expense Voucher?
+            </DialogTitle>
+          </DialogHeader>
+
+          {deletingExpense && (
+            <form onSubmit={handleDeleteExpense} className="space-y-4 pt-2">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Are you sure you want to permanently delete expense voucher <strong className="text-foreground font-mono">{deletingExpense.voucherNumber}</strong> for <strong className="text-foreground">{formatCurrency(deletingExpense.amount)}</strong> paid to <strong className="text-foreground">{deletingExpense.paidTo}</strong>?
+              </p>
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-300 text-xs">
+                ⚠️ This action is irreversible and removes the expense from all accounts.
+              </div>
+
+              <DialogFooter className="gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  className="rounded-xl text-xs"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold"
+                >
+                  {isSubmitting ? "Deleting..." : "Yes, Delete Permanently"}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
         </DialogContent>
       </Dialog>
     </div>

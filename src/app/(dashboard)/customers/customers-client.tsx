@@ -212,7 +212,7 @@ export function CustomersClient({ initialData }: CustomersClientProps) {
       {/* 2. Top Metric Cards (Lightweight Colorful Pharmacy Aesthetic) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Total Active Clients */}
-        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-sky-800">Active Pharmacies</span>
             <div className="h-8 w-8 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-700">
@@ -227,7 +227,7 @@ export function CustomersClient({ initialData }: CustomersClientProps) {
         </div>
 
         {/* Total Receivable Due */}
-        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-amber-800">Total Outstanding (AR)</span>
             <div className="h-8 w-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700">
@@ -241,7 +241,7 @@ export function CustomersClient({ initialData }: CustomersClientProps) {
         </div>
 
         {/* Total Credit Pool */}
-        <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-emerald-800">Total Approved Credit</span>
             <div className="h-8 w-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-700">
@@ -255,7 +255,7 @@ export function CustomersClient({ initialData }: CustomersClientProps) {
         </div>
 
         {/* Overdue / High-Risk Accounts */}
-        <div className="bg-rose-50/70 border border-rose-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-rose-50/70 border border-rose-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-rose-800">Overdue / Blocked</span>
             <div className="h-8 w-8 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-700">

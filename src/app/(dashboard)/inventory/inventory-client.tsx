@@ -21,13 +21,24 @@ import {
   Package,
   PackagePlus,
   Plus,
+  Edit,
+  Trash2,
+  CheckCircle2,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { DataTable } from "@/components/shared/data-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -41,7 +52,11 @@ import {
   InventorySummaryMetrics,
 } from "@/types/inventory";
 import { CategoryRecord } from "@/types/models";
-import { getInventoryAction } from "@/server/actions/inventory.actions";
+import {
+  getInventoryAction,
+  updateBatchAction,
+  deleteBatchAction,
+} from "@/server/actions/inventory.actions";
 
 interface InventoryClientProps {
   initialItems: InventoryItemRecord[];
@@ -123,6 +138,75 @@ export function InventoryClient({
   const handleSupplierChange = (val: string) => {
     setSelectedSupplier(val);
     refreshInventory(1, search, statusFilter, selectedCategory, val);
+  };
+
+  // Edit & Delete Batch state
+  const [editingBatch, setEditingBatch] = React.useState<InventoryItemRecord | null>(null);
+  const [editForm, setEditForm] = React.useState({
+    batchNumber: "",
+    expiryDate: "",
+    quantityOnHand: 0,
+    purchaseCostPrice: 0,
+    tradePrice: 0,
+    mrp: 0,
+    rackName: "",
+  });
+  const [deletingBatch, setDeletingBatch] = React.useState<InventoryItemRecord | null>(null);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [feedback, setFeedback] = React.useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  const handleOpenEdit = (b: InventoryItemRecord) => {
+    setEditingBatch(b);
+    setEditForm({
+      batchNumber: b.batchNumber,
+      expiryDate: b.expiryDate ? b.expiryDate.split("T")[0] : "",
+      quantityOnHand: b.quantityOnHand,
+      purchaseCostPrice: b.purchaseCostPrice,
+      tradePrice: b.tradePrice,
+      mrp: b.mrp,
+      rackName: b.rackName || "",
+    });
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingBatch) return;
+    setIsSubmitting(true);
+    setFeedback(null);
+    const res = await updateBatchAction(editingBatch.id || editingBatch.batchId, {
+      batchNumber: editForm.batchNumber,
+      expiryDate: editForm.expiryDate,
+      quantityOnHand: Number(editForm.quantityOnHand),
+      purchaseCostPrice: Number(editForm.purchaseCostPrice),
+      tradePrice: Number(editForm.tradePrice),
+      mrp: Number(editForm.mrp),
+      location: editForm.rackName,
+    });
+    setIsSubmitting(false);
+    if (res.success) {
+      setFeedback({ type: "success", message: res.message || "Batch updated successfully." });
+      setEditingBatch(null);
+      refreshInventory();
+      setTimeout(() => setFeedback(null), 4000);
+    } else {
+      setFeedback({ type: "error", message: res.error || "Failed to update batch." });
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingBatch) return;
+    setIsSubmitting(true);
+    setFeedback(null);
+    const res = await deleteBatchAction(deletingBatch.id || deletingBatch.batchId);
+    setIsSubmitting(false);
+    if (res.success) {
+      setFeedback({ type: "success", message: res.message || "Batch deleted permanently." });
+      setDeletingBatch(null);
+      refreshInventory();
+      setTimeout(() => setFeedback(null), 4000);
+    } else {
+      setFeedback({ type: "error", message: res.error || "Failed to delete batch." });
+    }
   };
 
   const columns: ColumnDef<InventoryItemRecord>[] = [
@@ -257,6 +341,32 @@ export function InventoryClient({
         return <Badge variant="success">IN STOCK</Badge>;
       },
     },
+    {
+      id: "actions",
+      header: () => <div className="text-right">Actions</div>,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-1.5 justify-end">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => handleOpenEdit(row.original)}
+            className="h-8 px-2 text-xs font-semibold text-primary hover:bg-primary/10 gap-1 rounded-lg"
+          >
+            <Edit className="h-3.5 w-3.5" />
+            Edit
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setDeletingBatch(row.original)}
+            className="h-8 px-2 text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 gap-1 rounded-lg"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Delete
+          </Button>
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -290,6 +400,20 @@ export function InventoryClient({
           </div>
         }
       />
+
+      {/* Global Feedback Banner */}
+      {feedback && (
+        <div
+          className={`flex items-center gap-2 p-3.5 rounded-xl border text-sm font-medium transition-all ${
+            feedback.type === "success"
+              ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+              : "bg-rose-50 text-rose-800 border-rose-200"
+          }`}
+        >
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          <span>{feedback.message}</span>
+        </div>
+      )}
 
       {/* Helper Banner for Idiot-Proof Clarity */}
       <div className="p-3.5 rounded-2xl bg-gradient-to-r from-blue-500/10 via-indigo-500/5 to-transparent border border-blue-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
@@ -480,6 +604,176 @@ export function InventoryClient({
           </Button>
         </div>
       </div>
+
+      {/* 1. Edit Batch Modal */}
+      <Dialog open={!!editingBatch} onOpenChange={(open) => !open && setEditingBatch(null)}>
+        <DialogContent className="sm:max-w-[500px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold flex items-center gap-2">
+              <Edit className="h-5 w-5 text-primary" />
+              Edit Medicine Batch Stock
+            </DialogTitle>
+          </DialogHeader>
+
+          {editingBatch && (
+            <form onSubmit={handleSaveEdit} className="space-y-4 pt-2 text-xs">
+              <div className="p-3 rounded-xl bg-muted/50 border space-y-1">
+                <div className="font-bold text-foreground text-sm">{editingBatch.brandName}</div>
+                <div className="text-muted-foreground">{editingBatch.genericName} • {editingBatch.strength}</div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold">Batch Number *</Label>
+                  <Input
+                    required
+                    value={editForm.batchNumber}
+                    onChange={(e) => setEditForm({ ...editForm, batchNumber: e.target.value })}
+                    className="h-9 text-xs font-mono font-bold"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold">Expiry Date *</Label>
+                  <Input
+                    required
+                    type="date"
+                    value={editForm.expiryDate}
+                    onChange={(e) => setEditForm({ ...editForm, expiryDate: e.target.value })}
+                    className="h-9 text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold">Stock Quantity (Units) *</Label>
+                  <Input
+                    required
+                    type="number"
+                    min="0"
+                    value={editForm.quantityOnHand}
+                    onChange={(e) => setEditForm({ ...editForm, quantityOnHand: Number(e.target.value) })}
+                    className="h-9 text-xs font-bold"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold">Rack / Storage Location</Label>
+                  <Input
+                    placeholder="Shelf / Rack A-1"
+                    value={editForm.rackName}
+                    onChange={(e) => setEditForm({ ...editForm, rackName: e.target.value })}
+                    className="h-9 text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold">Cost Price (Afs.) *</Label>
+                  <Input
+                    required
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={editForm.purchaseCostPrice}
+                    onChange={(e) => setEditForm({ ...editForm, purchaseCostPrice: Number(e.target.value) })}
+                    className="h-9 text-xs"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold">Trade Price (Afs.) *</Label>
+                  <Input
+                    required
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={editForm.tradePrice}
+                    onChange={(e) => setEditForm({ ...editForm, tradePrice: Number(e.target.value) })}
+                    className="h-9 text-xs"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold">MRP (Afs.) *</Label>
+                  <Input
+                    required
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={editForm.mrp}
+                    onChange={(e) => setEditForm({ ...editForm, mrp: Number(e.target.value) })}
+                    className="h-9 text-xs"
+                  />
+                </div>
+              </div>
+
+              <DialogFooter className="gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditingBatch(null)}
+                  className="rounded-xl text-xs"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={isSubmitting}
+                  className="bg-primary hover:bg-primary/90 text-white rounded-xl text-xs font-semibold"
+                >
+                  {isSubmitting ? "Saving..." : "Save Batch Changes"}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* 2. Permanent Delete Confirmation Modal */}
+      <Dialog open={!!deletingBatch} onOpenChange={(open) => !open && setDeletingBatch(null)}>
+        <DialogContent className="sm:max-w-[440px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold text-rose-600 flex items-center gap-2">
+              <Trash2 className="h-5 w-5" />
+              Permanently Delete Stock Batch?
+            </DialogTitle>
+          </DialogHeader>
+
+          {deletingBatch && (
+            <div className="space-y-3 pt-2 text-xs">
+              <p className="text-muted-foreground leading-relaxed">
+                Are you sure you want to permanently delete batch <strong className="text-foreground font-mono">{deletingBatch.batchNumber}</strong> for <strong className="text-foreground">{deletingBatch.brandName}</strong>?
+              </p>
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-300 space-y-1">
+                <div className="font-bold">⚠️ Irreversible Action</div>
+                <div>This will permanently remove this batch and all related inventory records from the system.</div>
+              </div>
+
+              <DialogFooter className="gap-2 pt-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDeletingBatch(null)}
+                  className="rounded-xl text-xs"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={isSubmitting}
+                  onClick={handleConfirmDelete}
+                  className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold shadow-sm"
+                >
+                  {isSubmitting ? "Deleting..." : "Yes, Delete Permanently"}
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

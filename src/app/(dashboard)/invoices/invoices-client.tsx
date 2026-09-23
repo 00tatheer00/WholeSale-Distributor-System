@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
 import { InvoiceQueryResult } from "@/server/services/invoice.service";
 import { CustomerRecord } from "@/types/models";
 
@@ -101,9 +101,9 @@ export function InvoicesClient({ initialInvoicesData, customers }: InvoicesClien
       {/* 2. Top Metric Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Total Invoiced */}
-        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-sky-800">Total Billed Invoices</span>
+            <span className="text-xs font-semibold text-sky-800">Total Billed Invoices</span>
             <div className="h-8 w-8 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-700">
               <FileText className="h-4 w-4" />
             </div>
@@ -115,9 +115,9 @@ export function InvoicesClient({ initialInvoicesData, customers }: InvoicesClien
         </div>
 
         {/* Total Collected */}
-        <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-emerald-800">Settled & Collected</span>
+            <span className="text-xs font-semibold text-emerald-800">Settled & Collected</span>
             <div className="h-8 w-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-700">
               <CreditCard className="h-4 w-4" />
             </div>
@@ -129,9 +129,9 @@ export function InvoicesClient({ initialInvoicesData, customers }: InvoicesClien
         </div>
 
         {/* Accounts Receivable Due */}
-        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-amber-800">Pending Receivables (AR)</span>
+            <span className="text-xs font-semibold text-amber-800">Pending Receivables (AR)</span>
             <div className="h-8 w-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700">
               <Building2 className="h-4 w-4" />
             </div>
@@ -143,9 +143,9 @@ export function InvoicesClient({ initialInvoicesData, customers }: InvoicesClien
         </div>
 
         {/* Active Challans */}
-        <div className="bg-indigo-50/70 border border-indigo-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-indigo-50/70 border border-indigo-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-indigo-800">Delivery Challans</span>
+            <span className="text-xs font-semibold text-indigo-800">Delivery Challans</span>
             <div className="h-8 w-8 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-700">
               <Truck className="h-4 w-4" />
             </div>
@@ -313,9 +313,9 @@ export function InvoicesClient({ initialInvoicesData, customers }: InvoicesClien
                       </div>
                     </td>
 
-                    {/* Issue Date */}
+                    {/* Issue Date with Time */}
                     <td className="px-4 py-4 text-xs text-muted-foreground whitespace-nowrap">
-                      {formatDate(inv.issueDate)}
+                      {formatDateTime(inv.issueDate)}
                     </td>
 
                     {/* Due Date */}

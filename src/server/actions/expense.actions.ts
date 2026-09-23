@@ -114,7 +114,7 @@ export async function createExpenseAction(
     return {
       success: true,
       data: { voucherNumber: result.data?.voucherNumber },
-      message: `Expense voucher ${result.data?.voucherNumber} for Rs. ${parsed.data.amount} recorded.`,
+      message: `Expense voucher ${result.data?.voucherNumber} for Afs. ${parsed.data.amount} recorded.`,
     };
   } catch (error: any) {
     console.error("createExpenseAction error:", error);
@@ -168,6 +168,31 @@ export async function updateExpenseAction(
   } catch (error: any) {
     console.error("updateExpenseAction error:", error);
     return { success: false, error: "Failed to update expense." };
+  }
+}
+
+export async function deleteExpenseAction(expenseId: string): Promise<ActionResult> {
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    const existing = await prisma.businessExpense.findUnique({
+      where: { id: expenseId },
+    });
+
+    if (!existing) {
+      return { success: false, error: "Expense voucher not found." };
+    }
+
+    await prisma.businessExpense.delete({
+      where: { id: expenseId },
+    });
+
+    revalidatePath("/expenses");
+    revalidatePath("/profit");
+    revalidatePath("/dashboard");
+    return { success: true, message: `Expense voucher ${existing.voucherNumber} deleted permanently.` };
+  } catch (error: any) {
+    console.error("deleteExpenseAction error:", error);
+    return { success: false, error: "Failed to delete expense voucher." };
   }
 }
 

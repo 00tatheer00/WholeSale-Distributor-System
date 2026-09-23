@@ -184,32 +184,32 @@ export function ReportsClient({ summary }: ReportsClientProps) {
 
       {/* 2. Top Summary KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-4.5 shadow-sm">
-          <div className="text-xs font-medium text-sky-800">Total Billed Revenue</div>
+        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
+          <div className="text-xs font-semibold text-sky-800">Total Billed Revenue</div>
           <div className="mt-2 text-2xl font-bold text-sky-950 font-mono">
             {formatCurrency(s.totalRevenue)}
           </div>
           <div className="text-[11px] text-sky-600 mt-1">{s.totalSalesCount} wholesale orders booked</div>
         </div>
 
-        <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-4.5 shadow-sm">
-          <div className="text-xs font-medium text-emerald-800">Total Purchases Intake</div>
+        <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
+          <div className="text-xs font-semibold text-emerald-800">Total Purchases Intake</div>
           <div className="mt-2 text-2xl font-bold text-emerald-950 font-mono">
             {formatCurrency(s.totalPurchases)}
           </div>
           <div className="text-[11px] text-emerald-600 mt-1">{s.totalPurchaseCount} consignments received</div>
         </div>
 
-        <div className="bg-purple-50/70 border border-purple-100/80 rounded-2xl p-4.5 shadow-sm">
-          <div className="text-xs font-medium text-purple-800">Customer Receivables (AR)</div>
+        <div className="bg-purple-50/70 border border-purple-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
+          <div className="text-xs font-semibold text-purple-800">Customer Receivables (AR)</div>
           <div className="mt-2 text-2xl font-bold text-purple-950 font-mono">
             {formatCurrency(s.totalCustomerDues)}
           </div>
           <div className="text-[11px] text-purple-600 mt-1">{s.totalCustomers} active pharmacy accounts</div>
         </div>
 
-        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-4.5 shadow-sm">
-          <div className="text-xs font-medium text-amber-800">Supplier Payables (AP)</div>
+        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
+          <div className="text-xs font-semibold text-amber-800">Supplier Payables (AP)</div>
           <div className="mt-2 text-2xl font-bold text-amber-950 font-mono">
             {formatCurrency(s.totalSupplierDues)}
           </div>

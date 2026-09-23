@@ -1,7 +1,7 @@
 import { NavigationSection } from "@/types";
 
 export const APP_NAME = "PharmaDist ERP";
-export const APP_DESCRIPTION = "Wholesale Medicine Distribution Management System (Pakistan Edition)";
+export const APP_DESCRIPTION = "Wholesale Medicine Distribution Management System";
 export const APP_VERSION = "1.0.0";
 
 /**

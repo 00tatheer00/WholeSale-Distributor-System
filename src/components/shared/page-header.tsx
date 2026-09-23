@@ -6,6 +6,7 @@ interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   description?: string;
   badge?: React.ReactNode;
   actions?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export function PageHeader({
@@ -13,9 +14,12 @@ export function PageHeader({
   description,
   badge,
   actions,
+  children,
   className,
   ...props
 }: PageHeaderProps) {
+  const actionContent = actions || children;
+
   return (
     <div
       className={cn(
@@ -35,8 +39,8 @@ export function PageHeader({
           <p className="text-sm text-muted-foreground">{description}</p>
         )}
       </div>
-      {actions && (
-        <div className="flex items-center gap-2.5 shrink-0">{actions}</div>
+      {actionContent && (
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">{actionContent}</div>
       )}
     </div>
   );

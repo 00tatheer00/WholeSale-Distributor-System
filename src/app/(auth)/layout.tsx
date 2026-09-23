@@ -56,8 +56,9 @@ export default function AuthLayout({
           <ShieldCheck className="h-4 w-4 text-[#0071E3]" />
           <span>Licensed Wholesale Pharmaceutical Distribution Management System</span>
         </div>
-        <div>
-          &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
+        <div className="flex flex-col sm:items-end text-[11px] gap-0.5">
+          <span>&copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.</span>
+          <span className="font-medium text-foreground/75">Built by Tech4Edges • CEO Tatheer • 03374005515</span>
         </div>
       </footer>
     </div>

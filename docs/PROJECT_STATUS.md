@@ -40,6 +40,7 @@
 | **Phase 25**| Windows NSIS Setup Installer (.exe) Optimization, Login Enforcement & Header UI Polish | ✅ Completed | Configured `electron-builder` with standard Windows NSIS setup wizard (`.exe` installer); Added automatic Desktop shortcut and Start Menu creation; Generated multi-resolution `electron/icon.ico`; Configured writeable `userData` database directory in `electron/main.js` guaranteeing read/write permissions for standard Windows users; Fixed dot-folder exclusion of `node_modules/.prisma` query engine by explicitly mapping `extraResources` and adding self-healing fallback copy in `main.js` (resolving packaged 500 internal server error); Enforced clean `/login` screen requirement on every application startup by clearing session storage; Removed obsolete "Install Mobile App" PWA installer button from Header; Added top menu "Lock / Logout to Login Screen"; Added dynamic port allocation to eliminate localhost:3000 collision crashes; Applied maximum LZMA compression and development file exclusions (327 MB → 189 MB total self-contained offline installer); Completely eliminated all hardcoded demo passwords from `/api/auth/login` (pure SQLite bcrypt authentication); Documented 2-click client download & install runbook in `docs/OFFLINE_DESKTOP_GUIDE.md`. |
 | **Phase 26**| Idiot-Proof Universal Quick-Add & UI/UX Simplification | ✅ Completed | Deployed 6-card high-visibility Quick Action Deck on Dashboard (`+ New Sale Bill`, `+ Add Factory Stock`, `+ Add Pharmacy`, `+ Add Supplier`, `+ Add Godown`, `+ Record Expense`) with rich colorful gradients; Added inline `[+ New Pharmacy]` and `[+ New Sales Rep]` quick modals in `/sales/new`; Added inline `[+ New Supplier]` and `[+ New Godown]` quick modals in `/purchases/new`; Added direct Admin Login Email & Password reset card right at the top of Tab 1 in `/settings`; Enhanced FEFO batch selector with prominent badges and expiry formatting; Standardized plain-language, idiot-proof titles across Sidebar navigation, Stock inventory, Invoices, and Expenses. Verified with 0 TypeScript errors (`npx tsc --noEmit`) and 53 Next.js production routes built cleanly. |
 | **Phase 27**| Complete Re-creation of Idiot-Proof Visual Guides & A4 PDFs | ✅ Completed | Deleted all legacy/foreign guides; Captured 7 high-res live UI screenshots; Authored brand-new ultra-simple Asan Roman Urdu & Easy English manuals (`PharmaDist_Asan_Urdu_Guide.html`, `PharmaDist_Easy_English_Guide.html`, `ASAN_URDU_GUIDE.md`, `EASY_ENGLISH_GUIDE.md`); Generated 2.47MB A4 print-ready PDFs; Deployed bilingual interactive portal at `docs/index.html` and `public/guide/index.html`; Updated Header guide button to `📖 System Guide (رہنمائی)`. Verified with 0 TypeScript errors and 53 production routes. |
+| **Phase 28**| Afghani Currency Localization, Master CRUD Controls, Stock Edit & Permanent Delete, Universal Print Integration & Card Layout Polish | ✅ Completed | 1) Standardized Afghani currency (`Afs.` / `AFN`) system-wide in `src/lib/utils.ts`, `prisma/schema.prisma`, and Settings; 2) Permanent batch/stock delete & edit (`updateBatchAction`, `deleteBatchAction`, Edit Batch Modal & Permanent Delete Dialog); 3) Fixed PageHeader root cause restoring Add buttons across all master pages + added Edit & Delete across Sales Reps (`/distributors`) and Daily Expenses (`/expenses`); 4) Full timestamp display with Date + Time (`formatDateTime`) on transactions, invoices, receipts; 5) Clarified "Destination Godown / Warehouse (منزل گودام) *" in purchases & stock transfers; 6) Universal Electron Native Print IPC integration (`triggerPrint()`) fixing dialog & preview issues on Invoices, Challans & Receipts; 7) Upgraded cramped card padding to generous `p-5 sm:p-6` across Sales, Invoices, Payments, Expenses, Reports, Customers & Reps; 8) Added software attribution branding `"Built by Tech4Edges - CEO Tatheer - 03374005515"` across Sidebar, Login, Auth, Settings, Invoices & Receipts. |
 
 ---
 
@@ -51,12 +52,11 @@
 - **Database ORM**: Prisma 6 with embedded SQLite & Atomic Transactions
 - **Authentication**: Local bcrypt password encryption (Offline sessions, zero fallback backdoors)
 - **UI Components**: Tailwind CSS, Radix UI primitives, Lucide React, TanStack Table v8, Recharts
-- **Regional Localization**: Pakistan Standard (`PKR`, `Rs.`, DRAP compliance, Raast, JazzCash, EasyPaisa, Bank Transfer, Cheque, Cash)
+- **Regional Localization**: Afghan Afghani (`Afs.` / `AFN`), Strict FEFO, DRAP Wholesale Guidelines, Universal Cash/Bank/Cheque
+- **Branding Attribution**: Built by Tech4Edges • CEO Tatheer • 03374005515
 - **Verification Status**:
   - `npx tsc --noEmit` $\rightarrow$ **0 Errors (Strict Type Safety)**
   - `npm run build` $\rightarrow$ **0 Errors (53 Production Routes Generated)**
-  - Empirical Route Verification $\rightarrow$ **`/login` (200 OK) & `/dashboard` (200 OK) verified on packaged standalone server**
-  - NSIS Desktop Installer (`.exe`) $\rightarrow$ **100% Built (`dist/PharmaDist Wholesale ERP Setup 1.0.0.exe`, 205 MB — Rebuilt 23-Sep-2026 with Phase 26/27 Simplified UI, Inline Dropdown Creation & Embedded Guides)**
 - **Desktop & Multi-PC LAN Support**:
   - Main PC runs `.exe` standalone application with embedded database.
   - Other PCs and Mobile devices on the same Wi-Fi connect via browser (`http://[Server-IP]:3000`) without any client-side installation.
@@ -65,8 +65,7 @@
 ---
 
 ## 3. Next Planned Phase
-- **Phase 27 — Client Live Handover & Operational Training**:
-  - Handover of simplified system and `.exe` installer to client.
-  - Final client acceptance walkthrough of 1-click Quick Action Deck and inline dropdown creation.
+- **Phase 29 — Client Live Handover & Operational Verification**:
+  - Live acceptance verification of Afghani currency, stock batch editing/deletion, and one-click Electron receipt & invoice printing.
 
 

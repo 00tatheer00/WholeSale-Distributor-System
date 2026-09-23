@@ -45,7 +45,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
 import { SaleQueryResult, SaleSummaryItem } from "@/server/services/sales.service";
 import { cancelSaleAction } from "@/server/actions/sales.actions";
 import { CustomerRecord, DistributorRecord } from "@/types/models";
@@ -202,9 +202,9 @@ export function SalesClient({ initialSalesData, customers, distributors = [] }: 
       {/* 2. Top Metric Cards (Lightweight Colorful Aesthetic) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Total Revenue */}
-        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-sky-800">Total Sales Revenue</span>
+            <span className="text-xs font-semibold text-sky-800">Total Sales Revenue</span>
             <div className="h-8 w-8 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-700">
               <ShoppingCart className="h-4 w-4" />
             </div>
@@ -216,9 +216,9 @@ export function SalesClient({ initialSalesData, customers, distributors = [] }: 
         </div>
 
         {/* Total Collected */}
-        <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-emerald-800">Collected at Booking</span>
+            <span className="text-xs font-semibold text-emerald-800">Collected at Booking</span>
             <div className="h-8 w-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-700">
               <CreditCard className="h-4 w-4" />
             </div>
@@ -230,9 +230,9 @@ export function SalesClient({ initialSalesData, customers, distributors = [] }: 
         </div>
 
         {/* Total Remaining Due */}
-        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-amber-800">Accounts Receivable Due</span>
+            <span className="text-xs font-semibold text-amber-800">Accounts Receivable Due</span>
             <div className="h-8 w-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700">
               <Building2 className="h-4 w-4" />
             </div>
@@ -244,9 +244,9 @@ export function SalesClient({ initialSalesData, customers, distributors = [] }: 
         </div>
 
         {/* Realized Gross Profit */}
-        <div className="bg-purple-50/70 border border-purple-100/80 rounded-2xl p-4.5 shadow-sm">
+        <div className="bg-purple-50/70 border border-purple-100/80 rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-purple-800">Gross Margin Profit</span>
+            <span className="text-xs font-semibold text-purple-800">Gross Margin Profit</span>
             <div className="h-8 w-8 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-700">
               <TrendingUp className="h-4 w-4" />
             </div>
@@ -508,9 +508,9 @@ export function SalesClient({ initialSalesData, customers, distributors = [] }: 
                       <div className="text-[10px] text-muted-foreground pl-5">Field Sales Rep</div>
                     </td>
 
-                    {/* Date */}
+                    {/* Date with Time */}
                     <td className="px-4 py-4 text-xs text-muted-foreground whitespace-nowrap">
-                      {formatDate(s.saleDate)}
+                      {formatDateTime(s.saleDate)}
                     </td>
 
                     {/* Items */}

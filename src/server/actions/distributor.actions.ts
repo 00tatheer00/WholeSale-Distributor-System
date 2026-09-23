@@ -12,6 +12,7 @@ import {
   getDistributorById,
   createDistributor,
   updateDistributor,
+  deleteDistributor,
   toggleDistributorStatus,
   recordDistributorExpense,
   DistributorQueryParams,
@@ -157,5 +158,22 @@ export async function recordDistributorExpenseAction(
   } catch (error: any) {
     console.error("recordDistributorExpenseAction error:", error);
     return { success: false, error: "Failed to log distributor expense." };
+  }
+}
+
+export async function deleteDistributorAction(id: string): Promise<ActionResult> {
+  try {
+    const result = await deleteDistributor(id);
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
+
+    revalidatePath("/distributors");
+    revalidatePath("/sales");
+    revalidatePath("/profit");
+    return { success: true, message: "Sales representative deleted successfully." };
+  } catch (error: any) {
+    console.error("deleteDistributorAction error:", error);
+    return { success: false, error: "Failed to delete sales representative." };
   }
 }
