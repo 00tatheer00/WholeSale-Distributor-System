@@ -26,6 +26,7 @@ import {
   Download,
   RefreshCw,
   FileCheck2,
+  Zap,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -69,7 +70,8 @@ import {
   CreateUserInput,
   UpdateUserInput,
 } from "@/validations/settings.schema";
-import { formatDate } from "@/lib/utils";
+import { formatDate, cn } from "@/lib/utils";
+import { useUiMode } from "@/providers/ui-mode-provider";
 
 interface SettingsClientProps {
   initialCompany: any;
@@ -82,6 +84,7 @@ export function SettingsClient({
   users: initialUsers,
   auditLogs,
 }: SettingsClientProps) {
+  const { uiMode, setUiMode } = useUiMode();
   const [activeTab, setActiveTab] = React.useState<
     "business" | "invoice" | "tax" | "inventory" | "credit" | "notifications" | "users" | "backup"
   >("business");
@@ -144,6 +147,9 @@ export function SettingsClient({
     notifyExpiredStock: initialCompany.notifyExpiredStock ?? true,
     notifyCreditBreach: initialCompany.notifyCreditBreach ?? true,
     notifySupplierDues: initialCompany.notifySupplierDues ?? true,
+
+    // Interface Mode
+    uiMode: (initialCompany.uiMode as "SIMPLE" | "FULL") || "SIMPLE",
   });
 
   const [isSaving, setIsSaving] = React.useState(false);
@@ -490,6 +496,104 @@ export function SettingsClient({
           {/* Section 1: Business Profile & Admin Credentials */}
           {activeTab === "business" && (
             <div className="space-y-6">
+              {/* SYSTEM INTERFACE MODE CARD (SIMPLE VS FULL ERP) */}
+              <Card className="border-2 border-emerald-500/40 bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-card rounded-2xl shadow-sm overflow-hidden">
+                <CardHeader className="border-b bg-emerald-500/10 pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-bold flex items-center gap-2 text-foreground">
+                      <div className="h-7 w-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm">
+                        <Zap className="h-4 w-4" />
+                      </div>
+                      System Interface Mode (سسٹم انٹرفیس موڈ)
+                    </CardTitle>
+                    <Badge
+                      className={cn(
+                        "text-[10px] font-bold uppercase",
+                        uiMode === "SIMPLE"
+                          ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
+                          : "bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30"
+                      )}
+                    >
+                      {uiMode === "SIMPLE" ? "Active: Aasan Mode ⚡" : "Active: Full ERP 🏢"}
+                    </Badge>
+                  </div>
+                  <CardDescription className="text-xs">
+                    Apni zaroorat ke mutabiq software ka interface asan ya advanced banayein. Aap jab chahein bina kisi data loss ke mode badal sakte hain.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-5 sm:p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Option 1: Aasan Mode */}
+                    <div
+                      onClick={() => {
+                        setUiMode("SIMPLE");
+                        setSettings((prev) => ({ ...prev, uiMode: "SIMPLE" }));
+                      }}
+                      className={cn(
+                        "relative p-4 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between gap-3 text-left",
+                        uiMode === "SIMPLE"
+                          ? "border-emerald-500 bg-emerald-500/10 shadow-sm"
+                          : "border-border/80 hover:border-emerald-500/40 hover:bg-muted/40"
+                      )}
+                    >
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-sm text-foreground flex items-center gap-2">
+                            <Zap className="h-4 w-4 text-emerald-600 fill-emerald-600/30" />
+                            ⚡ Aasan Wholesale Mode (سپر آسان)
+                          </span>
+                          {uiMode === "SIMPLE" && (
+                            <Badge className="bg-emerald-600 text-white text-[9px] font-bold">
+                              ACTIVE
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          Sirf rozmarrah ke zaroori kaam: Dawaiyan, Stock, Maal Khareedna, Sale Bill banana, aur Pharmacies ka khata. Faltu options (godown transfers, salesmen, manufacturers) chhupe hue hain taake kaam fast ho.
+                        </p>
+                      </div>
+                      <div className="pt-2 border-t border-border/50 text-[11px] text-emerald-700 dark:text-emerald-300 font-medium">
+                        ✓ Fast 3-Click Sale Billing & Auto Godown
+                      </div>
+                    </div>
+
+                    {/* Option 2: Full ERP Mode */}
+                    <div
+                      onClick={() => {
+                        setUiMode("FULL");
+                        setSettings((prev) => ({ ...prev, uiMode: "FULL" }));
+                      }}
+                      className={cn(
+                        "relative p-4 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between gap-3 text-left",
+                        uiMode === "FULL"
+                          ? "border-blue-500 bg-blue-500/10 shadow-sm"
+                          : "border-border/80 hover:border-blue-500/40 hover:bg-muted/40"
+                      )}
+                    >
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-sm text-foreground flex items-center gap-2">
+                            <Building2 className="h-4 w-4 text-blue-600" />
+                            🏢 Full Enterprise ERP (مکمل موڈ)
+                          </span>
+                          {uiMode === "FULL" && (
+                            <Badge className="bg-blue-600 text-white text-[9px] font-bold">
+                              ACTIVE
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          Tamam 24+ modules khule honge: Multiple Godowns, Inter-Warehouse Transfers, Field Salesmen (Order Bookers), Separate Manufacturers, Categories, Forensic Audit Logs, aur System Alerts.
+                        </p>
+                      </div>
+                      <div className="pt-2 border-t border-border/50 text-[11px] text-blue-700 dark:text-blue-300 font-medium">
+                        ✓ Full multi-department & multi-godown control
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* TOP PRIORITY CARD: ADMIN LOGIN CREDENTIALS & PASSWORD */}
               <Card className="border-2 border-primary/40 bg-gradient-to-br from-primary/5 via-blue-500/5 to-card rounded-2xl shadow-sm">
                 <CardHeader className="border-b bg-primary/10 pb-3">

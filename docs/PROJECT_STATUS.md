@@ -4,7 +4,7 @@
 **Repository**: [https://github.com/00tatheer00/WholeSale-Distributor-System.git](https://github.com/00tatheer00/WholeSale-Distributor-System.git)  
 **Branch**: `main`  
 **Current State**: **Final Audit & Production QA Complete — Certified Production-Ready**  
-**Last Updated**: 2026-09-21  
+**Last Updated**: 2026-09-23  
 
 ---
 
@@ -41,6 +41,7 @@
 | **Phase 26**| Idiot-Proof Universal Quick-Add & UI/UX Simplification | ✅ Completed | Deployed 6-card high-visibility Quick Action Deck on Dashboard (`+ New Sale Bill`, `+ Add Factory Stock`, `+ Add Pharmacy`, `+ Add Supplier`, `+ Add Godown`, `+ Record Expense`) with rich colorful gradients; Added inline `[+ New Pharmacy]` and `[+ New Sales Rep]` quick modals in `/sales/new`; Added inline `[+ New Supplier]` and `[+ New Godown]` quick modals in `/purchases/new`; Added direct Admin Login Email & Password reset card right at the top of Tab 1 in `/settings`; Enhanced FEFO batch selector with prominent badges and expiry formatting; Standardized plain-language, idiot-proof titles across Sidebar navigation, Stock inventory, Invoices, and Expenses. Verified with 0 TypeScript errors (`npx tsc --noEmit`) and 53 Next.js production routes built cleanly. |
 | **Phase 27**| Complete Re-creation of Idiot-Proof Visual Guides & A4 PDFs | ✅ Completed | Deleted all legacy/foreign guides; Captured 7 high-res live UI screenshots; Authored brand-new ultra-simple Asan Roman Urdu & Easy English manuals (`PharmaDist_Asan_Urdu_Guide.html`, `PharmaDist_Easy_English_Guide.html`, `ASAN_URDU_GUIDE.md`, `EASY_ENGLISH_GUIDE.md`); Generated 2.47MB A4 print-ready PDFs; Deployed bilingual interactive portal at `docs/index.html` and `public/guide/index.html`; Updated Header guide button to `📖 System Guide (رہنمائی)`. Verified with 0 TypeScript errors and 53 production routes. |
 | **Phase 28**| Afghani Currency Localization, Master CRUD Controls, Stock Edit & Permanent Delete, Universal Print Integration & Card Layout Polish | ✅ Completed | 1) Standardized Afghani currency (`Afs.` / `AFN`) system-wide in `src/lib/utils.ts`, `prisma/schema.prisma`, and Settings; 2) Permanent batch/stock delete & edit (`updateBatchAction`, `deleteBatchAction`, Edit Batch Modal & Permanent Delete Dialog); 3) Fixed PageHeader root cause restoring Add buttons across all master pages + added Edit & Delete across Sales Reps (`/distributors`) and Daily Expenses (`/expenses`); 4) Full timestamp display with Date + Time (`formatDateTime`) on transactions, invoices, receipts; 5) Clarified "Destination Godown / Warehouse (منزل گودام) *" in purchases & stock transfers; 6) Universal Electron Native Print IPC integration (`triggerPrint()`) fixing dialog & preview issues on Invoices, Challans & Receipts; 7) Upgraded cramped card padding to generous `p-5 sm:p-6` across Sales, Invoices, Payments, Expenses, Reports, Customers & Reps; 8) Added software attribution branding `"Built by Tech4Edges - CEO Tatheer - 03374005515"` across Sidebar, Login, Auth, Settings, Invoices & Receipts. |
+| **Phase 29**| Dual Interface Mode (Aasan Wholesale Mode ⚡ vs Full Enterprise ERP Mode 🏢) | ✅ Completed | 1) Implemented instant persistent Dual-Mode State Engine (`UiModeProvider`, `useUiMode()`) with `localStorage` zero-latency caching and SQLite `Company.uiMode` synchronization; 2) Created streamlined `SIMPLE_NAVIGATION_SECTIONS` reducing clutter from 24+ items down to 4 focused categories & 13 core actions (Medicines, Available Stock, Purchase In, New Sale Bill, Sales History, Pharmacies Khata, Suppliers, Wasooli Payments, Daily Kharcha, Profit Reports, Settings & Guides); 3) Added 1-click Quick Toggle pill in top Header (`[ ⚡ آسان موڈ ]` / `[ 🏢 Full ERP ]`); 4) Deployed interactive "System Interface Mode" selection card at the top of Tab 1 in `/settings`; 5) Added auto-allocated default godown in `/purchases/new` for Simple Mode; 6) Streamlined customer and salesman selection in `/sales/new` with full width pharmacy and optional salesman expander; 7) Preserved 100% of underlying models, routes and API capabilities in Full ERP Mode with zero data loss. Verified with 0 TypeScript errors (`npx tsc --noEmit`) and 53 production routes cleanly built. |
 
 ---
 
@@ -65,7 +66,8 @@
 ---
 
 ## 3. Next Planned Phase
-- **Phase 29 — Client Live Handover & Operational Verification**:
-  - Live acceptance verification of Afghani currency, stock batch editing/deletion, and one-click Electron receipt & invoice printing.
+- **Phase 30 — Client Live Handover & Operational Verification**:
+  - Live acceptance verification of Aasan vs Full ERP mode toggling, Afghani currency, stock batch editing/deletion, and one-click Electron receipt & invoice printing.
+
 
 

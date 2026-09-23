@@ -239,6 +239,9 @@ model Company {
   notifyCreditBreach  Boolean @default(true) @map("notify_credit_breach")
   notifySupplierDues  Boolean @default(true) @map("notify_supplier_dues")
 
+  // Interface & Experience Settings
+  uiMode            String?  @default("SIMPLE") @map("ui_mode")
+
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 

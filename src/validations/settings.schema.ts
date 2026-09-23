@@ -44,6 +44,9 @@ export const companySettingsSchema = z.object({
   notifyExpiredStock: z.boolean().default(true),
   notifyCreditBreach: z.boolean().default(true),
   notifySupplierDues: z.boolean().default(true),
+
+  // UI Mode (Aasan Wholesale vs Full Enterprise ERP)
+  uiMode: z.enum(["SIMPLE", "FULL"]).default("SIMPLE"),
 });
 
 export type CompanySettingsInput = z.infer<typeof companySettingsSchema>;

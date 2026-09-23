@@ -46,6 +46,7 @@ import { createPurchaseOrderAction } from "@/server/actions/purchase.actions";
 import { createSupplierAction } from "@/server/actions/supplier.actions";
 import { createWarehouseAction } from "@/server/actions/warehouse.actions";
 import { PurchaseOrderInput, PurchaseItemInput } from "@/validations/purchase.schema";
+import { useUiMode } from "@/providers/ui-mode-provider";
 
 interface PurchaseFormClientProps {
   suppliers: Array<{ id: string; name: string; code?: string | null; creditDays: number; currentPayable: number }>;
@@ -71,6 +72,7 @@ export function PurchaseFormClient({
   preselectedSupplierId,
 }: PurchaseFormClientProps) {
   const router = useRouter();
+  const { isSimple } = useUiMode();
 
   const [supplierList, setSupplierList] = React.useState(suppliers);
   const [warehouseList, setWarehouseList] = React.useState(warehouses);
@@ -452,30 +454,43 @@ export function PurchaseFormClient({
                 <div className="flex items-center justify-between">
                   <Label htmlFor="warehouse" className="text-xs font-semibold flex items-center gap-1.5">
                     <WarehouseIcon className="h-3.5 w-3.5 text-teal-600" />
-                    Destination Godown / Warehouse (منزل گودام) <span className="text-rose-500">*</span>
+                    Destination Godown (منزل گودام) <span className="text-rose-500">*</span>
                   </Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsQuickWarehouseOpen(true)}
-                    className="h-6 px-2 text-[10px] rounded-lg text-teal-600 border-teal-300 hover:bg-teal-50 font-bold gap-1"
-                  >
-                    <Plus className="h-3 w-3" /> New Godown
-                  </Button>
+                  {!isSimple && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsQuickWarehouseOpen(true)}
+                      className="h-6 px-2 text-[10px] rounded-lg text-teal-600 border-teal-300 hover:bg-teal-50 font-bold gap-1"
+                    >
+                      <Plus className="h-3 w-3" /> New Godown
+                    </Button>
+                  )}
                 </div>
-                <Select value={warehouseId} onValueChange={setWarehouseId}>
-                  <SelectTrigger id="warehouse" className="text-xs h-9">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {warehouseList.map((w) => (
-                      <SelectItem key={w.id} value={w.id}>
-                        {w.name} ({w.code})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {isSimple ? (
+                  <div className="h-9 px-3 rounded-md bg-muted/60 border border-border/80 flex items-center justify-between text-xs text-foreground">
+                    <span className="font-medium flex items-center gap-1.5 text-foreground">
+                      📍 {warehouseList.find((w) => w.id === warehouseId)?.name || "Main Godown (مرکزی گودام)"}
+                    </span>
+                    <span className="text-[10px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded font-semibold border border-emerald-500/20">
+                      Auto-Allocated
+                    </span>
+                  </div>
+                ) : (
+                  <Select value={warehouseId} onValueChange={setWarehouseId}>
+                    <SelectTrigger id="warehouse" className="text-xs h-9">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {warehouseList.map((w) => (
+                        <SelectItem key={w.id} value={w.id}>
+                          {w.name} ({w.code})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               <div className="space-y-1.5">

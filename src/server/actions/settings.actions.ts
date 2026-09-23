@@ -81,6 +81,9 @@ export async function getCompanySettingsAction(): Promise<ActionResult<any>> {
           notifyExpiredStock: company.notifyExpiredStock ?? true,
           notifyCreditBreach: company.notifyCreditBreach ?? true,
           notifySupplierDues: company.notifySupplierDues ?? true,
+
+          // UI Mode
+          uiMode: (company.uiMode as "SIMPLE" | "FULL") || "SIMPLE",
         },
       };
     }
@@ -120,11 +123,28 @@ export async function getCompanySettingsAction(): Promise<ActionResult<any>> {
         notifyExpiredStock: true,
         notifyCreditBreach: true,
         notifySupplierDues: true,
+        uiMode: "SIMPLE",
       },
     };
   } catch (error: any) {
     console.error("getCompanySettingsAction error:", error);
     return { success: false, error: "Failed to load company settings." };
+  }
+}
+
+export async function updateUiModeAction(mode: "SIMPLE" | "FULL"): Promise<ActionResult> {
+  try {
+    const company = await prisma.company.findFirst();
+    if (company) {
+      await prisma.company.update({
+        where: { id: company.id },
+        data: { uiMode: mode },
+      });
+    }
+    return { success: true };
+  } catch (error: any) {
+    console.error("updateUiModeAction error:", error);
+    return { success: false, error: "Failed to update interface mode." };
   }
 }
 
@@ -176,6 +196,7 @@ export async function updateCompanySettingsAction(data: CompanySettingsInput): P
           notifyExpiredStock: parsed.data.notifyExpiredStock,
           notifyCreditBreach: parsed.data.notifyCreditBreach,
           notifySupplierDues: parsed.data.notifySupplierDues,
+          uiMode: parsed.data.uiMode,
         },
       });
     } else {
@@ -215,6 +236,7 @@ export async function updateCompanySettingsAction(data: CompanySettingsInput): P
           notifyExpiredStock: parsed.data.notifyExpiredStock,
           notifyCreditBreach: parsed.data.notifyCreditBreach,
           notifySupplierDues: parsed.data.notifySupplierDues,
+          uiMode: parsed.data.uiMode,
         },
       });
     }

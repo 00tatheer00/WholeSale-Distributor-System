@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useUiMode } from "@/providers/ui-mode-provider";
 import {
   Dialog,
   DialogContent,
@@ -42,7 +43,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import { createSaleOrderAction } from "@/server/actions/sales.actions";
 import { createCustomerAction } from "@/server/actions/customer.actions";
 import { createDistributorAction } from "@/server/actions/distributor.actions";
@@ -105,6 +106,8 @@ interface SaleOrderFormProps {
 
 export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderFormProps) {
   const router = useRouter();
+  const { isSimple } = useUiMode();
+  const [showSalesmanInSimple, setShowSalesmanInSimple] = React.useState(false);
 
   const [customerList, setCustomerList] = React.useState(customers);
   const [distributorList, setDistributorList] = React.useState(distributors);
@@ -619,20 +622,31 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Customer Pharmacy */}
-            <div className="space-y-1.5 md:col-span-2">
+            <div className={cn("space-y-1.5", isSimple && !showSalesmanInSimple ? "md:col-span-3" : "md:col-span-2")}>
               <div className="flex items-center justify-between">
                 <Label className="text-xs font-semibold text-foreground">
                   Customer Pharmacy / Medical Store <span className="text-rose-500">*</span>
                 </Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsQuickCustomerOpen(true)}
-                  className="h-6 px-2 text-[10px] rounded-lg text-primary border-primary/30 hover:bg-primary/5 font-bold gap-1"
-                >
-                  <Plus className="h-3 w-3" /> New Customer
-                </Button>
+                <div className="flex items-center gap-2">
+                  {isSimple && !showSalesmanInSimple && (
+                    <button
+                      type="button"
+                      onClick={() => setShowSalesmanInSimple(true)}
+                      className="text-[11px] text-muted-foreground hover:text-primary font-medium"
+                    >
+                      + Assign Salesman (اختیاری)
+                    </button>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsQuickCustomerOpen(true)}
+                    className="h-6 px-2 text-[10px] rounded-lg text-primary border-primary/30 hover:bg-primary/5 font-bold gap-1"
+                  >
+                    <Plus className="h-3 w-3" /> New Customer
+                  </Button>
+                </div>
               </div>
               <Select
                 value={selectedCustomerId}
@@ -655,37 +669,39 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
               </Select>
             </div>
 
-            {/* Sales Representative */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <Label className="text-xs font-semibold text-foreground">Sales Representative</Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsQuickDistributorOpen(true)}
-                  className="h-6 px-2 text-[10px] rounded-lg text-primary border-primary/30 hover:bg-primary/5 font-bold gap-1"
+            {/* Sales Representative (Hidden in Simple Mode unless user clicks to show) */}
+            {(!isSimple || showSalesmanInSimple) && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-semibold text-foreground">Sales Representative</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsQuickDistributorOpen(true)}
+                    className="h-6 px-2 text-[10px] rounded-lg text-primary border-primary/30 hover:bg-primary/5 font-bold gap-1"
+                  >
+                    <Plus className="h-3 w-3" /> New Rep
+                  </Button>
+                </div>
+                <Select
+                  value={selectedDistributorId}
+                  onValueChange={(val) => setSelectedDistributorId(val)}
                 >
-                  <Plus className="h-3 w-3" /> New Rep
-                </Button>
+                  <SelectTrigger className="h-10 rounded-xl text-sm bg-muted/20">
+                    <SelectValue placeholder="Direct Order / HQ Cashier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Direct Order / HQ Cashier</SelectItem>
+                    {distributorList.map((d) => (
+                      <SelectItem key={d.id} value={d.id}>
+                        {d.name} ({d.assignedTerritory})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <Select
-                value={selectedDistributorId}
-                onValueChange={(val) => setSelectedDistributorId(val)}
-              >
-                <SelectTrigger className="h-10 rounded-xl text-sm bg-muted/20">
-                  <SelectValue placeholder="Direct Order / HQ Cashier" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Direct Order / HQ Cashier</SelectItem>
-                  {distributorList.map((d) => (
-                    <SelectItem key={d.id} value={d.id}>
-                      {d.name} ({d.assignedTerritory})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            )}
           </div>
 
           {/* Customer Live Credit & Compliance Snapshot */}

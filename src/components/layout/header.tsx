@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Search, Menu, Building2 } from "lucide-react";
+import { Search, Menu, Building2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
@@ -10,12 +10,16 @@ import { NotificationsPopover } from "@/components/layout/notifications-popover"
 import { InfoGuideModal } from "@/components/layout/info-guide-modal";
 import { UserNav } from "@/components/layout/user-nav";
 import { Badge } from "@/components/ui/badge";
+import { useUiMode } from "@/providers/ui-mode-provider";
+import { cn } from "@/lib/utils";
 
 interface HeaderProps {
   onMobileMenuToggle: () => void;
 }
 
 export function Header({ onMobileMenuToggle }: HeaderProps) {
+  const { isSimple, toggleUiMode } = useUiMode();
+
   return (
     <header className="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-border/80 bg-background/80 px-4 sm:px-6 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70 transition-all gap-3">
       {/* Left: Mobile Toggle & Breadcrumbs */}
@@ -49,6 +53,36 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
 
       {/* Right: Actions, Badges, Theme, Notifications & User Profile */}
       <div className="flex items-center gap-2 shrink-0">
+        {/* 1-Click Interface Mode Switcher Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={toggleUiMode}
+          className={cn(
+            "h-8 px-2.5 rounded-full text-xs font-semibold gap-1.5 transition-all shadow-2xs border",
+            isSimple
+              ? "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
+              : "bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30"
+          )}
+          title={
+            isSimple
+              ? "Aasan Wholesale Mode is active. Click to switch to Full Enterprise ERP"
+              : "Full ERP Mode is active. Click to switch to Aasan Wholesale Mode"
+          }
+        >
+          <Zap
+            className={cn(
+              "h-3.5 w-3.5",
+              isSimple
+                ? "text-emerald-600 fill-emerald-600/40"
+                : "text-blue-600 fill-blue-600/40"
+            )}
+          />
+          <span className="hidden sm:inline">
+            {isSimple ? "⚡ آسان موڈ" : "🏢 Full ERP"}
+          </span>
+        </Button>
+
         <InfoGuideModal />
 
         <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/80 text-secondary-foreground text-xs font-medium border border-border/50 shrink-0 whitespace-nowrap">

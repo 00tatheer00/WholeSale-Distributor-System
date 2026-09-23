@@ -32,10 +32,12 @@ import {
   Warehouse,
   ArrowLeftRight,
   PackagePlus,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { NAVIGATION_SECTIONS, APP_NAME } from "@/lib/constants";
+import { NAVIGATION_SECTIONS, SIMPLE_NAVIGATION_SECTIONS, APP_NAME } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
+import { useUiMode } from "@/providers/ui-mode-provider";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   LayoutDashboard,
@@ -63,6 +65,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Warehouse,
   ArrowLeftRight,
   PackagePlus,
+  Zap,
 };
 
 interface SidebarProps {
@@ -72,6 +75,8 @@ interface SidebarProps {
 
 export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
   const pathname = usePathname();
+  const { isSimple, toggleUiMode } = useUiMode();
+  const activeSections = isSimple ? SIMPLE_NAVIGATION_SECTIONS : NAVIGATION_SECTIONS;
 
   return (
     <aside
@@ -94,9 +99,21 @@ export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
               <span className="text-sm font-bold truncate leading-tight text-foreground">
                 {APP_NAME}
               </span>
-              <span className="text-[10px] text-muted-foreground font-medium tracking-wider uppercase">
-                Wholesale Pharma ERP
-              </span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] text-muted-foreground font-medium tracking-wider uppercase">
+                  Wholesale ERP
+                </span>
+                <span
+                  className={cn(
+                    "text-[9px] font-bold px-1.5 py-0.2 rounded-full",
+                    isSimple
+                      ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                      : "bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/20"
+                  )}
+                >
+                  {isSimple ? "⚡ آسان" : "🏢 مکمل"}
+                </span>
+              </div>
             </div>
           )}
         </Link>
@@ -118,7 +135,7 @@ export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
 
       {/* Navigation Sections */}
       <div className="flex-1 overflow-y-auto py-4 px-2.5 space-y-4">
-        {NAVIGATION_SECTIONS.map((section, idx) => (
+        {activeSections.map((section, idx) => (
           <div key={idx} className="space-y-1">
             {!isCollapsed && (
               <h4 className="px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
@@ -175,19 +192,75 @@ export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
         ))}
       </div>
 
-      {/* System Status & Tech4Edges Branding Footer */}
+      {/* Mode Switcher & Tech4Edges Branding Footer */}
       <div className="p-3 border-t border-sidebar-border space-y-2">
+        {/* 1-Click Mode Toggle Button */}
+        {!isCollapsed ? (
+          <button
+            type="button"
+            onClick={toggleUiMode}
+            className={cn(
+              "w-full flex items-center justify-between px-2.5 py-2 rounded-xl border text-[11px] font-medium transition-all group shadow-2xs",
+              isSimple
+                ? "bg-emerald-500/10 border-emerald-500/25 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-500/20"
+                : "bg-blue-500/10 border-blue-500/25 text-blue-800 dark:text-blue-300 hover:bg-blue-500/20"
+            )}
+            title={
+              isSimple
+                ? "Currently in Aasan Wholesale Mode. Click to switch to Full ERP Mode"
+                : "Currently in Full ERP Mode. Click to switch to Aasan Wholesale Mode"
+            }
+          >
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Zap
+                className={cn(
+                  "h-3.5 w-3.5 shrink-0 transition-transform group-hover:scale-110",
+                  isSimple
+                    ? "text-emerald-600 fill-emerald-600/30"
+                    : "text-blue-600 fill-blue-600/30"
+                )}
+              />
+              <span className="font-bold truncate">
+                {isSimple ? "Aasan Mode (آسان)" : "Full ERP (مکمل)"}
+              </span>
+            </div>
+            <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-background/90 border border-border/80 text-muted-foreground font-mono font-semibold shrink-0 group-hover:border-foreground/30">
+              Switch ⇄
+            </span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={toggleUiMode}
+            className={cn(
+              "w-full flex justify-center p-2 rounded-xl transition-all border",
+              isSimple
+                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/20"
+                : "bg-blue-500/10 border-blue-500/20 text-blue-600 hover:bg-blue-500/20"
+            )}
+            title={
+              isSimple
+                ? "Aasan Mode Active (Click to switch to Full ERP)"
+                : "Full ERP Active (Click to switch to Aasan Mode)"
+            }
+          >
+            <Zap className="h-4 w-4" />
+          </button>
+        )}
+
         <div
           className={cn(
-            "flex items-center rounded-xl bg-muted/60 p-2.5 text-xs border border-border/40",
-            isCollapsed ? "justify-center" : "gap-2.5"
+            "flex items-center rounded-xl bg-muted/60 p-2 text-xs border border-border/40",
+            isCollapsed ? "justify-center" : "gap-2"
           )}
         >
           <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0 ring-2 ring-emerald-500/20" />
           {!isCollapsed && (
             <div className="flex flex-col truncate">
               <span className="text-[11px] font-semibold text-foreground">System Online</span>
-              <span className="text-[10px] text-muted-foreground">FEFO Inventory Active</span>
+              <span className="text-[10px] text-muted-foreground truncate">
+                {isSimple ? "Simple Wholesale Active" : "Enterprise ERP Active"}
+              </span>
             </div>
           )}
         </div>

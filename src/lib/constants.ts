@@ -199,3 +199,108 @@ export const NAVIGATION_SECTIONS: NavigationSection[] = [
     ],
   },
 ];
+
+/**
+ * Streamlined "Aasan Wholesale" Navigation Configuration for fast daily workflow
+ */
+export const SIMPLE_NAVIGATION_SECTIONS: NavigationSection[] = [
+  {
+    title: "Overview (جائزہ)",
+    items: [
+      {
+        title: "Dashboard",
+        href: "/dashboard",
+        iconName: "LayoutDashboard",
+        description: "Overview & key distribution KPIs",
+      },
+    ],
+  },
+  {
+    title: "Daily Operations (روزانہ کا کام)",
+    items: [
+      {
+        title: "Medicines & Batches",
+        href: "/medicines",
+        iconName: "Pill",
+        description: "Medicine catalog, rates & batch info",
+      },
+      {
+        title: "Available Stock (اسٹاک)",
+        href: "/inventory",
+        iconName: "Boxes",
+        description: "Live godown stock, edit & delete batches",
+      },
+      {
+        title: "Purchase Stock (+ مال خریدیں)",
+        href: "/purchases/new",
+        iconName: "PackagePlus",
+        description: "Direct factory/supplier stock intake",
+      },
+      {
+        title: "New Sale Bill (+ بل بنائیں)",
+        href: "/sales/new",
+        iconName: "ShoppingCart",
+        description: "Fast wholesale billing & instant print",
+      },
+      {
+        title: "Sales & Invoices (بلوں کی ہسٹری)",
+        href: "/sales",
+        iconName: "FileSpreadsheet",
+        description: "All customer bills & delivery records",
+      },
+    ],
+  },
+  {
+    title: "Khata & Accounts (کھاتہ اور حساب)",
+    items: [
+      {
+        title: "Pharmacies (+ میڈیکل اسٹورز)",
+        href: "/customers",
+        iconName: "Store",
+        description: "Pharmacy customers & credit ledger",
+      },
+      {
+        title: "Suppliers (+ سپلائرز)",
+        href: "/suppliers",
+        iconName: "Truck",
+        description: "Wholesale vendors, factories & dues",
+      },
+      {
+        title: "Wasooli / Payments (وصولی)",
+        href: "/payments",
+        iconName: "CreditCard",
+        description: "Customer cash collection & money receipts",
+      },
+      {
+        title: "Daily Kharcha (+ روزانہ خرچہ)",
+        href: "/expenses",
+        iconName: "Wallet",
+        description: "Record shop expenses, rent, bills & tea",
+      },
+    ],
+  },
+  {
+    title: "Reports & System (رپورٹیں اور سیٹنگز)",
+    items: [
+      {
+        title: "Profit & Reports",
+        href: "/reports",
+        iconName: "BarChart3",
+        description: "Net profit, sales reports & Excel export",
+      },
+      {
+        title: "System Settings",
+        href: "/settings",
+        iconName: "Settings",
+        description: "Company profile, bills & user accounts",
+      },
+      {
+        title: "System Guide (رہنمائی)",
+        href: "/help",
+        iconName: "BookOpen",
+        description: "Complete user manual & visual guides",
+      },
+    ],
+  },
+];
+

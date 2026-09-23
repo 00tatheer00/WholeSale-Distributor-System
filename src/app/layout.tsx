@@ -47,6 +47,7 @@ export const metadata: Metadata = {
 
 import { Suspense } from "react";
 import { TopProgressBar } from "@/components/shared/top-progress-bar";
+import { UiModeProvider } from "@/providers/ui-mode-provider";
 
 export default function RootLayout({
   children,
@@ -62,10 +63,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Suspense fallback={null}>
-            <TopProgressBar />
-          </Suspense>
-          {children}
+          <UiModeProvider>
+            <Suspense fallback={null}>
+              <TopProgressBar />
+            </Suspense>
+            {children}
+          </UiModeProvider>
         </ThemeProvider>
       </body>
     </html>
