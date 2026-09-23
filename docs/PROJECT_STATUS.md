@@ -56,7 +56,7 @@
   - `npx tsc --noEmit` $\rightarrow$ **0 Errors (Strict Type Safety)**
   - `npm run build` $\rightarrow$ **0 Errors (53 Production Routes Generated)**
   - Empirical Route Verification $\rightarrow$ **`/login` (200 OK) & `/dashboard` (200 OK) verified on packaged standalone server**
-  - NSIS Desktop Installer (`.exe`) $\rightarrow$ **100% Built (`dist/PharmaDist Wholesale ERP Setup 1.0.0.exe`, 189 MB)**
+  - NSIS Desktop Installer (`.exe`) $\rightarrow$ **100% Built (`dist/PharmaDist Wholesale ERP Setup 1.0.0.exe`, 205 MB — Rebuilt 23-Sep-2026 with Phase 26/27 Simplified UI, Inline Dropdown Creation & Embedded Guides)**
 - **Desktop & Multi-PC LAN Support**:
   - Main PC runs `.exe` standalone application with embedded database.
   - Other PCs and Mobile devices on the same Wi-Fi connect via browser (`http://[Server-IP]:3000`) without any client-side installation.
