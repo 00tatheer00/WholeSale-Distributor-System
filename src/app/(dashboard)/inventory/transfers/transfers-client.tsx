@@ -452,7 +452,7 @@ export function TransfersClient({
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
                   <WarehouseIcon className="h-3.5 w-3.5 text-teal-600" />
-                  Destination Godown / Warehouse (منزل گودام) *
+                  Destination Godown / Warehouse *
                 </Label>
                 <Select
                   value={destWarehouseId}

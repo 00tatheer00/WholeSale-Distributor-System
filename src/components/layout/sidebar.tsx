@@ -111,7 +111,7 @@ export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                       : "bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/20"
                   )}
                 >
-                  {isSimple ? "⚡ آسان" : "🏢 مکمل"}
+                  {isSimple ? "⚡ Simple" : "🏢 Full ERP"}
                 </span>
               </div>
             </div>
@@ -207,8 +207,8 @@ export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
             )}
             title={
               isSimple
-                ? "Currently in Aasan Wholesale Mode. Click to switch to Full ERP Mode"
-                : "Currently in Full ERP Mode. Click to switch to Aasan Wholesale Mode"
+                ? "Currently in Simple Wholesale Mode. Click to switch to Full ERP Mode"
+                : "Currently in Full ERP Mode. Click to switch to Simple Wholesale Mode"
             }
           >
             <div className="flex items-center gap-1.5 min-w-0">
@@ -221,7 +221,7 @@ export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                 )}
               />
               <span className="font-bold truncate">
-                {isSimple ? "Aasan Mode (آسان)" : "Full ERP (مکمل)"}
+                {isSimple ? "Simple Mode" : "Full ERP Mode"}
               </span>
             </div>
             <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-background/90 border border-border/80 text-muted-foreground font-mono font-semibold shrink-0 group-hover:border-foreground/30">
@@ -240,8 +240,8 @@ export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
             )}
             title={
               isSimple
-                ? "Aasan Mode Active (Click to switch to Full ERP)"
-                : "Full ERP Active (Click to switch to Aasan Mode)"
+                ? "Simple Mode Active (Click to switch to Full ERP)"
+                : "Full ERP Active (Click to switch to Simple Mode)"
             }
           >
             <Zap className="h-4 w-4" />

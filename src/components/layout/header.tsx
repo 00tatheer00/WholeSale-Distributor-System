@@ -66,8 +66,8 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
           )}
           title={
             isSimple
-              ? "Aasan Wholesale Mode is active. Click to switch to Full Enterprise ERP"
-              : "Full ERP Mode is active. Click to switch to Aasan Wholesale Mode"
+              ? "Simple Wholesale Mode is active. Click to switch to Full Enterprise ERP"
+              : "Full ERP Mode is active. Click to switch to Simple Wholesale Mode"
           }
         >
           <Zap
@@ -79,7 +79,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
             )}
           />
           <span className="hidden sm:inline">
-            {isSimple ? "⚡ آسان موڈ" : "🏢 Full ERP"}
+            {isSimple ? "⚡ Simple Mode" : "🏢 Full ERP"}
           </span>
         </Button>
 

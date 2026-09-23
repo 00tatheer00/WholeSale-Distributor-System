@@ -580,7 +580,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
       </div>
 
       <PageHeader
-        title="Create Sale Invoice & Bill (+ Naya Bill)"
+        title="Create Sale Invoice & Bill (+ New Bill)"
         description="Select customer pharmacy, choose medicine batches (auto-sorted earliest expiry first), and print instant wholesale invoice."
       />
 
@@ -634,7 +634,7 @@ export function SaleOrderForm({ customers, medicines, distributors }: SaleOrderF
                       onClick={() => setShowSalesmanInSimple(true)}
                       className="text-[11px] text-muted-foreground hover:text-primary font-medium"
                     >
-                      + Assign Salesman (اختیاری)
+                      + Assign Sales Rep (Optional)
                     </button>
                   )}
                   <Button

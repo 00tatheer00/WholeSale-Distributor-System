@@ -454,7 +454,7 @@ export function PurchaseFormClient({
                 <div className="flex items-center justify-between">
                   <Label htmlFor="warehouse" className="text-xs font-semibold flex items-center gap-1.5">
                     <WarehouseIcon className="h-3.5 w-3.5 text-teal-600" />
-                    Destination Godown (منزل گودام) <span className="text-rose-500">*</span>
+                    Destination Godown / Warehouse <span className="text-rose-500">*</span>
                   </Label>
                   {!isSimple && (
                     <Button
@@ -471,7 +471,7 @@ export function PurchaseFormClient({
                 {isSimple ? (
                   <div className="h-9 px-3 rounded-md bg-muted/60 border border-border/80 flex items-center justify-between text-xs text-foreground">
                     <span className="font-medium flex items-center gap-1.5 text-foreground">
-                      📍 {warehouseList.find((w) => w.id === warehouseId)?.name || "Main Godown (مرکزی گودام)"}
+                      📍 {warehouseList.find((w) => w.id === warehouseId)?.name || "Main Godown"}
                     </span>
                     <span className="text-[10px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded font-semibold border border-emerald-500/20">
                       Auto-Allocated

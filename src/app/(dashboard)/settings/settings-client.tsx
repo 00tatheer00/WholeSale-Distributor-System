@@ -504,7 +504,7 @@ export function SettingsClient({
                       <div className="h-7 w-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm">
                         <Zap className="h-4 w-4" />
                       </div>
-                      System Interface Mode (سسٹم انٹرفیس موڈ)
+                      System Interface Mode
                     </CardTitle>
                     <Badge
                       className={cn(
@@ -514,16 +514,16 @@ export function SettingsClient({
                           : "bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30"
                       )}
                     >
-                      {uiMode === "SIMPLE" ? "Active: Aasan Mode ⚡" : "Active: Full ERP 🏢"}
+                      {uiMode === "SIMPLE" ? "Active: Simple Mode ⚡" : "Active: Full ERP 🏢"}
                     </Badge>
                   </div>
                   <CardDescription className="text-xs">
-                    Apni zaroorat ke mutabiq software ka interface asan ya advanced banayein. Aap jab chahein bina kisi data loss ke mode badal sakte hain.
+                    Configure your preferred daily operational mode. You can toggle between Simple Wholesale and Full Enterprise ERP anytime without data loss.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-5 sm:p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Option 1: Aasan Mode */}
+                    {/* Option 1: Simple Mode */}
                     <div
                       onClick={() => {
                         setUiMode("SIMPLE");
@@ -540,7 +540,7 @@ export function SettingsClient({
                         <div className="flex items-center justify-between">
                           <span className="font-bold text-sm text-foreground flex items-center gap-2">
                             <Zap className="h-4 w-4 text-emerald-600 fill-emerald-600/30" />
-                            ⚡ Aasan Wholesale Mode (سپر آسان)
+                            ⚡ Simple Wholesale Mode
                           </span>
                           {uiMode === "SIMPLE" && (
                             <Badge className="bg-emerald-600 text-white text-[9px] font-bold">
@@ -549,7 +549,7 @@ export function SettingsClient({
                           )}
                         </div>
                         <p className="text-xs text-muted-foreground leading-relaxed">
-                          Sirf rozmarrah ke zaroori kaam: Dawaiyan, Stock, Maal Khareedna, Sale Bill banana, aur Pharmacies ka khata. Faltu options (godown transfers, salesmen, manufacturers) chhupe hue hain taake kaam fast ho.
+                          Streamlined daily workflow: Medicine catalog, live stock, purchase intake, sale billing, and customer pharmacy ledgers. Advanced multi-godown and salesmen modules are hidden for high-speed operation.
                         </p>
                       </div>
                       <div className="pt-2 border-t border-border/50 text-[11px] text-emerald-700 dark:text-emerald-300 font-medium">
@@ -574,7 +574,7 @@ export function SettingsClient({
                         <div className="flex items-center justify-between">
                           <span className="font-bold text-sm text-foreground flex items-center gap-2">
                             <Building2 className="h-4 w-4 text-blue-600" />
-                            🏢 Full Enterprise ERP (مکمل موڈ)
+                            🏢 Full Enterprise ERP
                           </span>
                           {uiMode === "FULL" && (
                             <Badge className="bg-blue-600 text-white text-[9px] font-bold">
@@ -583,7 +583,7 @@ export function SettingsClient({
                           )}
                         </div>
                         <p className="text-xs text-muted-foreground leading-relaxed">
-                          Tamam 24+ modules khule honge: Multiple Godowns, Inter-Warehouse Transfers, Field Salesmen (Order Bookers), Separate Manufacturers, Categories, Forensic Audit Logs, aur System Alerts.
+                          All 24+ modules active: Multiple godowns, inter-warehouse transfers, field sales reps (order bookers), separate manufacturer directory, categories, forensic audit logs, and system alerts.
                         </p>
                       </div>
                       <div className="pt-2 border-t border-border/50 text-[11px] text-blue-700 dark:text-blue-300 font-medium">
@@ -602,7 +602,7 @@ export function SettingsClient({
                       <div className="h-7 w-7 rounded-lg bg-primary text-white flex items-center justify-center shadow-sm">
                         <KeyRound className="h-4 w-4" />
                       </div>
-                      Admin Login Email & Password (Apna Login & Password Badlein)
+                      Admin Login Email & Password
                     </CardTitle>
                     <Badge className="bg-primary/20 text-primary border-primary/30 text-[10px] font-bold uppercase">
                       Direct Access

@@ -944,10 +944,10 @@ export function InfoGuideModal() {
           variant="outline"
           size="sm"
           className="h-9 px-2.5 sm:px-3.5 gap-1.5 sm:gap-2 rounded-full border-blue-200 dark:border-blue-800/60 bg-blue-50/70 dark:bg-blue-950/50 text-[#0071E3] hover:bg-[#0071E3] hover:text-white transition-all text-xs font-semibold shadow-sm"
-          title="System Operations Guide (رہنمائی) - Asan Urdu & English"
+          title="System Operations Guide"
         >
           <BookOpen className="h-4 w-4 stroke-[2.2]" />
-          <span className="hidden sm:inline font-semibold">System Guide (رہنمائی)</span>
+          <span className="hidden sm:inline font-semibold">System Guide</span>
           <span className="sm:hidden font-semibold">Guide</span>
         </Button>
       </DialogTrigger>

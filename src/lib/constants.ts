@@ -145,7 +145,7 @@ export const NAVIGATION_SECTIONS: NavigationSection[] = [
         description: "Customer cash recovery & money receipts",
       },
       {
-        title: "Daily Expenses (+ Add Kharcha)",
+        title: "Daily Expenses (+ Add Expense)",
         href: "/expenses",
         iconName: "Wallet",
         description: "Record rent, bills, fuel, salaries & tea",
@@ -201,11 +201,11 @@ export const NAVIGATION_SECTIONS: NavigationSection[] = [
 ];
 
 /**
- * Streamlined "Aasan Wholesale" Navigation Configuration for fast daily workflow
+ * Streamlined "Simple Wholesale" Navigation Configuration for fast daily workflow
  */
 export const SIMPLE_NAVIGATION_SECTIONS: NavigationSection[] = [
   {
-    title: "Overview (جائزہ)",
+    title: "Overview",
     items: [
       {
         title: "Dashboard",
@@ -216,7 +216,7 @@ export const SIMPLE_NAVIGATION_SECTIONS: NavigationSection[] = [
     ],
   },
   {
-    title: "Daily Operations (روزانہ کا کام)",
+    title: "Daily Operations",
     items: [
       {
         title: "Medicines & Batches",
@@ -225,25 +225,25 @@ export const SIMPLE_NAVIGATION_SECTIONS: NavigationSection[] = [
         description: "Medicine catalog, rates & batch info",
       },
       {
-        title: "Available Stock (اسٹاک)",
+        title: "Available Stock",
         href: "/inventory",
         iconName: "Boxes",
         description: "Live godown stock, edit & delete batches",
       },
       {
-        title: "Purchase Stock (+ مال خریدیں)",
+        title: "Purchase Stock (+ Add)",
         href: "/purchases/new",
         iconName: "PackagePlus",
         description: "Direct factory/supplier stock intake",
       },
       {
-        title: "New Sale Bill (+ بل بنائیں)",
+        title: "New Sale Bill (+ Create)",
         href: "/sales/new",
         iconName: "ShoppingCart",
         description: "Fast wholesale billing & instant print",
       },
       {
-        title: "Sales & Invoices (بلوں کی ہسٹری)",
+        title: "Sales & Invoices",
         href: "/sales",
         iconName: "FileSpreadsheet",
         description: "All customer bills & delivery records",
@@ -251,28 +251,28 @@ export const SIMPLE_NAVIGATION_SECTIONS: NavigationSection[] = [
     ],
   },
   {
-    title: "Khata & Accounts (کھاتہ اور حساب)",
+    title: "Accounts & Ledgers",
     items: [
       {
-        title: "Pharmacies (+ میڈیکل اسٹورز)",
+        title: "Pharmacies (+ Add)",
         href: "/customers",
         iconName: "Store",
         description: "Pharmacy customers & credit ledger",
       },
       {
-        title: "Suppliers (+ سپلائرز)",
+        title: "Suppliers (+ Add)",
         href: "/suppliers",
         iconName: "Truck",
         description: "Wholesale vendors, factories & dues",
       },
       {
-        title: "Wasooli / Payments (وصولی)",
+        title: "Payments & Recovery",
         href: "/payments",
         iconName: "CreditCard",
         description: "Customer cash collection & money receipts",
       },
       {
-        title: "Daily Kharcha (+ روزانہ خرچہ)",
+        title: "Daily Expenses (+ Add)",
         href: "/expenses",
         iconName: "Wallet",
         description: "Record shop expenses, rent, bills & tea",
@@ -280,7 +280,7 @@ export const SIMPLE_NAVIGATION_SECTIONS: NavigationSection[] = [
     ],
   },
   {
-    title: "Reports & System (رپورٹیں اور سیٹنگز)",
+    title: "Reports & System",
     items: [
       {
         title: "Profit & Reports",
@@ -295,7 +295,7 @@ export const SIMPLE_NAVIGATION_SECTIONS: NavigationSection[] = [
         description: "Company profile, bills & user accounts",
       },
       {
-        title: "System Guide (رہنمائی)",
+        title: "System Guide",
         href: "/help",
         iconName: "BookOpen",
         description: "Complete user manual & visual guides",

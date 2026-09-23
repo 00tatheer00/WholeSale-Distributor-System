@@ -167,8 +167,8 @@ export function PWAInstaller() {
                 </Badge>
               </div>
               <ol className="list-decimal list-inside space-y-1 text-muted-foreground text-[11px] leading-relaxed">
-                <li>Safari browser ke bottom bar me <strong>Share Button (⎋ / مربع تیر)</strong> dabayein.</li>
-                <li>Scroll karke <strong>&ldquo;Add to Home Screen (ہوم اسکرین پر شامل کریں)&rdquo;</strong> par tap karein.</li>
+                <li>Safari browser ke bottom bar me <strong>Share Button (⎋)</strong> dabayein.</li>
+                <li>Scroll karke <strong>&ldquo;Add to Home Screen&rdquo;</strong> par tap karein.</li>
                 <li>Top right par <strong>&ldquo;Add&rdquo;</strong> dabayein. App home screen par real app ki tarah open hogi!</li>
               </ol>
             </div>
