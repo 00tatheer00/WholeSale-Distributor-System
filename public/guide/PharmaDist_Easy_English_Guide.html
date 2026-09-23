@@ -7,7 +7,7 @@
   <meta name="description" content="Simple step-by-step visual operating manual for wholesale pharmaceutical distribution with embedded screenshots.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #0284c7;
@@ -42,7 +42,7 @@
     }
 
     .container {
-      max-width: 960px;
+      max-width: 980px;
       margin: 0 auto;
       padding: 30px 20px 80px;
     }
@@ -138,8 +138,6 @@
       padding: 40px 36px;
       margin-bottom: 36px;
       box-shadow: 0 12px 30px rgba(2, 132, 199, 0.2);
-      position: relative;
-      overflow: hidden;
     }
 
     .hero-badge {
@@ -166,7 +164,7 @@
       font-size: 15px;
       line-height: 1.6;
       opacity: 0.95;
-      max-width: 750px;
+      max-width: 780px;
     }
 
     /* Chapter / Section Card */
@@ -236,11 +234,7 @@
       border-bottom: 1px solid var(--slate-200);
     }
 
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
     .dot-red { background: #ef4444; }
     .dot-yellow { background: #f59e0b; }
     .dot-green { background: #10b981; }
@@ -269,11 +263,9 @@
       gap: 8px;
     }
 
-    .screenshot-caption strong {
-      color: var(--slate-900);
-    }
+    .screenshot-caption strong { color: var(--slate-900); }
 
-    /* Steps and Callouts */
+    /* Steps */
     .step-list {
       display: flex;
       flex-direction: column;
@@ -319,7 +311,48 @@
       line-height: 1.55;
     }
 
-    /* Colorful Callout Boxes */
+    /* Terminology & Fields Table */
+    .fields-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 13.5px;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--slate-200);
+    }
+
+    .fields-table th {
+      background: var(--slate-100);
+      color: var(--slate-900);
+      text-align: left;
+      padding: 10px 16px;
+      font-weight: 800;
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    .fields-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--slate-100);
+      vertical-align: top;
+    }
+
+    .fields-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .code-term {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: var(--slate-100);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    /* Callouts */
     .callout {
       padding: 16px 20px;
       border-radius: 14px;
@@ -331,38 +364,12 @@
       line-height: 1.6;
     }
 
-    .callout-icon {
-      font-size: 20px;
-      line-height: 1;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
+    .callout-icon { font-size: 20px; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+    .callout-emerald { background: var(--emerald-light); border: 1px solid #a7f3d0; color: #065f46; }
+    .callout-blue { background: var(--primary-light); border: 1px solid #bae6fd; color: #0369a1; }
+    .callout-amber { background: var(--amber-light); border: 1px solid #fde68a; color: #92400e; }
 
-    .callout-emerald {
-      background: var(--emerald-light);
-      border: 1px solid #a7f3d0;
-      color: #065f46;
-    }
-
-    .callout-blue {
-      background: var(--primary-light);
-      border: 1px solid #bae6fd;
-      color: #0369a1;
-    }
-
-    .callout-amber {
-      background: var(--amber-light);
-      border: 1px solid #fde68a;
-      color: #92400e;
-    }
-
-    .callout-rose {
-      background: var(--rose-light);
-      border: 1px solid #fecdd3;
-      color: #9f1239;
-    }
-
-    /* Quick Action Button Cards Grid */
+    /* Action Cards Grid */
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -414,14 +421,12 @@
       line-height: 1.45;
     }
 
-    /* Print Controls */
     @media print {
       .top-bar, .no-print { display: none !important; }
       body { background: #fff !important; color: #000 !important; font-size: 12pt; }
       .container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
       .chapter { border: 1px solid #ccc !important; box-shadow: none !important; page-break-inside: avoid; margin-bottom: 20px !important; }
       .screenshot-frame { border: 1px solid #bbb !important; box-shadow: none !important; page-break-inside: avoid; }
-      .hero { page-break-inside: avoid; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     }
   </style>
@@ -438,6 +443,7 @@
       </div>
     </div>
     <div class="nav-actions">
+      <a href="index.html" class="btn btn-outline">Interactive Portal</a>
       <a href="PharmaDist_Asan_Urdu_Guide.html" class="btn btn-outline">Urdu Guide (اردو)</a>
       <a href="PharmaDist_Easy_English_Guide.pdf" download class="btn btn-outline">⬇ Download PDF</a>
       <button onclick="window.print()" class="btn btn-primary">🖨 Print Manual</button>
@@ -686,12 +692,36 @@
         </div>
       </div>
 
-      <div class="callout callout-amber">
-        <div class="callout-icon">⚠️</div>
-        <div>
-          <strong>DRAP Compliance:</strong> Accurate expiry dates are critical. The system uses these dates to enforce First-Expire, First-Out (FEFO) dispensing to prevent expired medicine stock.
-        </div>
-      </div>
+      <table class="fields-table">
+        <thead>
+          <tr>
+            <th>Field Name</th>
+            <th>Purpose & DRAP Standard</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="code-term">Batch #</span></td>
+            <td>Manufacturer lot code. Strictly tracked for recall and safety per DRAP wholesale standards.</td>
+          </tr>
+          <tr>
+            <td><span class="code-term">Expiry Date</span></td>
+            <td>Shelf-life expiration date. Guides automated FEFO queuing to prevent stock obsolescence.</td>
+          </tr>
+          <tr>
+            <td><span class="code-term">Bonus Qty</span></td>
+            <td>Free promotional bonus goods received under manufacturer trade schemes (e.g. 100 + 10 free).</td>
+          </tr>
+          <tr>
+            <td><span class="code-term">Cost Price</span></td>
+            <td>Actual acquisition cost in PKR. Preserved historically to calculate true gross profit margins.</td>
+          </tr>
+          <tr>
+            <td><span class="code-term">Trade Price (TP)</span></td>
+            <td>Standard DRAP wholesale price invoiced to customer retail pharmacies.</td>
+          </tr>
+        </tbody>
+      </table>
     </section>
 
     <!-- Chapter 4: Wholesale Sale & FEFO Invoicing -->
@@ -761,19 +791,57 @@
       </div>
     </section>
 
-    <!-- Chapter 5: Inventory, Corrections & Damages -->
+    <!-- Chapter 5: Registering Customers -->
     <section class="chapter">
       <div class="chapter-header">
         <div class="chapter-number">5</div>
         <div class="chapter-title-wrap">
-          <h2>Stock Cockpit, Corrections & Broken Goods</h2>
-          <p>Real-time batch visibility and simple ± Stock adjustments</p>
+          <h2>Customer Pharmacy Onboarding & Credit Setup</h2>
+          <p>Credit limits, drug licenses, sales territories, and contact information</p>
         </div>
       </div>
 
-      <p>
-        To inspect current warehouse balances, expiries, and valuation, go to <strong>Stock & Batches (Inventory)</strong> in the sidebar:
-      </p>
+      <div class="screenshot-frame">
+        <div class="screenshot-bar">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+          <span class="screenshot-title">Add New Customer Pharmacy</span>
+        </div>
+        <img src="screenshots/07_new_customer.png" alt="Add New Customer Screen">
+        <div class="screenshot-caption">
+          <strong>Figure 5:</strong> Customer registration screen capturing pharmacy details, proprietor name, and credit terms.
+        </div>
+      </div>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-badge">1</div>
+          <div class="step-content">
+            <h3>Pharmacy & Proprietor Name:</h3>
+            <p>Enter business name (e.g. <em>Al-Shifa Medical Store</em>) and proprietor name.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-badge">2</div>
+          <div class="step-content">
+            <h3>Credit Limit (Rs.) & Payment Terms:</h3>
+            <p>Set maximum allowable credit exposure in PKR (e.g. Rs. 100,000) and credit days limit (e.g. 30 days) to prevent bad debt exposure.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 6: Stock & Batches Control -->
+    <section class="chapter">
+      <div class="chapter-header">
+        <div class="chapter-number">6</div>
+        <div class="chapter-title-wrap">
+          <h2>Stock & Batches Inventory Cockpit</h2>
+          <p>Live stock balances, batch-level valuation, and expiry surveillance</p>
+        </div>
+      </div>
 
       <div class="screenshot-frame">
         <div class="screenshot-bar">
@@ -784,7 +852,36 @@
         </div>
         <img src="screenshots/04_inventory.png" alt="Medicine Stock Inventory Cockpit">
         <div class="screenshot-caption">
-          <strong>Figure 5:</strong> Inventory Cockpit with "+ Add New Stock" and "± Correct Stock / Damage" buttons right at the top.
+          <strong>Figure 6:</strong> Inventory Cockpit featuring "+ Add New Stock" and "± Correct Stock / Damage" controls.
+        </div>
+      </div>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-badge">🔍</div>
+          <div class="step-content">
+            <h3>Live Search & Filter:</h3>
+            <p>Search across brand names, generic formulations, SKU codes, or batch numbers in real-time.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-badge">⏰</div>
+          <div class="step-content">
+            <h3>Near Expiry (&lt;90 Days) Alert Box:</h3>
+            <p>Batches expiring within 90 days are flagged in the watchdog counter, prompting promotional clearance or return-to-vendor.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 7: Damage & Stock Correction -->
+    <section class="chapter">
+      <div class="chapter-header">
+        <div class="chapter-number">7</div>
+        <div class="chapter-title-wrap">
+          <h2>Damaged Goods, Breakage & Stock Correction</h2>
+          <p>How to reconcile broken bottles, expired losses, or physical audit variances</p>
         </div>
       </div>
 
@@ -794,7 +891,7 @@
           <div class="step-content">
             <h3>Recording Breakage or Damaged Goods:</h3>
             <p>
-              Click the amber button <strong>± Correct Stock / Damage</strong> at the top. Select the medicine and batch, type the reason (e.g., "Broken bottles found in box"), set the quantity to negative (e.g. -2), and submit. Inventory updates immediately.
+              Click the amber button <strong>± Correct Stock / Damage</strong> at the top. Select the medicine and batch, type the reason (e.g., "Broken bottles found in box"), set the quantity to negative (e.g. <code>-2</code>), and submit. Inventory updates immediately.
             </p>
           </div>
         </div>
@@ -804,36 +901,22 @@
           <div class="step-content">
             <h3>Physical Recount Surpluses:</h3>
             <p>
-              Click the same <strong>± Correct Stock / Damage</strong> button, enter positive quantity (+5), and record the physical audit reason.
-            </p>
-          </div>
-        </div>
-
-        <div class="step-item">
-          <div class="step-badge">3</div>
-          <div class="step-content">
-            <h3>Expiry Alerts (&lt;90 Days):</h3>
-            <p>
-              Batches nearing expiry within 90 days appear in the <strong>Near Expiry</strong> alert box, enabling you to sell them at promo rates or arrange return-to-vendor (RTV) before expiry.
+              Click the same button, enter a positive quantity (e.g. <code>+5</code>), and record the physical audit reason.
             </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Chapter 6: Daily Expenses -->
+    <!-- Chapter 8: Daily Expenses -->
     <section class="chapter">
       <div class="chapter-header">
-        <div class="chapter-number">6</div>
+        <div class="chapter-number">8</div>
         <div class="chapter-title-wrap">
-          <h2>Recording Operating Expenses</h2>
+          <h2>Recording Operating Expenses (Overhead Costs)</h2>
           <p>Rent, electricity, fuel, delivery, salaries, and daily tea expenses</p>
         </div>
       </div>
-
-      <p>
-        True net profitability requires logging daily overhead expenses into the system:
-      </p>
 
       <div class="screenshot-frame">
         <div class="screenshot-bar">
@@ -844,7 +927,7 @@
         </div>
         <img src="screenshots/05_expenses.png" alt="Daily Operating Expenses Cockpit">
         <div class="screenshot-caption">
-          <strong>Figure 6:</strong> Expenses screen tracking operational cost heads.
+          <strong>Figure 7:</strong> Expenses screen tracking operational cost heads and net derivations.
         </div>
       </div>
 
@@ -852,7 +935,7 @@
         <div class="step-item">
           <div class="step-badge">1</div>
           <div class="step-content">
-            <h3>Click Expense Button</h3>
+            <h3>Click Expense Button:</h3>
             <p>Click the red card <strong>+ Record Expense</strong> directly on the Dashboard.</p>
           </div>
         </div>
@@ -860,7 +943,7 @@
         <div class="step-item">
           <div class="step-badge">2</div>
           <div class="step-content">
-            <h3>Choose Category</h3>
+            <h3>Choose Category:</h3>
             <p>Select the cost head: <em>Warehouse Rent</em>, <em>Utilities & Electricity</em>, <em>Delivery & Fuel</em>, or <em>Staff Welfare / Tea</em>.</p>
           </div>
         </div>
@@ -868,17 +951,118 @@
         <div class="step-item">
           <div class="step-badge">3</div>
           <div class="step-content">
-            <h3>Enter Amount & Save</h3>
-            <p>Enter the paid amount (e.g. Rs. 1500) and save. This expense is deducted automatically from your gross profit to compute true <strong>Today's Net Profit</strong>.</p>
+            <h3>Enter Amount & Save:</h3>
+            <p>Enter the paid amount (e.g. Rs. 1,500) and save. This expense is deducted automatically from your gross profit to compute true <strong>Today's Net Profit</strong>.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Chapter 7: Daily Routine / Standard Operating Procedure -->
+    <!-- Chapter 9: Customer Collections & Receipts -->
     <section class="chapter">
       <div class="chapter-header">
-        <div class="chapter-number">7</div>
+        <div class="chapter-number">9</div>
+        <div class="chapter-title-wrap">
+          <h2>Customer Collections & Money Receipts (AR Settlement)</h2>
+          <p>Cash, cheque, bank transfer, and Raast receivable recovery</p>
+        </div>
+      </div>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-badge">1</div>
+          <div class="step-content">
+            <h3>Navigate to Collections & Receipts:</h3>
+            <p>Go to <strong>Collections & Receipts</strong> in the sidebar and click <strong>+ Record Payment</strong>.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-badge">2</div>
+          <div class="step-content">
+            <h3>Choose Customer & Amount:</h3>
+            <p>Select the customer pharmacy (live outstanding balance displays). Enter recovered amount.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-badge">3</div>
+          <div class="step-content">
+            <h3>Print Customer Money Receipt:</h3>
+            <p>After saving, print an official customer money receipt voucher for formal acknowledgement.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 10: Supplier AP Settlement -->
+    <section class="chapter">
+      <div class="chapter-header">
+        <div class="chapter-number">10</div>
+        <div class="chapter-title-wrap">
+          <h2>Supplier AP Settlement & Factory Payments</h2>
+          <p>Manufacturer ledger reconciliation and payable vouchers</p>
+        </div>
+      </div>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-badge">1</div>
+          <div class="step-content">
+            <h3>Open Suppliers Directory:</h3>
+            <p>Navigate to <strong>Suppliers & Accounts</strong>. Outstanding payable amounts display for each vendor.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-badge">2</div>
+          <div class="step-content">
+            <h3>Record Payment Voucher:</h3>
+            <p>Click on the supplier and select <strong>+ Make Payment</strong> to log the transaction and adjust ledger dues.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 11: Reports & Excel Export -->
+    <section class="chapter">
+      <div class="chapter-header">
+        <div class="chapter-number">11</div>
+        <div class="chapter-title-wrap">
+          <h2>10 Centralized Reports & 1-Click Excel Export</h2>
+          <p>Sales, stock valuation, expiries, customer dues, and native Excel (.xls / CSV) exports</p>
+        </div>
+      </div>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-badge">📊</div>
+          <div class="step-content">
+            <h3>Key Available Reports:</h3>
+            <p>
+              1. <strong>Sales Report</strong> (Daily and monthly sales breakdown)<br>
+              2. <strong>Inventory Valuation Report</strong> (Total warehouse stock asset valuation)<br>
+              3. <strong>Customer Dues & Aging</strong> (Receivables breakdown by age bracket)<br>
+              4. <strong>Expiry Watchdog Report</strong> (Near-expiry and quarantined batch logs)<br>
+              5. <strong>Low Stock Reorder</strong> (Medicines below safety reorder threshold)
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-badge">📑</div>
+          <div class="step-content">
+            <h3>1-Click Excel / CSV Export:</h3>
+            <p>Every report includes an <strong>Export Excel (.xls)</strong> button for instant download and tax audit readiness.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 12: Daily Routine / Standard Operating Procedure -->
+    <section class="chapter">
+      <div class="chapter-header">
+        <div class="chapter-number">12</div>
         <div class="chapter-title-wrap">
           <h2>Daily Distributor Routine (Standard Operating Procedure)</h2>
           <p>Morning opening, operational hours, and evening financial closing</p>
