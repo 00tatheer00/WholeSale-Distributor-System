@@ -58,6 +58,9 @@
 - **Verification Status**:
   - `npx tsc --noEmit` $\rightarrow$ **0 Errors (Strict Type Safety)**
   - `npm run build` $\rightarrow$ **0 Errors (53 Production Routes Generated)**
+- **Windows Desktop Packaging**:
+  - Setup Installer: `dist/PharmaDist Wholesale ERP Setup 1.0.0.exe` (207 MB, Packaged: 2026-09-23)
+  - Standalone Unpacked: `dist/win-unpacked/PharmaDist Wholesale ERP.exe` (Portable zero-install runner)
 - **Desktop & Multi-PC LAN Support**:
   - Main PC runs `.exe` standalone application with embedded database.
   - Other PCs and Mobile devices on the same Wi-Fi connect via browser (`http://[Server-IP]:3000`) without any client-side installation.
