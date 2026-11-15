@@ -1,119 +1,116 @@
-# Wholesale Medicine Distribution Management System (WMDMS)
+# PharmaDist — Wholesale Medicine Distribution Management System
 
-> **Enterprise Web-Based ERP for Wholesale Pharmaceutical Distributors, Stockists, and Drug Suppliers**
+An enterprise-oriented ERP for wholesale pharmaceutical distributors, stockists, and medicine suppliers. The application models the operational flow from procurement and batch-controlled inventory through sales, collections, expenses, and financial reporting.
 
----
+## Core workflows
 
-## 1. Project Overview
+- **Medicine and batch management:** Maintain medicine records, batch details, pricing, and expiry dates.
+- **FEFO inventory:** Prioritize stock with the earliest expiry date for eligible sales.
+- **Purchasing and suppliers:** Record supplier purchases and manage supplier balances.
+- **Wholesale sales:** Create pharmacy sales, invoices, and delivery documents.
+- **Customer accounts:** Track pharmacy balances, credit limits, and receivables.
+- **Payments and expenses:** Record collections, supplier payments, and operating expenses.
+- **Financial reporting:** Review cost of goods sold, gross margin, net margin, and operational reports.
+- **Administration:** Manage users and permissions, system settings, notifications, and audit records.
+- **Desktop packaging:** The repository also includes an Electron desktop application configuration.
 
-The **Wholesale Medicine Distribution Management System (WMDMS)** is an enterprise web application designed exclusively for high-volume, multi-tier pharmaceutical wholesale distribution. 
+## Technology
 
-### Core Architectural Guardrails:
-- **Wholesale Pharma ERP Only**: Tailored strictly for B2B wholesale pharmaceutical business (Manufacturer $\rightarrow$ Purchase $\rightarrow$ Warehouse/FEFO $\rightarrow$ Sales Rep $\rightarrow$ Customer Pharmacy $\rightarrow$ Invoicing $\rightarrow$ AR Dues $\rightarrow$ COGS/Profit).
-- **Batch & FEFO Enforcement**: Automated First-Expire, First-Out queue allocation with mandatory expiration date tracking and DGDA quarantine guards.
-- **Credit Risk Protection**: Automated customer credit limits and overdue aging thresholds to prevent bad debt exposure.
-- **Accurate Margin Accounting**: Real-time batch-specific Cost of Goods Sold (COGS) tracking for authentic Gross and Net profit calculation ($\text{Revenue} - \text{COGS} = \text{Gross Profit}$).
-- **Double-Entry Traceability**: Immutable audit logs and double-entry stock movement tracking.
-
----
-
-## 2. Technology Stack
-
-| Layer | Technology |
+| Area | Stack |
 |---|---|
-| **Framework** | Next.js 15 (App Router, Server Components & Server Actions) |
-| **Language** | TypeScript 5 (Strict Mode) |
-| **Styling & Design System** | Tailwind CSS + shadcn/ui + Lucide Icons (Apple-Inspired Aesthetic) |
-| **Theme** | Light / Dark Mode via `next-themes` |
-| **Database** | Supabase PostgreSQL 15+ |
-| **ORM & Migrations** | Prisma 6 with transaction pooling |
-| **Authentication** | Supabase Auth (`@supabase/ssr`) with Cookie Session Management |
-| **Storage** | Supabase Storage (`company-logos`, `documents`) |
-| **Data Validation** | Zod (End-to-End Type Validation) |
-| **Form Handling** | React Hook Form + `@hookform/resolvers` |
-| **Data Tables** | TanStack Table v8 |
-| **Charts & Analytics** | Recharts |
-| **Transactional Email** | Resend API |
-| **Deployment Target** | Vercel Edge / Serverless Platform |
+| Web application | Next.js 15, App Router |
+| Language | TypeScript |
+| UI | Tailwind CSS, shadcn/ui, Lucide |
+| Database | Supabase PostgreSQL |
+| ORM | Prisma 6 |
+| Authentication | Supabase Auth and SSR |
+| Validation and forms | Zod, React Hook Form |
+| Tables and charts | TanStack Table, Recharts |
+| Email | Resend |
+| Desktop | Electron |
 
----
+## Requirements
 
-## 3. Implemented Enterprise Modules (M01 – M16)
-
-1. **Authentication & RBAC**: Supabase Auth with server-side middleware route guards (`/login`, `/reset-password`).
-2. **Distribution Command Dashboard (`/dashboard`)**: Real-time business KPIs, sales/purchase trajectories, top medicines, receivables, and payables.
-3. **Medicine & Therapeutic Master (`/medicines`, `/categories`)**: Drug catalog, generic formulations, dosage forms, and unit conversions.
-4. **FEFO Batch & Expiry Engine (`/medicines/[id]`, `/inventory`)**: Batch creation, unit trade price, MRP, acquisition cost, and expiry tracking.
-5. **Inventory & Stock Ledgers (`/inventory/movements`, `/inventory/adjustments`)**: Immutable double-entry stock movement ledger with negative stock prevention.
-6. **Manufacturer Suppliers & AP (`/suppliers`, `/suppliers/[id]`)**: Vendor directory, accounts payable (AP) balance ledger, and payment terms.
-7. **Procurement & Consignments (`/purchases`, `/purchases/new`, `/purchases/[id]`)**: Multi-item purchase intake, batch creation, and safe rollback reversal.
-8. **Customer Pharmacies & AR (`/customers`, `/customers/[id]`, `/customers/[id]/ledger`)**: Licensed pharmacy directory, credit gauge, and chronological statement ledger.
-9. **Wholesale Sales & Invoicing (`/sales`, `/sales/new`, `/sales/[id]`)**: High-speed booking, atomic FEFO batch allocation, historical COGS capture, and credit barrier checks.
-10. **DGDA Wholesale Tax Invoices (`/invoices`, `/invoices/[id]`)**: DGDA-compliant invoices and printable delivery challans.
-11. **Collections & Money Receipts (`/payments`)**: Customer collections, FIFO invoice settlement, and supplier disbursement vouchers.
-12. **Medical Representatives (`/distributors`, `/distributors/[id]`)**: Representative directory, 360° sales & collection cockpits, and net contribution.
-13. **Operating Expenses (`/expenses`)**: Direct and overhead expense heads, expense vouchers (`EXP-YYYY-XXXXX`), and cancellation.
-14. **Profit & Financials (`/profit`)**: Exact P&L intelligence with historical batch COGS preservation, gross margins, and net margins.
-15. **Reports Center & Analytics (`/reports`)**: 10+ sub-reports (`/reports/sales`, `/reports/purchases`, `/reports/inventory`, `/reports/expiry`, `/reports/low-stock`, `/reports/customer-dues`, `/reports/supplier-dues`, `/reports/medicines`, `/reports/payments`) with filtered CSV export.
-16. **System Administration & Audit Logs (`/settings`, `/audit-logs`, `/notifications`)**: System settings, immutable audit explorer with payload diffs, and real-time business alerts.
-
----
-
-## 4. Local Development Setup
-
-### 1. Prerequisites
 - Node.js 20+
-- PostgreSQL database or Supabase project
+- npm
+- A configured Supabase project and PostgreSQL connection
 
-### 2. Installation
+## Local setup
+
 ```bash
-# Clone the repository
 git clone https://github.com/00tatheer00/WholeSale-Distributor-System.git
-cd "WholeSale-Distributor-System"
-
-# Install dependencies
+cd WholeSale-Distributor-System
 npm install
-
-# Setup environment variables
 cp .env.example .env.local
 ```
 
-### 3. Database Schema Setup
+Edit `.env.local` with your own Supabase URL, public key, server-side service-role key, database URLs, and email settings. Do not commit real credentials.
+
+Generate the Prisma client and apply the current Prisma schema to your development database:
+
 ```bash
-# Generate Prisma Client
-npx prisma generate
-
-# Apply migrations
-npx prisma migrate dev
-
-# Seed base demonstration data (development only)
-npm run seed
+npm run prisma:generate
+npm run prisma:push
 ```
 
-### 4. Running Locally
+For development-only seed data:
+
+```bash
+npm run db:seed
+```
+
+Start the web application:
+
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) to access the application.
 
----
+Open [http://localhost:3000](http://localhost:3000).
 
-## 5. Production Deployment & Disaster Recovery
+## Useful scripts
 
-- **د سیسټم بشپړ لارښود په پښتو کې (Pashto System Guide)**: [`docs/SYSTEM_GUIDE_PASHTO.md`](./docs/SYSTEM_GUIDE_PASHTO.md)
-- **Production Deployment Runbook**: [`docs/production-deployment.md`](./docs/production-deployment.md)
-- **Disaster Recovery & Backup Runbook**: [`docs/backup-recovery.md`](./docs/backup-recovery.md)
-- **Project Progress & Phase Continuation**: [`docs/PROJECT_STATUS.md`](./docs/PROJECT_STATUS.md)
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start the Next.js development server |
+| `npm run build` | Build the web application |
+| `npm run start` | Start the production web server |
+| `npm run typecheck` | Run TypeScript without emitting files |
+| `npm run prisma:generate` | Generate Prisma Client |
+| `npm run prisma:push` | Push the Prisma schema to the configured database |
+| `npm run prisma:validate` | Validate the Prisma schema |
+| `npm run db:seed` | Run the offline seed script |
+| `npm run electron:dev` | Start the web app with the Electron shell |
+| `npm run electron:build` | Build the Windows desktop installer |
 
----
+Use `prisma:push` only where it is appropriate for your environment. Review the schema and back up important data before applying database changes.
 
-## 6. Verification & Quality Assurance
+## Documentation
+
+- [Production deployment runbook](./docs/production-deployment.md)
+- [Backup and recovery guide](./docs/backup-recovery.md)
+- [Project status](./docs/PROJECT_STATUS.md)
+- [Asan Roman Urdu user guide](./docs/ASAN_URDU_GUIDE.md)
+- [Easy English user guide](./docs/EASY_ENGLISH_GUIDE.md)
+
+The `docs/screenshots/` directory contains application screenshots used by the project guides.
+
+## Verification
+
+Run the checks available in the repository before opening a release or deploying:
 
 ```bash
-# Run strict TypeScript check
+npm run prisma:validate
 npm run typecheck
-
-# Run production build
 npm run build
 ```
-*(All 46 Next.js App Router routes compile and optimize cleanly with 0 errors).*
+
+## Security
+
+- Keep production credentials in your deployment provider's secret manager or a local ignored environment file.
+- Never expose the Supabase service-role key to client-side code.
+- Review Row Level Security policies and database access before production deployment.
+- Back up the database before schema changes or upgrades.
+
+## License
+
+See the repository's [LICENSE](./LICENSE) file.
