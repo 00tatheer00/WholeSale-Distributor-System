@@ -130,3 +130,11 @@ npm run build
 ## License
 
 See the repository's [LICENSE](./LICENSE) file.
+
+---
+
+## Repository standards
+
+- [Contribution guidelines](./CONTRIBUTING.md)
+- [Security policy](./SECURITY.md)
+- [Pull request template](./.github/PULL_REQUEST_TEMPLATE.md)
