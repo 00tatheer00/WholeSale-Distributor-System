@@ -84,6 +84,22 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Use `prisma:push` only where it is appropriate for your environment. Review the schema and back up important data before applying database changes.
 
+## Product screenshots
+
+The following screenshots show key workflows from the application:
+
+| Dashboard | Sales |
+|---|---|
+| ![PharmaDist dashboard](./docs/screenshots/01_dashboard.png) | ![Create a sale](./docs/screenshots/02_new_sale.png) |
+
+| Purchasing | Inventory |
+|---|---|
+| ![Create a purchase](./docs/screenshots/03_new_purchase.png) | ![Inventory](./docs/screenshots/04_inventory.png) |
+
+| Expenses | Settings |
+|---|---|
+| ![Expenses](./docs/screenshots/05_expenses.png) | ![Settings](./docs/screenshots/06_settings.png) |
+
 ## Documentation
 
 - [Production deployment runbook](./docs/production-deployment.md)
